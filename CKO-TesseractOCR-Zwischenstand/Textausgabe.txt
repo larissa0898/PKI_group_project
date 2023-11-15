@@ -1,0 +1,95 @@
+
+
+
+
+Preisliste Bundesanzeiger für entgeltliche Publikationen 
+
+
+
+
+
+
+WICHTIG! 
+
+Zum Bundesanzeiger sind mit Inkrafttreten des DiRUG (Gesetz zur Umsetzung der 
+igitalisierungsrichtlinie) zum 01.08.2022 nur noch Rechnungslegungsunterlagen und 
+Unternehmensberichte für Geschäftsjahre beginnend vor dem 01.01.2022 
+einzureichen. 
+
+
+
+
+
+
+Nur für diese Unterlagen ist der Bundesanzeiger das richtige Offenlegungsmedium. 
+
+
+Rechnungslegungsunterlagen und Unternehmensberichte mit einem Geschäftsjahres- 
+beginn nach dem 31.12.2021 sind an das Unternehmensregister zu übermitteln. 
+
+
+
+
+
+
+Grundsätzlich hängt das Publikationsentgelt vom Einreichungsformat ab und orientiert sich am Um- 
+fang der ordnungsgemäß offenzulegenden Unterlagen (Bezahlung nach sichtbaren Zeichen - ohne 
+Leerzeichen), sofern nicht nachfolgend Fixpreise, Besonderheiten oder Mindestpreise genannt sind. 
+
+
+1. Mindestpreise 
+- Generell, unabhängig von Einreichungsformat und Umfang 30,00 EUR 
+- Bei Jahresabschlüssen, für die kein Fixpreis festgesetzt ist 40,00 EUR 
+
+
+2. Zeichenpreis 
+a) Anlieferungsformat XML/XBRL 
+Bitte beachten Sie, dass diese Dokumentenformate nur auf Basis der Vorgaben des Bundesan- 
+zeiger Verlags angenommen werden und dass bei Einstellung der Daten in einen falschen Bereich 
+des Bundesanzeigers oder bei der Übermittlung von gescannten Dokumenten die Berechnung 
+nach 2d) dieser Preisliste erfolgt. 
+Beachten Sie hierzu die "Allgemeinen Geschäftsbedingungen für die entgeltliche Einreichung zur 
+Publikation im Bundesanzeiger” (im Folgenden AGB). 
+
+
+Das Entgelt berechnet sich nach nachfolgender Staffelung für die jeweiligen - weiteren - Zeichen 
+
+
+
+
+
+
+- bis 7.000 Zeichen 1,40 ct pro sichtbarem Zeichen 
+- ab 7.001 bis 15.000 Zeichen 1,00 ct pro sichtbarem Zeichen 
+- ab 15.001 bis 26.000 Zeichen 0,55 ct pro sichtbarem Zeichen 
+- ab 26.001 bis 60.000 Zeichen 0,28 ct pro sichtbarem Zeichen 
+- ab 60.001 Zeichen 0,15 ct pro sichtbarem Zeichen 
+
+
+b) Anlieferungsformat ESEF XHTML/iXBRL 
+Bitte beachten Sie, dass dieses Dokumentenformat nur von einem Inlandsemittenten 
+(5 2 Abs. 14 WpHG), der Wertpapiere (5 2 Abs. 1 WpHG) begibt und keine Kapitalgesellschaft 
+im Sinne des S 327a HGB ist, an den Bundesanzeiger übermittelt werden darf. Hierzu sind die 
+Vorgaben des Bundesanzeiger Verlags sowie die technischen Regulierungsstandards der Dele- 
+gierten Verordnung (EU) 2019/815 des einheitlichen elektronischen Formats für Jahresfinanzbe- 
+richte (ESEF) einzuhalten. Beachten Sie hierzu die AGB. 
+
+0,60 ct pro sichtbarem Zeichen 
+
+
+
+
+
+
+€) Anlieferungsformat Word/RTF/Excel/PDF 
+Bitte beachten Sie, dass Excel- und PDF-Einreichungen nur für bestimmte Veröffentlichungsarten 
+‚möglich sind und dass bei Einstellung der Daten in einen falschen Bereich des Bundesanzeigers 
+oder bei der Übermittlung von gescannten Dokumenten die Berechnung nach 2d) dieser Preisliste 
+erfolgt. Beachten Sie hierzu die AGB. 
+
+
+
+
+
+
+1,65 ct pro sichtbarem Zeichen 
