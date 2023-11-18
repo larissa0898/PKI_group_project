@@ -3,26 +3,26 @@ Dieses Repository beinhaltet den Programmcode des Gruppenprojekts "A1-1" in Prog
 
 ## Gruppeneinteilung
 - Frontend, GUI: Dietmar, Larissa
-  ## Zwischenstand
-  ## ToDo
+  ### Zwischenstand
+  ### ToDo
   
 - Datenhandler Import/Export: Anita
-  ## Zwischenstand
-  ## ToDo
+  ### Zwischenstand
+  ### ToDo
   
 - Basiseffekte: Phil
-  ## Zwischenstand
-  ## ToDo
+  ### Zwischenstand
+  ### ToDo
   
 - Spezialeffekte: Anas
-  ## Zwischenstand
-  ## ToDo
+  ### Zwischenstand
+  ### ToDo
   
 - Objekterkennung (YOLO) + Tesseract-OCR: Claus, Larissa
-  ## Zwischenstand
+  ### Zwischenstand
   14.11. - Upload der Basis Texterkennung
   18.11. - Einteilung für nächsten Step: Larissa: OCR  Claus: Objektklassifizierung
-  ## ToDo
+  ### ToDo
 
 #### Inhaltsverzeichnis
 - [Installation](#installation)
