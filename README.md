@@ -16,7 +16,15 @@ Dieses Repository beinhaltet den Programmcode des Gruppenprojekts "A1-1" in Prog
   
 - Spezialeffekte: Anas
   ### Zwischenstand
+  Entwicklung angefangen!
   ### ToDo
+  1- Markup
+  2- Weichzeichner für Hintergrund
+  3- Licht- und Schatteneffekte: Lichtquellen hinzufügen, um ein Bild realistischer aussehen zu lassen, oder Schatten hinzufügen, um Tiefe zu erzeugen
+  4- Texteffekte: Text zu einem Bild hinzufügen und verschiedene Effekte auf den Text anwenden, wie z.B. Schatten, Glühen, Kontur, und mehr
+  5- Farbeffekte: die Farbbalance eines Bildes ändern, es in Schwarzweiß umwandeln, Sepia-Töne hinzufügen, die Sättigung ändern, und so weiter
+  5- Filtereffekte: verschiedene Filter anwenden, um das Aussehen eines Bildes zu ändern.
+  
   
 - Objekterkennung (YOLO) + Tesseract-OCR: Claus, Larissa
   ### Zwischenstand
