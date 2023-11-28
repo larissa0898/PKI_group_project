@@ -1,0 +1,6 @@
+gTTS==2.3.0
+langdetect==1.0.9
+pytesseract==0.3.10
+reportlab==4.0.7
+pygame==2.1.2
+Pillow==9.3.0
