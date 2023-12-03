@@ -64,6 +64,42 @@ with dpg.group(pos=(900, 20), width=280):
     dpg.add_checkbox(label="Option 1", default_value=True)
     dpg.add_slider_float(label="Einstellung 1", default_value=0.5, max_value=1.0)
 
+# Bereich für Standardfunktionen rechts
+with dpg.group(pos=(900, 300), width=280):
+    dpg.add_text("Standardfunktionen")
+    dpg.add_button(label="Button 1", callback=print_me)
+    dpg.add_button(label="Button 2", callback=print_me)
+    dpg.add_button(label="Button 3", callback=print_me)
+    dpg.add_button(label="Button 4", callback=print_me)
+    dpg.add_button(label="Button 5", callback=print_me)
+
+# Bereich für Erweiterte Funktionen rechts
+with dpg.group(pos=(900, 500), width=280):
+    dpg.add_text("Erweiterte Funktionen")
+    dpg.add_button(label="Button 6", callback=print_me)
+    dpg.add_button(label="Button 7", callback=print_me)
+    dpg.add_button(label="Button 8", callback=print_me)
+    dpg.add_button(label="Button 9", callback=print_me)
+    dpg.add_button(label="Button 10", callback=print_me)
+
+# Bereich für Bilderkennung rechts
+with dpg.group(pos=(900, 700), width=280):
+    dpg.add_text("Bilderkennung")
+    dpg.add_button(label="Button 11", callback=print_me)
+    dpg.add_button(label="Button 12", callback=print_me)
+    dpg.add_button(label="Button 13", callback=print_me)
+    dpg.add_button(label="Button 14", callback=print_me)
+    dpg.add_button(label="Button 15", callback=print_me)
+
+# Bereich für OCR Erkennung rechts
+with dpg.group(pos=(900, 900), width=280):
+    dpg.add_text("OCR Erkennung")
+    dpg.add_button(label="Button 16", callback=print_me)
+    dpg.add_button(label="Button 17", callback=print_me)
+    dpg.add_button(label="Button 18", callback=print_me)
+    dpg.add_button(label="Button 19", callback=print_me)
+    dpg.add_button(label="Button 20", callback=print_me)
+
 # Dear PyGui initialisieren und starten
 dpg.setup_dearpygui()
 dpg.show_viewport()
