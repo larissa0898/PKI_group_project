@@ -66,23 +66,44 @@ def show_properties_callback(sender):
             f"Bildhöhe: {image_height}px"
         )
 
+
+def load_image_callback(sender):
+    with dpg.file_dialog(
+        directory_selector=False,
+        parent="BILDBEARBEITUNG UND BILDANALYSE",
+        filefilter="Bilder (*.jpg *.png *.bmp);;Alle Dateien (*.*)",
+        width=800,  # Beispiel für die Breite des Dateidialogfensters
+        height=600,  # Beispiel für die Höhe des Dateidialogfensters
+        pos=(100, 100)  # Beispiel für die Position des Dateidialogfensters
+    ) as file_dialog:
+        file_path = dpg.get_value(file_dialog)
+
+        if file_path:
+            image = cv2.imread(file_path)
+            if image is not None:
+                dpg.set_value("##ImageLabel", f"Aktuelles Bild: {file_path}")
+                dpg.show_item("##ImageViewer")
+                dpg.set_value("##ImageViewer", image.tolist())
+            else:
+                print("Fehler beim Laden des Bildes.")
+
+
 # Dear PyGui-Context erstellen
 dpg.create_context()
 
 # Hauptfenster (Viewport) erstellen und Parameter Titel, Größe und Hintergrund übernehmen
 dpg.create_viewport(title="BILDBEARBEITUNG UND BILDANALYSE", width=1200, height=1000, clear_color=(238, 238, 228,0))
-#dpg.add_button(label="Klick mich!", callback=lambda: print("Button wurde geklickt"))
 
 # Fenster in der Mitte des Bildschirms positionieren (ohne genaue Größenabfrage)
 dpg.set_viewport_pos(pos=(400, 10))  # Position relativ zum Hauptbildschirm
 
 # Hintergrundfarbe des Hauptfensters setzen (optional)
-dpg.set_viewport_clear_color(color=(234, 234, 213, 255))  # Parameter Hintergrund setzen
+dpg.set_viewport_clear_color(color=(234, 234, 213, 255))
 
 # Menüleiste erstellen
 with dpg.viewport_menu_bar():
     with dpg.menu(label="Datei"):
-        dpg.add_menu_item(label="Datei öffnen", callback=print_me)
+        dpg.add_menu_item(label="Datei öffnen", callback=load_image_callback)
         dpg.add_menu_item(label="Datei speichern", callback=save_file_callback)
         dpg.add_menu_item(label="Datei speichern unter", callback=save_file_as_callback)
         dpg.add_separator()
@@ -111,7 +132,12 @@ with dpg.viewport_menu_bar():
         dpg.add_menu_item(label="Entwicklerteam", callback=show_info_dialog)
         dpg.add_menu_item(label="Programmversion", callback=show_version_dialog)
 
-#ith (dpg.window(tag="Primary Window")):
+# Zusätzliches Image Viewer-Fenster
+with dpg.window(label="Bildanzeige", pos=(20, 50), width=750, height=800, show=True, tag="ImageViewer"):
+    dpg.add_text("Aktuelles Bild: ", tag="##ImageLabel")
+#    dpg.add_image(tag="##ImageViewer", width=400, height=400)
+
+#Fenster, um die Bedienung vorzunehmen
 with dpg.window(label="Bedienung", pos=(825,50), width=320, height=800):
     with dpg.group(pos=(20, 50), width=50, height=50):
         dpg.add_text('Standardfunktionen')
