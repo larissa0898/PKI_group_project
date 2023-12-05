@@ -49,6 +49,9 @@ Dieses Repository beinhaltet den Programmcode des Gruppenprojekts "A1-1" in Prog
 [Objektklassifikation]
 - YOLO - Fehlende yolov3.weights von: https://github.com/patrick013/Object-Detection---Yolov3/blob/master/model/yolov3.weights
 
+## Farbschema
+- https://imagecolorpicker.com/color-code/eeeee4  
+
 ## Literatur
 Youtube zu Tesseract OCR - https://www.youtube.com/watch?v=6DjFscX4I_c von Murtaza's Workshop
 
