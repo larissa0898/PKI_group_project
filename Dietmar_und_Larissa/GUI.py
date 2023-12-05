@@ -1,29 +1,34 @@
 import dearpygui.dearpygui as dpg
 import sys
 import cv2
-import tkinter
+import os
 import numpy as np
-from tkinter import filedialog
+
 def print_me(sender):
     print(f"Datei: {sender}")
+
 def close_program(sender):
     print("Programm wird geschlossen.")
     dpg.destroy_context()
     sys.exit()
 
+#Öffnet den Datei öffnen Dialog
+def open_file_callback(sender):
+    file_path = dpg.open_file_dialog()
+    if file_path:
+        print(f"Datei öffnen: {file_path}")
+        load_and_display_image(file_path)
+
 # Funktion zum Laden und Anzeigen des Bildes
 def load_and_display_image(file_path):
     image = cv2.imread(file_path)
     if image is not None:
-        # Hier kannst du die Größe des Anzeigebereichs anpassen
         dpg.draw_image("##Image", (0, 0), (image.shape[1], image.shape[0]), image)
         dpg.set_item_label("##ImageLabel", f"Aktuelles Bild: {file_path}")
 
-def open_file_callback(sender):
-    file_path = filedialog.askopenfilename()
-    if file_path:
-        print(f"Datei öffnen: {file_path}")
-        load_and_display_image(file_path)
+
+with dpg.handler_registry():
+    dpg.add_key_release_handler(callback=open_file_callback)
 
 def save_file_callback(sender):
     file_path = dpg.save_file_dialog()
