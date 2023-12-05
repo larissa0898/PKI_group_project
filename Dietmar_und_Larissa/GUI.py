@@ -1,4 +1,5 @@
 import dearpygui.dearpygui as dpg
+import dearpygui_extend as dpge
 import sys
 import cv2
 import os
@@ -11,24 +12,6 @@ def close_program(sender):
     print("Programm wird geschlossen.")
     dpg.destroy_context()
     sys.exit()
-
-#Öffnet den Datei öffnen Dialog
-def open_file_callback(sender):
-    file_path = dpg.open_file_dialog()
-    if file_path:
-        print(f"Datei öffnen: {file_path}")
-        load_and_display_image(file_path)
-
-# Funktion zum Laden und Anzeigen des Bildes
-def load_and_display_image(file_path):
-    image = cv2.imread(file_path)
-    if image is not None:
-        dpg.draw_image("##Image", (0, 0), (image.shape[1], image.shape[0]), image)
-        dpg.set_item_label("##ImageLabel", f"Aktuelles Bild: {file_path}")
-
-
-with dpg.handler_registry():
-    dpg.add_key_release_handler(callback=open_file_callback)
 
 def save_file_callback(sender):
     file_path = dpg.save_file_dialog()
@@ -80,7 +63,7 @@ dpg.set_viewport_clear_color(color=(234, 234, 213, 255))  # Parameter Hintergrun
 # Menüleiste erstellen
 with dpg.viewport_menu_bar():
     with dpg.menu(label="Datei"):
-        dpg.add_menu_item(label="Datei öffnen", callback=open_file_callback)
+        dpg.add_menu_item(label="Datei öffnen", callback=print_me)
         dpg.add_menu_item(label="Datei speichern", callback=save_file_callback)
         dpg.add_menu_item(label="Datei speichern unter", callback=save_file_as_callback)
         dpg.add_separator()
@@ -95,6 +78,13 @@ with dpg.viewport_menu_bar():
 
     with dpg.menu(label="Bearbeiten"):
         dpg.add_menu_item(label="Rückgängig", callback=print_me)
+
+    with dpg.menu(label="Dateibrowser"):
+        dpg.add_file_browser(
+            initial_path='~/Downloads/images',
+            collapse_sequences=True,
+            sequence_padding='#'
+        )
 
     with dpg.menu(label="Settings"):
         dpg.add_menu_item(label="Setting 1", callback=print_me)
