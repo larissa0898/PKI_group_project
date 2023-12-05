@@ -1,13 +1,23 @@
+########################### BIBLIOTHEKEN LADEN #########################
 import dearpygui.dearpygui as dpg
-import dearpygui_extend as dpge
 import sys
+import os
 import cv2
+
+########################################################################
+########################### FUNKTIONSAUFRUFE ###########################
+########################################################################
+
 def print_me(sender):
     print(f"Datei: {sender}")
 def close_program(sender):
     print("Programm wird geschlossen.")
     dpg.destroy_context()
     sys.exit()
+def callback(sender, app_data, user_data):
+    print("Sender: ", sender)
+    assert isinstance(app_data, object)
+    print("App Data: ", app_data)
 def show_info_dialog():
     with dpg.handler_registry():
         with dpg.window(label=" ",pos=(460,50), width=280, height=260):
@@ -65,40 +75,36 @@ def show_properties_callback(sender):
             f"Bildbreite: {image_width}px\n"
             f"Bildhöhe: {image_height}px"
         )
+def update_image_texture(image_path):
+    texture_id = dpg.get_item_info("file_dialog_id")['children'][0]
+    texture_data = cv2.imread(image_path)
+    dpg.set_value(texture_id, texture_data)
 
 
 def load_image_callback(sender):
-    with dpg.file_dialog(
-        directory_selector=False,
-        parent="BILDBEARBEITUNG UND BILDANALYSE",
-        filefilter="Bilder (*.jpg *.png *.bmp);;Alle Dateien (*.*)",
-        width=800,  # Beispiel für die Breite des Dateidialogfensters
-        height=600,  # Beispiel für die Höhe des Dateidialogfensters
-        pos=(100, 100)  # Beispiel für die Position des Dateidialogfensters
-    ) as file_dialog:
-        file_path = dpg.get_value(file_dialog)
+    file_dialog_id = dpg.add_file_dialog(directory_selector=True, show=False, callback=callback, id="file_dialog_id", parent="BILDBEARBEITUNG UND BILDANALYSE", width=800, height=600, pos=(100, 100))
+    dpg.add_file_extension("", color=(150, 250, 150, 255), parent=file_dialog_id)
+    dpg.add_file_extension("Source files (*.jpg *.png *.bmp){.jpg,.png,.bmp}", color=(0, 255, 255, 255), parent=file_dialog_id)
+    dpg.add_file_extension(".h", color=(255, 0, 255, 255), custom_text="[header]", parent=file_dialog_id)
+    dpg.add_file_extension(".py", color=(0, 255, 0, 255), custom_text="[Python]", parent=file_dialog_id)
 
-        if file_path:
-            image = cv2.imread(file_path)
-            if image is not None:
-                dpg.set_value("##ImageLabel", f"Aktuelles Bild: {file_path}")
-                dpg.show_item("##ImageViewer")
-                dpg.set_value("##ImageViewer", image.tolist())
-            else:
-                print("Fehler beim Laden des Bildes.")
+    # Nachdem das Bild geladen wurde, rufe die Funktion zum Aktualisieren der Textur auf
+    selected_file = dpg.get_value("file_dialog_id")
+    if selected_file:
+        update_image_texture(selected_file)
 
+#############################################################################
+########################### FUNKTIONSAUFRUFE ENDE ###########################
+#############################################################################
 
 # Dear PyGui-Context erstellen
 dpg.create_context()
 
 # Hauptfenster (Viewport) erstellen und Parameter Titel, Größe und Hintergrund übernehmen
-dpg.create_viewport(title="BILDBEARBEITUNG UND BILDANALYSE", width=1200, height=1000, clear_color=(238, 238, 228,0))
+dpg.create_viewport(title="BILDBEARBEITUNG UND BILDANALYSE", width=1200, height=950, clear_color=(234, 234, 213, 255))
 
 # Fenster in der Mitte des Bildschirms positionieren (ohne genaue Größenabfrage)
 dpg.set_viewport_pos(pos=(400, 10))  # Position relativ zum Hauptbildschirm
-
-# Hintergrundfarbe des Hauptfensters setzen (optional)
-dpg.set_viewport_clear_color(color=(234, 234, 213, 255))
 
 # Menüleiste erstellen
 with dpg.viewport_menu_bar():
@@ -133,12 +139,12 @@ with dpg.viewport_menu_bar():
         dpg.add_menu_item(label="Programmversion", callback=show_version_dialog)
 
 # Zusätzliches Image Viewer-Fenster
-with dpg.window(label="Bildanzeige", pos=(20, 50), width=750, height=800, show=True, tag="ImageViewer"):
-    dpg.add_text("Aktuelles Bild: ", tag="##ImageLabel")
-#    dpg.add_image(tag="##ImageViewer", width=400, height=400)
+with dpg.window(label="Bildanzeige", pos=(20, 50), width=750, height=800, no_title_bar=True):
+    dpg.add_image(parent="file_dialog_id", texture_tag=2, width=750, height=800)
 
 #Fenster, um die Bedienung vorzunehmen
-with dpg.window(label="Bedienung", pos=(825,50), width=320, height=800):
+with dpg.window(label="Bedienung", pos=(825,50), width=320, height=800, no_title_bar=True):
+    dpg.add_text("Bedienungselemente")
     with dpg.group(pos=(20, 50), width=50, height=50):
         dpg.add_text('Standardfunktionen')
         dpg.add_separator()  # Trennlinie einfügen
