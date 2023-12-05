@@ -3,11 +3,12 @@ Dieses Repository beinhaltet den Programmcode des Gruppenprojekts "A1-1" in Prog
 
 ## Gruppeneinteilung
 - Frontend, GUI: Dietmar, Larissa
-  ### Zwischenstand
+  ### GUI im Rohentwurf fertig
   ### ToDo
   
-- Datenhandler Import/Export: Anita
+- Datenhandler Import/Export: Dietmar
   ### Zwischenstand
+  Nach Weggang von Anita Thema konzipiert, Umsetzung folgt unmittelbar.
   ### ToDo
   
 - Basiseffekte: Phil
