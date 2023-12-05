@@ -1,12 +1,61 @@
 import dearpygui.dearpygui as dpg
 import sys
+import cv2
+import tkinter
+import numpy as np
+from tkinter import filedialog
 def print_me(sender):
     print(f"Datei: {sender}")
-
 def close_program(sender):
     print("Programm wird geschlossen.")
     dpg.destroy_context()
     sys.exit()
+
+# Funktion zum Laden und Anzeigen des Bildes
+def load_and_display_image(file_path):
+    image = cv2.imread(file_path)
+    if image is not None:
+        # Hier kannst du die Größe des Anzeigebereichs anpassen
+        dpg.draw_image("##Image", (0, 0), (image.shape[1], image.shape[0]), image)
+        dpg.set_item_label("##ImageLabel", f"Aktuelles Bild: {file_path}")
+
+def open_file_callback(sender):
+    file_path = filedialog.askopenfilename()
+    if file_path:
+        print(f"Datei öffnen: {file_path}")
+        load_and_display_image(file_path)
+
+def save_file_callback(sender):
+    file_path = dpg.save_file_dialog()
+    if file_path:
+        print(f"Datei speichern: {file_path}")
+        # Hier könntest du die Logik für das Speichern des aktuellen Bildes implementieren
+
+def save_file_as_callback(sender):
+    file_path = dpg.save_file_dialog()
+    if file_path:
+        print(f"Datei speichern unter: {file_path}")
+        # Hier könntest du die Logik für das Speichern des aktuellen Bildes an einem anderen Ort implementieren
+
+def print_callback(sender):
+    # Hier öffnen wir den Druckdialog
+    dpg.show_tool(dpg.mvTool_Print)
+
+def show_properties_callback(sender):
+    current_image_path = dpg.get_value("##ImageLabel").replace("Aktuelles Bild: ", "")
+    if current_image_path:
+        file_size = os.path.getsize(current_image_path)
+        file_size_kb = file_size / 1024.0  # Konvertiere Bytes in Kilobytes
+
+        image = cv2.imread(current_image_path)
+        image_height, image_width, _ = image.shape
+
+        properties_text = (
+            f"Dateipfad: {current_image_path}\n"
+            f"Dateigröße: {file_size_kb:.2f} KB\n"
+            f"Bildbreite: {image_width}px\n"
+            f"Bildhöhe: {image_height}px"
+        )
 
 # Dear PyGui-Context erstellen
 dpg.create_context()
@@ -26,9 +75,9 @@ dpg.set_viewport_clear_color(color=(234, 234, 213, 255))  # Parameter Hintergrun
 # Menüleiste erstellen
 with dpg.viewport_menu_bar():
     with dpg.menu(label="Datei"):
-        dpg.add_menu_item(label="Datei öffnen")
-        dpg.add_menu_item(label="Datei speichern", callback=print_me)
-        dpg.add_menu_item(label="Datei speichern unter", callback=print_me)
+        dpg.add_menu_item(label="Datei öffnen", callback=open_file_callback)
+        dpg.add_menu_item(label="Datei speichern", callback=save_file_callback)
+        dpg.add_menu_item(label="Datei speichern unter", callback=save_file_as_callback)
         dpg.add_separator()
         dpg.add_menu_item(label="Datei schließen", callback=print_me)
         dpg.add_menu_item(label="Zuletzt verwendet", callback=print_me)
@@ -57,7 +106,6 @@ with dpg.viewport_menu_bar():
         dpg.add_menu_item(label="Programmversion", callback=print_me)
 
 with (dpg.window(tag="Primary Window")):
-
     # Bereich für Standardfunktionen rechts
     with dpg.group(pos=(700, 50), width=50, height=50):
         dpg.add_text('Standardfunktionen')
@@ -69,7 +117,7 @@ with (dpg.window(tag="Primary Window")):
             dpg.add_button(label="Button", callback=print_me, width=50, height=50)
             dpg.add_button(label="Button", callback=print_me, width=50, height=50)
 
-    # Bereich für Erweiterte Funktionen rechts
+    # Bereich für erweiterte Funktionen rechts
     with dpg.group(pos=(700, 200), width=50, height=50):
         dpg.add_text("Erweiterte Funktionen")
         dpg.add_separator()  # Trennlinie einfügen
