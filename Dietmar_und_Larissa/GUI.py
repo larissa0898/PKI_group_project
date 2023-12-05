@@ -4,20 +4,44 @@ import sys
 import cv2
 import os
 import numpy as np
-
 def print_me(sender):
     print(f"Datei: {sender}")
-
 def close_program(sender):
     print("Programm wird geschlossen.")
     dpg.destroy_context()
     sys.exit()
-
+def show_info_dialog():
+    with dpg.handler_registry():
+        with dpg.window(label=" ",pos=(460,50), width=280, height=260):
+            dpg.add_text("BILDBEARBEITUNG UND BILDANALYSE")
+            dpg.add_separator()
+            dpg.add_spacing(count=4)  # Leerzeile
+            dpg.add_text("Entwicklerteam Gruppe a1-1:")
+            dpg.add_spacing(count=3)  # Leerzeile
+            dpg.add_text("Al-Atrash, Anas Abdelsaman Ramadan")
+            dpg.add_spacing(count=1)
+            dpg.add_text("Balczukat, Phil")
+            dpg.add_spacing(count=1)
+            dpg.add_text("Ferme, Larissa")
+            dpg.add_spacing(count=1)
+            dpg.add_text("Koch, Claus-Peter")
+            dpg.add_spacing(count=1)
+            dpg.add_text("Ysop, Dietmar")
+            dpg.add_spacing(count=3)
+def show_version_dialog():
+    with dpg.handler_registry():
+        with dpg.window(label=" ",pos=(460,50), width=280, height=160):
+            dpg.add_text("BILDBEARBEITUNG UND BILDANALYSE")
+            dpg.add_separator()
+            dpg.add_spacing(count=4)  # Leerzeile
+            dpg.add_text("Programmversion 3.0")
+            dpg.add_spacing(count=1)
+            dpg.add_text("(c) 2024")
+            dpg.add_spacing(count=3)
 def save_file_callback(sender):
     file_path = dpg.save_file_dialog()
     if file_path:
         print(f"Datei speichern: {file_path}")
-        # Hier könntest du die Logik für das Speichern des aktuellen Bildes implementieren
 
 def save_file_as_callback(sender):
     file_path = dpg.save_file_dialog()
@@ -25,9 +49,11 @@ def save_file_as_callback(sender):
         print(f"Datei speichern unter: {file_path}")
         # Hier könntest du die Logik für das Speichern des aktuellen Bildes an einem anderen Ort implementieren
 
+
 def print_callback(sender):
     # Hier öffnen wir den Druckdialog
     dpg.show_tool(dpg.mvTool_Print)
+
 
 def show_properties_callback(sender):
     current_image_path = dpg.get_value("##ImageLabel").replace("Aktuelles Bild: ", "")
@@ -45,6 +71,7 @@ def show_properties_callback(sender):
             f"Bildhöhe: {image_height}px"
         )
 
+
 # Dear PyGui-Context erstellen
 dpg.create_context()
 
@@ -52,7 +79,7 @@ dpg.create_context()
 background_color = (234 / 255.0, 234 / 255.0, 213 / 255.0, 1.0)
 
 # Hauptfenster (Viewport) erstellen und Parameter Titel, Größe und Hintergrund übernehmen
-dpg.create_viewport(title="Bildbearbeitung und Bildanalyse", width=1200, height=1000, clear_color=background_color)
+dpg.create_viewport(title="BILDBEARBEITUNG UND BILDANALYSE", width=1200, height=1000, clear_color=background_color)
 
 # Fenster in der Mitte des Bildschirms positionieren (ohne genaue Größenabfrage)
 dpg.set_viewport_pos(pos=(400, 10))  # Position relativ zum Hauptbildschirm
@@ -79,13 +106,6 @@ with dpg.viewport_menu_bar():
     with dpg.menu(label="Bearbeiten"):
         dpg.add_menu_item(label="Rückgängig", callback=print_me)
 
-    with dpg.menu(label="Dateibrowser"):
-        dpg.add_file_browser(
-            initial_path='~/Downloads/images',
-            collapse_sequences=True,
-            sequence_padding='#'
-        )
-
     with dpg.menu(label="Settings"):
         dpg.add_menu_item(label="Setting 1", callback=print_me)
         dpg.add_menu_item(label="Setting 1", callback=print_me)
@@ -98,11 +118,12 @@ with dpg.viewport_menu_bar():
 
     with dpg.menu(label="Info"):
         dpg.add_menu_item(label="Hilfe", callback=print_me)
-        dpg.add_menu_item(label="Programmversion", callback=print_me)
+        dpg.add_menu_item(label="Entwicklerteam", callback=show_info_dialog)
+        dpg.add_menu_item(label="Programmversion", callback=show_version_dialog)
 
 with (dpg.window(tag="Primary Window")):
     # Bereich für Standardfunktionen rechts
-    with dpg.group(pos=(700, 50), width=50, height=50):
+    with dpg.group(pos=(900, 50), width=50, height=50):
         dpg.add_text('Standardfunktionen')
         dpg.add_separator()  # Trennlinie einfügen
         with dpg.group(horizontal=True, horizontal_spacing=5):  # Buttons nebeneinander anordnen
@@ -113,7 +134,7 @@ with (dpg.window(tag="Primary Window")):
             dpg.add_button(label="Button", callback=print_me, width=50, height=50)
 
     # Bereich für erweiterte Funktionen rechts
-    with dpg.group(pos=(700, 200), width=50, height=50):
+    with dpg.group(pos=(900, 200), width=50, height=50):
         dpg.add_text("Erweiterte Funktionen")
         dpg.add_separator()  # Trennlinie einfügen
         with dpg.group(horizontal=True, horizontal_spacing=5):  # Buttons nebeneinander anordnen
@@ -124,7 +145,7 @@ with (dpg.window(tag="Primary Window")):
             dpg.add_button(label="Button", callback=print_me)
 
     # Bereich für Bilderkennung und -transformation
-    with dpg.group(pos=(700, 350), width=50, height=50):
+    with dpg.group(pos=(900, 350), width=50, height=50):
         dpg.add_text("Bilderkennung und -transformation")
         dpg.add_separator()  # Trennlinie einfügen
         with dpg.group(horizontal=True, horizontal_spacing=5):  # Buttons nebeneinander anordnen
@@ -135,7 +156,7 @@ with (dpg.window(tag="Primary Window")):
             dpg.add_button(label="Button", callback=print_me)
 
     # Bereich für Video Features
-    with dpg.group(pos=(700, 500), width=50, height=50):
+    with dpg.group(pos=(900, 500), width=50, height=50):
         dpg.add_text("Video Features")
         dpg.add_separator()  # Trennlinie einfügen
         with dpg.group(horizontal=True, horizontal_spacing=5):  # Buttons nebeneinander anordnen
@@ -146,7 +167,7 @@ with (dpg.window(tag="Primary Window")):
             dpg.add_button(label="Button", callback=print_me)
 
     # Bereich für OCR Erkennung
-    with dpg.group(pos=(700, 650), width=50, height=50):
+    with dpg.group(pos=(900, 650), width=50, height=50):
         dpg.add_text("OCR Erkennung")
         dpg.add_separator()  # Trennlinie einfügen
         with dpg.group(horizontal=True, horizontal_spacing=5):  # Buttons nebeneinander anordnen
