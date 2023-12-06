@@ -10,6 +10,12 @@ import cv2
 
 def print_me(sender):
     print(f"Datei: {sender}")
+
+def color_me(sender):
+    if sender == color_picker_id:  # Überprüfe, ob der Aufruf vom Color Picker kommt
+        current_image_path = dpg.get_value("##ImageLabel").replace("Aktuelles Bild: ", "")
+        selected_color = dpg.get_value(sender)
+        print(f"Ausgewählte Farbe: {selected_color} für das Bild: {current_image_path}")
 def close_program(sender):
     print("Programm wird geschlossen.")
     dpg.destroy_context()
@@ -75,23 +81,18 @@ def show_properties_callback(sender):
             f"Bildbreite: {image_width}px\n"
             f"Bildhöhe: {image_height}px"
         )
-def update_image_texture(image_path):
-    texture_id = dpg.get_item_info("file_dialog_id")['children'][0]
-    texture_data = cv2.imread(image_path)
-    dpg.set_value(texture_id, texture_data)
-
 
 def load_image_callback(sender):
-    file_dialog_id = dpg.add_file_dialog(directory_selector=True, show=False, callback=callback, id="file_dialog_id", parent="BILDBEARBEITUNG UND BILDANALYSE", width=800, height=600, pos=(100, 100))
-    dpg.add_file_extension("", color=(150, 250, 150, 255), parent=file_dialog_id)
-    dpg.add_file_extension("Source files (*.jpg *.png *.bmp){.jpg,.png,.bmp}", color=(0, 255, 255, 255), parent=file_dialog_id)
-    dpg.add_file_extension(".h", color=(255, 0, 255, 255), custom_text="[header]", parent=file_dialog_id)
-    dpg.add_file_extension(".py", color=(0, 255, 0, 255), custom_text="[Python]", parent=file_dialog_id)
+    dpg.add_file_dialog(directory_selector=True, show=False, callback=callback, id="file_dialog_id", width=800, height=600)
+    dpg.add_file_extension("", color=(150, 250, 150, 255), parent="file_dialog_id")
+    dpg.add_file_extension("Source files (*.jpg *.png *.bmp){.jpg,.png,.bmp}", color=(0, 255, 255, 255), parent="file_dialog_id")
+    dpg.add_file_extension(".h", color=(255, 0, 255, 255), custom_text="[header]", parent="file_dialog_id")
+    dpg.add_file_extension(".py", color=(0, 255, 0, 255), custom_text="[Python]", parent="file_dialog_id")
 
-    # Nachdem das Bild geladen wurde, rufe die Funktion zum Aktualisieren der Textur auf
-    selected_file = dpg.get_value("file_dialog_id")
-    if selected_file:
-        update_image_texture(selected_file)
+def update_image_texture(image_path):
+    texture_id = dpg.get_item_info(id="file_dialog_id")['children'][0]
+    texture_data = cv2.imread(image_path)
+    dpg.set_value(texture_id, texture_data)
 
 #############################################################################
 ########################### FUNKTIONSAUFRUFE ENDE ###########################
@@ -100,11 +101,8 @@ def load_image_callback(sender):
 # Dear PyGui-Context erstellen
 dpg.create_context()
 
-# Hauptfenster (Viewport) erstellen und Parameter Titel, Größe und Hintergrund übernehmen
-dpg.create_viewport(title="BILDBEARBEITUNG UND BILDANALYSE", width=1200, height=950, clear_color=(234, 234, 213, 255))
-
-# Fenster in der Mitte des Bildschirms positionieren (ohne genaue Größenabfrage)
-dpg.set_viewport_pos(pos=(400, 10))  # Position relativ zum Hauptbildschirm
+# Hauptfenster (Viewport) erstellen und Parameter Titel, Größe und Hintergrund festlegen
+dpg.create_viewport(title="BILDBEARBEITUNG UND BILDANALYSE", width=1200, height=950, x_pos=(400), y_pos=(10), clear_color=(234, 234, 213, 255))
 
 # Menüleiste erstellen
 with dpg.viewport_menu_bar():
@@ -131,7 +129,7 @@ with dpg.viewport_menu_bar():
         dpg.add_menu_item(label="OCR und Video", callback=print_me)
 
     with dpg.menu(label="Color Picker"):
-        dpg.add_color_picker(label="Color Me", callback=print_me)
+        dpg.add_color_picker(label="Color Me", callback=color_me)
 
     with dpg.menu(label="Info"):
         dpg.add_menu_item(label="Hilfe", callback=print_me)
