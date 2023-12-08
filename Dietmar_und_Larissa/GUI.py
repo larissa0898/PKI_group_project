@@ -1,20 +1,17 @@
 ########################### BIBLIOTHEKEN LADEN #########################
 import dearpygui.dearpygui as dpg
-import sys
 import os
+import sys
 import cv2
+from tkinter import filedialog
+
+###### Integration Funktionen Phil Balczukat ###########################
+import Phil.basic_features_lib
+########################################################################
 
 ########################################################################
 ########################### FUNKTIONSAUFRUFE ###########################
 ########################################################################
-
-## Funktionsaufrufe Phil ##
-
-
-
-
-
-
 
 def print_me(sender):
     print(f"Datei: {sender}")
@@ -30,7 +27,6 @@ def close_program(sender):
     sys.exit()
 def callback(sender, app_data, user_data):
     print("Sender: ", sender)
-    assert isinstance(app_data, object)
     print("App Data: ", app_data)
 def show_info_dialog():
     with dpg.handler_registry():
@@ -89,18 +85,16 @@ def show_properties_callback(sender):
             f"Bildbreite: {image_width}px\n"
             f"Bildhöhe: {image_height}px"
         )
-
-def load_image_callback(sender):
-    dpg.add_file_dialog(directory_selector=True, show=False, callback=callback, id="file_dialog_id", width=800, height=600)
-    dpg.add_file_extension("", color=(150, 250, 150, 255), parent="file_dialog_id")
-    dpg.add_file_extension("Source files (*.jpg *.png *.bmp){.jpg,.png,.bmp}", color=(0, 255, 255, 255), parent="file_dialog_id")
-    dpg.add_file_extension(".h", color=(255, 0, 255, 255), custom_text="[header]", parent="file_dialog_id")
-    dpg.add_file_extension(".py", color=(0, 255, 0, 255), custom_text="[Python]", parent="file_dialog_id")
+def show_file_dialog():
+    # Bild laden
+    f_types = [('JPEG Files', '*.jpg'),('PNG Files', '*.png'), ('BMP Files', '*.bmp')]
+    filename = filedialog.askopenfilename(filetypes=f_types)
+    update_image_texture(filename)
 
 def update_image_texture(image_path):
-    texture_id = dpg.get_item_info(id="file_dialog_id")['children'][0]
     texture_data = cv2.imread(image_path)
-    dpg.set_value(texture_id, texture_data)
+    cv2.imshow('Image', texture_data)
+    cv2.waitKey(0)
 
 #############################################################################
 ########################### FUNKTIONSAUFRUFE ENDE ###########################
@@ -110,12 +104,12 @@ def update_image_texture(image_path):
 dpg.create_context()
 
 # Hauptfenster (Viewport) erstellen und Parameter Titel, Größe und Hintergrund festlegen
-dpg.create_viewport(title="BILDBEARBEITUNG UND BILDANALYSE", width=1200, height=950, x_pos=(400), y_pos=(10), clear_color=(234, 234, 213, 255))
+dpg.create_viewport(title="BILDBEARBEITUNG UND BILDANALYSE", width=1400, height=950, x_pos=(400), y_pos=(10), clear_color=(234, 234, 213, 255))
 
 # Menüleiste erstellen
 with dpg.viewport_menu_bar():
     with dpg.menu(label="Datei"):
-        dpg.add_menu_item(label="Datei öffnen", callback=load_image_callback)
+        dpg.add_menu_item(label="Datei öffnen", callback=show_file_dialog)
         dpg.add_menu_item(label="Datei speichern", callback=save_file_callback)
         dpg.add_menu_item(label="Datei speichern unter", callback=save_file_as_callback)
         dpg.add_separator()
@@ -149,18 +143,18 @@ with dpg.window(label="Bildanzeige", pos=(20, 50), width=750, height=800, no_tit
     dpg.add_image(parent="file_dialog_id", texture_tag=2, width=750, height=800)
 
 #Fenster, um die Bedienung vorzunehmen
-with dpg.window(label="Bedienung", pos=(825,50), width=320, height=800, no_title_bar=True):
+with dpg.window(label="Bedienung", pos=(780,50), width=550, height=800, no_title_bar=True):
     dpg.add_text("Bedienungselemente")
-    with dpg.group(pos=(20, 50), width=50, height=50):
+    with dpg.group(pos=(20, 50), width=120, height=50):
         dpg.add_text('Standardfunktionen')
         dpg.add_separator()  # Trennlinie einfügen
         with dpg.group(horizontal=True, horizontal_spacing=5):  # Buttons nebeneinander anordnen
-            dpg.add_button(label="Rotieren", callback=print_me, width=50, height=50)
-            dpg.add_button(label="Skalieren", callback=print_me, width=50, height=50)
-            dpg.add_button(label="Spiegeln horizontal", callback=print_me, width=50, height=50)
-            dpg.add_button(label="Spiegeln vertikal", callback=print_me, width=50, height=50)
-            dpg.add_button(label="Ausschneiden", callback=print_me, width=50, height=50)
-            dpg.add_button(label="Rahmen hinzufügen", callback=print_me, width=50, height=50)
+            #dpg.add_button(label="Rotieren", callback=Phil.basic_features_lib.rotate_img(), width=50, height=50)
+            dpg.add_button(label="Skalieren", callback=print_me)
+            dpg.add_button(label="Spiegeln horizontal", callback=print_me)
+            dpg.add_button(label="Spiegeln vertikal", callback=print_me)
+            dpg.add_button(label="Ausschneiden", callback=print_me)
+            dpg.add_button(label="Rahmen hinzufügen", callback=print_me)
 
     # Bereich für erweiterte Funktionen rechts
     with dpg.group(pos=(20, 200), width=50, height=50):
