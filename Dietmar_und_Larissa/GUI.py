@@ -8,6 +8,14 @@ import cv2
 ########################### FUNKTIONSAUFRUFE ###########################
 ########################################################################
 
+## Funktionsaufrufe Phil ##
+
+
+
+
+
+
+
 def print_me(sender):
     print(f"Datei: {sender}")
 
@@ -147,11 +155,12 @@ with dpg.window(label="Bedienung", pos=(825,50), width=320, height=800, no_title
         dpg.add_text('Standardfunktionen')
         dpg.add_separator()  # Trennlinie einfügen
         with dpg.group(horizontal=True, horizontal_spacing=5):  # Buttons nebeneinander anordnen
-            dpg.add_button(label="Button", callback=print_me, width=50, height=50)
-            dpg.add_button(label="Button", callback=print_me, width=50, height=50)
-            dpg.add_button(label="Button", callback=print_me, width=50, height=50)
-            dpg.add_button(label="Button", callback=print_me, width=50, height=50)
-            dpg.add_button(label="Button", callback=print_me, width=50, height=50)
+            dpg.add_button(label="Rotieren", callback=print_me, width=50, height=50)
+            dpg.add_button(label="Skalieren", callback=print_me, width=50, height=50)
+            dpg.add_button(label="Spiegeln horizontal", callback=print_me, width=50, height=50)
+            dpg.add_button(label="Spiegeln vertikal", callback=print_me, width=50, height=50)
+            dpg.add_button(label="Ausschneiden", callback=print_me, width=50, height=50)
+            dpg.add_button(label="Rahmen hinzufügen", callback=print_me, width=50, height=50)
 
     # Bereich für erweiterte Funktionen rechts
     with dpg.group(pos=(20, 200), width=50, height=50):
