@@ -15,6 +15,7 @@ label_Bildbreite = None
 label_Bildhöhe = None
 label_Dateipfad = None
 
+#Erzeugt eine Messagebox, um eine kurze Übersicht zu den Funktionen anzuzeigen
 def show_help_dialog():
     help_text = """
     Hier sind die Funktionen des Programms:
@@ -49,6 +50,27 @@ def show_help_dialog():
     """
     messagebox.showinfo("Hilfe", help_text)
 
+#Erzeugt eine Messagebox, um Auskunft über das Entwicklerteam zu geben
+def show_info_dialog():
+    message = "Entwicklerteam Gruppe a1-1:\n\n" + "\n".join([
+        "Al-Atrash, Anas Abdelsaman Ramadan",
+        "Balczukat, Phil",
+        "Ferme, Larissa",
+        "Koch, Claus-Peter",
+        "Ysop, Dietmar"
+    ])
+    messagebox.showinfo("BILDBEARBEITUNG UND BILDANALYSE", message)
+
+#Erzeugt eine Messagebox, um Auskunft über die Programmversion zu geben
+def show_version_dialog():
+    version_text = """
+    BILDBEARBEITUNG UND BILDANALYSE
+
+    Programmversion 3.0
+    (c) 2024
+    """
+    messagebox.showinfo("Version", version_text)
+
 def print_me():
     print(f"Datei: {file_path.get()}")
 
@@ -61,25 +83,6 @@ def center_window(window):
     x_position = (screen_width - window_width) // 2
     y_position = (screen_height - window_height) // 2
     window.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
-
-def show_info_dialog():
-    message = "Entwicklerteam Gruppe a1-1:\n\n" + "\n".join([
-        "Al-Atrash, Anas Abdelsaman Ramadan",
-        "Balczukat, Phil",
-        "Ferme, Larissa",
-        "Koch, Claus-Peter",
-        "Ysop, Dietmar"
-    ])
-    messagebox.showinfo("BILDBEARBEITUNG UND BILDANALYSE", message)
-
-def show_version_dialog():
-    version_text = """
-    BILDBEARBEITUNG UND BILDANALYSE
-
-    Programmversion 3.0
-    (c) 2024
-    """
-    messagebox.showinfo("Version", version_text)
 
 #Funktion, um den Dateidialog zu öffnen und ein Bild zu laden
 def show_file_dialog():
