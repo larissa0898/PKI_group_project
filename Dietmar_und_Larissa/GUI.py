@@ -6,6 +6,11 @@ import numpy as np
 import PIL.Image, PIL.ImageTk
 from PIL import Image, ImageTk
 from tkinter import messagebox
+from Claus_und_Larissa.Claus.Gesichtswiederkennung.Gesichtswiedererkennung import Gesichtswiedererkennung
+from Claus_und_Larissa.Claus.Gesichtswiederkennung.Gesichtswiedererkennung import Gesichtswiedererkennung_Trainieren
+from Claus_und_Larissa.Claus.Gesichtswiederkennung.Gesichtswiedererkennung import Lade_TrainiertesModell
+import json
+from pathlib import Path
 
 # Integration Funktionen Phil Balczukat
 #import Phil.basic_features_lib
@@ -71,6 +76,66 @@ def show_version_dialog():
     """
     messagebox.showinfo("Version", version_text)
 
+def resize_image(image, max_width, max_height):
+    '''Funktion skaliert das Bild auf eine max.Breite oder Höhe, ohne das Format zu ändern
+    1:1 aus ChatGPT 3.5'''
+    # Get the original image dimensions
+    height, width = image.shape[:2]
+
+    # Calculate the aspect ratio
+    aspect_ratio = width / height
+
+    # Calculate new dimensions while maintaining aspect ratio
+    new_width = min(width, max_width)
+    new_height = int(new_width / aspect_ratio)
+
+    # If the calculated height exceeds the maximum height, recalculate dimensions
+    if new_height > max_height:
+        new_height = max_height
+        new_width = int(new_height * aspect_ratio)
+
+    # Resize the image
+    resized_image = cv2.resize(image, (new_width, new_height))
+
+    return resized_image
+
+def FaceRecognitionTraining():
+    '''Funktion zur Wiedererkennung von Personen im Bild, basierend auf den gespeicherten Trainingsdaten, die ausgewählt werden können'''
+    try:
+        # Laden der trainierten Label Daten aus einer JSON Datei
+        file_path_training = filedialog.askdirectory(title="Speicherordner Trainingsdaten")
+        print("Ordner Trainingsdaten:", file_path_training)
+
+        # Dateipfad für die Speicherung des Modells wählen
+        file_path_save = filedialog.askdirectory(title="Speicherort für trainiertes Datenmodell")
+        print("Speicherordner:", file_path_save)
+
+        Gesichtswiedererkennung_Trainieren(file_path_training,file_path_save)
+
+        print("Training durchgeführt")
+
+    except Exception as err_face_recognition_training:
+        print("Error Face Recognition Training: ", err_face_recognition_training)
+
+def FaceRecognition():
+    '''Funktion zur Wiedererkennung von Personen im Bild, basierend auf den gespeicherten Trainingsdaten, die ausgewählt werden können'''
+    try:
+        # Laden der trainierten Label und Modell Daten aus einer JSON und XML Datei
+        file_path = filedialog.askdirectory(title="Pfad der vortrainierten Daten (Verzeichnis) wählen")
+        print("Selected Folder:", file_path)
+        trained_recognizer, label_map_load = Lade_TrainiertesModell(file_path)
+
+        # Test mit bekannten Bildern auf Basis der bekannten Gesichtsdatenbank
+        # ToDo: Bis hier noch statisch.. noch anzupassen
+        test_image_path = filedialog.askopenfilename(title="Bild mit Gesichtern auswählen")
+        #file_path+r"/search/ElonMusk_Gruppe.jpg"
+        img = Gesichtswiedererkennung(trained_recognizer, test_image_path, label_map_load)
+        show_image_live(img)
+
+    except Exception as err_face_recognition:
+        print("Error Face Recognition: ", err_face_recognition)
+
+
 def print_me():
     print(f"Datei: {file_path.get()}")
 
@@ -89,6 +154,25 @@ def show_file_dialog():
     file_types = [('JPEG Files', '*.jpg'), ('PNG Files', '*.png'), ('BMP Files', '*.bmp')]
     filename = filedialog.askopenfilename(filetypes=file_types)
     show_image(filename)
+
+#Funktion zum Anzeigen des live verarbeiten Bildes, ohne speichern
+def show_image_live(image):
+    #original_image = cv2.imread(image_path)
+    #resized_image = cv2.resize(image, (495, 600))
+    resized_image = resize_image(image, 595, 800)
+    # Konvertiere das Bild von BGR zu RGB (für die Anzeige in Tkinter)
+    rgb_image = cv2.cvtColor(resized_image, cv2.COLOR_BGR2RGB)
+
+    # Erstelle ein PhotoImage-Objekt aus dem Numpy-Array
+    tk_image = ImageTk.PhotoImage(Image.fromarray(rgb_image))
+
+    # Erstelle ein Canvas und zeige das Bild darin an
+    canvas = tk.Canvas(root, width=tk_image.width(), height=tk_image.height())
+    canvas.place(x=35, y=65)
+    canvas.create_image(0, 0, anchor=tk.NW, image=tk_image)
+
+    # Halte das Tkinter-Fenster offen
+    root.mainloop()
 
 #Funktion um das ausgewählte Bild zu laden und die Dateieigenschaften zuzuweisen
 def show_image(image_path):
@@ -249,8 +333,8 @@ tk.Label(bilderkennung_frame, text="Bilderkennung und -transformation", bg="#eee
 # Bereitstellung der Buttons (Erweitert) und nebeneinander anordnen
 buttons_frame = tk.Frame(bilderkennung_frame)
 buttons_frame.pack()
-tk.Button(buttons_frame, text="Funktion 1", command=print_me, width=10, height=3, bg="#e4e4ee").pack(side="left", padx=5)
-tk.Button(buttons_frame, text="Funktion 2", command=print_me, width=10, height=3, bg="#e4e4ee").pack(side="left", padx=5)
+tk.Button(buttons_frame, text="Gesichts-\nwiedererk.", command=FaceRecognition, width=10, height=3, bg="#e4e4ee").pack(side="left", padx=5)
+tk.Button(buttons_frame, text="Gesichts-\nwiederk.\nTraining", command=FaceRecognitionTraining, width=10, height=3, bg="#e4e4ee").pack(side="left", padx=5)
 tk.Button(buttons_frame, text="Funktion 3", command=print_me, width=10, height=3, bg="#e4e4ee").pack(side="left", padx=5)
 tk.Button(buttons_frame, text="Funktion 4", command=print_me, width=10, height=3, bg="#e4e4ee").pack(side="left", padx=5)
 tk.Button(buttons_frame, text="Funktion 5", command=print_me, width=10, height=3, bg="#e4e4ee").pack(side="left", padx=5)
