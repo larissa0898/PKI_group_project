@@ -126,7 +126,7 @@ def FaceRecognition():
         trained_recognizer, label_map_load = Lade_TrainiertesModell(file_path)
 
         # Test mit bekannten Bildern auf Basis der bekannten Gesichtsdatenbank
-         test_image_path = filedialog.askopenfilename(title="Bild mit Gesichtern auswählen")
+        test_image_path = filedialog.askopenfilename(title="Bild mit Gesichtern auswählen")
         #file_path+r"/search/ElonMusk_Gruppe.jpg"
         img = Gesichtswiedererkennung(trained_recognizer, test_image_path, label_map_load)
         show_image_live(img)
