@@ -1,13 +1,15 @@
-
 from langdetect import detect
 from pytesseract import Output
 from reportlab.lib.pagesizes import letter
-import reportlab.pdfgen.canvas as pdf_canvas
 import pytesseract
 import cv2
 from gtts import gTTS
 import pygame
 import os
+from PIL import Image, ImageDraw, ImageFont
+import numpy as np
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 
 def get_img(img_path):
@@ -15,10 +17,23 @@ def get_img(img_path):
     return image
 
 
-def transform_image(image): # Text und Metadaten des Bildes werden für die OCR Boxes extracted
-    custom_config = r'--oem 3 --psm 6 -l deu'  # Deutsche Sprache (deu) und zusätzliche Konfigurationen
-    text = pytesseract.image_to_string(image, config=custom_config)
-    results = pytesseract.image_to_data(image, output_type=Output.DICT)
+def transform_image(image):
+    text = pytesseract.image_to_string(image)
+    language= detect(text)
+    if language == 'de':
+        language = 'deu'
+    elif language == 'en':
+        language = 'eng'
+    elif language == 'fr':
+        language = 'fra'
+    elif language == 'es':
+        language = 'spa'
+    elif language == 'it':
+        language = 'ita'
+    
+    text = pytesseract.image_to_string(image, lang=language)
+    results = pytesseract.image_to_data(image, lang=language, output_type=Output.DICT)
+
     return text, results
 
 
@@ -29,12 +44,26 @@ def get_OCRboxes(image, text, results):
         
         w = results['width'][i]
         h = results['height'][i]    
-        text = results['text'][i]
+        detected_text = results['text'][i]
         conf = int(results['conf'][i])    
         if conf > 58:
-            text = ''.join([c if ord(c) < 128 else "" for c in text]).strip()
-            cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv2.putText(image, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 200), 2)
+            cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 1)
+            image = add_text_with_pillow(image, detected_text, x, y)
+
+    return image
+
+
+def add_text_with_pillow(image, text, x, y):
+    img_pil = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    draw = ImageDraw.Draw(img_pil)
+    
+    font_path = "Arial.ttf"
+    font = ImageFont.truetype(font_path, size=10)
+
+    # Zeichne den Text mit der ausgewählten Schriftart
+    draw.text((x, y - 10), text, font=font, fill=(100, 0, 0))
+    
+    return cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
 
 
 def show_image_with_ocr(image, text):
@@ -72,22 +101,30 @@ def text_to_pdf(text, img_path):
     output_name = img_path.split('/')[-1].split('.')[0]
     pdf_path = f"{output_name}.pdf"
 
-    c = pdf_canvas.Canvas(pdf_path, pagesize=letter)
+    c = canvas.Canvas(pdf_path, pagesize=letter)
     textobject = c.beginText()
 
-    textobject.setTextOrigin(100, 700)  # Textposition festlegen
-    textobject.setFont("Helvetica", 12)  # Schriftart und -größe festlegen
+    x_coordinate = 50  # Start x-coordinate
+    y_coordinate = 750  # Start y-coordinate
 
-    # Breite und Höhe des Textfeldes festlegen
-    width = 400
-    height = 200
+    textobject.setTextOrigin(x_coordinate, y_coordinate)  # Text position
+    textobject.setFont("Helvetica", 12)  # Font and size
 
-    lines = text.split('\n')  # Teile den Text in Zeilen auf
+    lines = text.split('\n')
+    line_height = 14  # Height between lines
+
     for line in lines:
-        textobject.textLine(line[:width])  # Füge jede Zeile hinzu, beschränkt auf die angegebene Breite
+        textobject.textLine(line)  # Add each line without limiting width
+        y_coordinate -= line_height  # Adjust vertical position
 
-    textobject = c.drawText(textobject)  # Zeichne den Text
+        if y_coordinate <= 50:  # Check if approaching page bottom
+            c.drawText(textobject)  # Draw the text on the page
+            c.showPage()  # Add a new page
+            y_coordinate = 750  # Reset y-coordinate for new page
+            textobject = c.beginText()  # Begin new text object for the new page
+            textobject.setTextOrigin(x_coordinate, y_coordinate)  # Reset text position
 
+    c.drawText(textobject)  # Draw the text on the last page
     c.save()
 
 

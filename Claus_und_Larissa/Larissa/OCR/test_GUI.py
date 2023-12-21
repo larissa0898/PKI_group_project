@@ -21,14 +21,19 @@ def enable_functions():
     btn_language.config(state=tk.NORMAL)
     btn_extract.config(state=tk.NORMAL)
 
+""" def perform_ocr_with_translation():
+    perform_ocr(translate=True)
+
+def perform_ocr_without_translation():
+    perform_ocr(translate=False) """
+
 def perform_ocr():
     global extracted_text
     image = get_img(img_path)
     text, results = transform_image(image)
-    get_OCRboxes(image, text, results)
-    show_image_with_ocr(image, text)
-    extracted_text = text
-        
+    image_with_text = get_OCRboxes(image, text, results)
+    show_image_with_ocr(image_with_text, text)
+    extracted_text = text 
 
 def read_text():
     global extracted_text

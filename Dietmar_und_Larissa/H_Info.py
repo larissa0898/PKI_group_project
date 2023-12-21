@@ -38,7 +38,7 @@ def show_help_dialog():
 
     4. OCR Funktionen:
        - OCR Start: Startet die Texterkennung im Bild.
-       - Text 2 Speech: Konvertiert erkannten Text in Sprache.
+       - Text 2 Speech: Spielt Audio-Datei mit dem extrahierten Text ab.
        - Sprache anzeigen: Anzeiger der erkannten Sprache.
     """
     messagebox.showinfo("Hilfe", help_text)

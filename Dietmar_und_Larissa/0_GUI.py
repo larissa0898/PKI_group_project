@@ -26,6 +26,8 @@ from H_Info import show_help_dialog
 from H_Info import show_info_dialog
 from H_Info import show_version_dialog
 
+from D_OCR import *
+
 # Variablen für Bildeigenschaften global definieren
 label_Bildbreite = None
 label_Bildhöhe = None
@@ -56,6 +58,7 @@ def show_file_dialog():
 
 # Funktion um das ausgewählte Bild zu laden und die Dateieigenschaften zuzuweisen
 def show_image(image_path):
+    global original_image
     original_image = cv2.imread(image_path)
     resized_image = cv2.resize(original_image, (495, 600))
 
@@ -161,7 +164,7 @@ label_standard = customtkinter.CTkLabel(standard_frame, text="---------- STANDAR
 label_standard.place(x=15, y=15)
 
 # Bereitstellung der Buttons (Standard) inkl. Anordnung im standard_frame und Bild laden
-rotieren_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_rotieren.png"  # Lade das Bild
+rotieren_path = r".\Icons\icon_rotieren.png"  # Lade das Bild
 rotieren_original = Image.open(rotieren_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 rotieren_image = rotieren_original.resize(size=[30, 30])
@@ -169,7 +172,7 @@ tk_image = ImageTk.PhotoImage(rotieren_image)
 rotieren_button = customtkinter.CTkButton(standard_frame, text="Rotieren", image=tk_image)
 rotieren_button.place(x=15, y=50)
 
-skalieren_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_skalieren.png"  # Lade das Bild
+skalieren_path = r".\Icons\icon_skalieren.png"  # Lade das Bild
 skalieren_original = Image.open(skalieren_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 skalieren_image = skalieren_original.resize(size=[30, 30])
@@ -177,7 +180,7 @@ tk_image = ImageTk.PhotoImage(skalieren_image)
 skalieren_button = customtkinter.CTkButton(standard_frame, text="Skalieren", image=tk_image)
 skalieren_button.place(x=200, y=50)
 
-spiegelhor_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_spiegeln_horizontal.png"  # Lade das Bild
+spiegelhor_path = r".\Icons\icon_spiegeln_horizontal.png"  # Lade das Bild
 spiegelhor_original = Image.open(spiegelhor_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 spiegelhor_image = spiegelhor_original.resize(size=[30, 30])
@@ -185,7 +188,7 @@ tk_image = ImageTk.PhotoImage(spiegelhor_image)
 spiegelhor_button = customtkinter.CTkButton(standard_frame, text="Spiegeln\n horizontal", image=tk_image)
 spiegelhor_button.place(x=385, y=50)
 
-vertikal_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_spiegeln_vertikal.png"  # Lade das Bild
+vertikal_path = r".\Icons\icon_spiegeln_vertikal.png"  # Lade das Bild
 vertikal_original = Image.open(vertikal_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 vertikal_image = vertikal_original.resize(size=[30, 30])
@@ -193,7 +196,7 @@ tk_image = ImageTk.PhotoImage(vertikal_image)
 spiegelver_button = customtkinter.CTkButton(standard_frame, text="Spiegeln\n vertikal", image=tk_image)
 spiegelver_button.place(x=15, y=100)
 
-ausschneiden_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_ausschneiden.png"  # Lade das Bild
+ausschneiden_path = r".\Icons\icon_ausschneiden.png"  # Lade das Bild
 ausschneiden_original = Image.open(ausschneiden_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 ausschneiden_image = ausschneiden_original.resize(size=[30, 30])
@@ -201,7 +204,7 @@ tk_image = ImageTk.PhotoImage(ausschneiden_image)
 ausschneiden_button = customtkinter.CTkButton(standard_frame, text="Ausschneiden", image=tk_image)
 ausschneiden_button.place(x=200, y=100)
 
-rahmen_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_Rahmen_hinzufügen.png"  # Lade das Bild
+rahmen_path = r".\Icons\icon_Rahmen_hinzufügen.png"  # Lade das Bild
 rahmen_original = Image.open(rahmen_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 rahmen_image = rahmen_original.resize(size=[30, 30])
@@ -211,184 +214,220 @@ rahmen_button.place(x=385, y=100)
 
 # Label für die Erweiterten Funktionen erzeugen und positionieren
 label_erweitert = customtkinter.CTkLabel(standard_frame, text="---------- ERWEITERTE FUNKTIONEN ----------", fg_color="transparent")
-label_erweitert.place(x=15, y=180)
+label_erweitert.place(x=15, y=160)#180
 
-markup_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_markup.png"  # Lade das Bild
+markup_path = r".\Icons\icon_markup.png"  # Lade das Bild
 markup_original = Image.open(markup_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 markup_image = markup_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(markup_image)
 markup_button = customtkinter.CTkButton(standard_frame, text="Markup", image=tk_image)
-markup_button.place(x=15, y=215)
+markup_button.place(x=15, y=195)#215
 
-filter_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_filter.png"  # Lade das Bild
+filter_path = r".\Icons\icon_filter.png"  # Lade das Bild
 filter_original = Image.open(filter_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 filter_image = filter_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(filter_image)
 filter_button = customtkinter.CTkButton(standard_frame, text="Filter", image=tk_image)
-filter_button.place(x=200, y=215)
+filter_button.place(x=200, y=195)#215
 
-blackwhite_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_blackwhite.png"  # Lade das Bild
+blackwhite_path = r".\Icons\icon_blackwhite.png"  # Lade das Bild
 blackwhite_original = Image.open(blackwhite_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 blackwhite_image = blackwhite_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(blackwhite_image)
 blackwhite_button = customtkinter.CTkButton(standard_frame, text="Schwarz\n Weiß", image=tk_image)
-blackwhite_button.place(x=385, y=215)
+blackwhite_button.place(x=385, y=195)#215
 
-blur_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_blur.png"  # Lade das Bild
+blur_path = r".\Icons\icon_blur.png"  # Lade das Bild
 blur_original = Image.open(blur_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 blur_image = blur_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(blur_image)
 blur_button = customtkinter.CTkButton(standard_frame, text="Blur Effekt", image=tk_image)
-blur_button.place(x=15, y=265)
+blur_button.place(x=15, y=245)#265
 
-text_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_text.png"  # Lade das Bild
+text_path = r".\Icons\icon_text.png"  # Lade das Bild
 text_original = Image.open(text_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 text_image = text_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(text_image)
 text_button = customtkinter.CTkButton(standard_frame, text="Text", image=tk_image)
-text_button.place(x=200, y=265)
+text_button.place(x=200, y=245)#265
 
-kontrast_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_kontrast.png"  # Lade das Bild
+kontrast_path = r".\Icons\icon_kontrast.png"  # Lade das Bild
 kontrast_original = Image.open(kontrast_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 kontrast_image = kontrast_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(kontrast_image)
 kontrast_button = customtkinter.CTkButton(standard_frame, text="Kontrast", image=tk_image)
-kontrast_button.place(x=385, y=265)
+kontrast_button.place(x=385, y=245)#265
 
-helligkeit_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_Helligkeit.png"  # Lade das Bild
+helligkeit_path = r".\Icons\icon_Helligkeit.png"  # Lade das Bild
 helligkeit_original = Image.open(helligkeit_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 helligkeit_image = helligkeit_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(helligkeit_image)
 helligkeit_button = customtkinter.CTkButton(standard_frame, text="Kontrast", image=tk_image)
-helligkeit_button.place(x=15, y=315)
+helligkeit_button.place(x=15, y=295)#315
 
-dunkel_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_dunkel.png"  # Lade das Bild
+dunkel_path = r".\Icons\icon_dunkel.png"  # Lade das Bild
 dunkel_original = Image.open(dunkel_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 dunkel_image = dunkel_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(dunkel_image)
 dunkel_button = customtkinter.CTkButton(standard_frame, text="Dunkel", image=tk_image)
-dunkel_button.place(x=200, y=315)
+dunkel_button.place(x=200, y=295)#315
 
-pixel_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_pixel.png"  # Lade das Bild
+pixel_path = r".\Icons\icon_pixel.png"  # Lade das Bild
 pixel_original = Image.open(pixel_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 pixel_image = pixel_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(pixel_image)
 pixel_button = customtkinter.CTkButton(standard_frame, text="Pixel", image=tk_image)
-pixel_button.place(x=385, y=315)
+pixel_button.place(x=385, y=295) #315
 
-konvertieren_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_konvertieren.png"  # Lade das Bild
+konvertieren_path = r".\Icons\icon_konvertieren.png"  # Lade das Bild
 konvertieren_original = Image.open(konvertieren_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 konvertieren_image = konvertieren_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(konvertieren_image)
 konvertieren_button = customtkinter.CTkButton(standard_frame, text="Konvertieren", image=tk_image)
-konvertieren_button.place(x=15, y=365)
+konvertieren_button.place(x=15, y=345)#365
 
-licht_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_Licht.png"  # Lade das Bild
+licht_path = r".\Icons\icon_Licht.png"  # Lade das Bild
 licht_original = Image.open(licht_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 licht_image = licht_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(licht_image)
 licht_button = customtkinter.CTkButton(standard_frame, text="Licht", image=tk_image)
-licht_button.place(x=200, y=365)
+licht_button.place(x=200, y=345)#365
 
-schatten_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_schatten.png"  # Lade das Bild
+schatten_path = r".\Icons\icon_schatten.png"  # Lade das Bild
 schatten_original = Image.open(schatten_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 schatten_image = schatten_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(schatten_image)
 schatten_button = customtkinter.CTkButton(standard_frame, text="Schatten", image=tk_image)
-schatten_button.place(x=385, y=365)
+schatten_button.place(x=385, y=345) #365
 
-rgb_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_rgb.png"  # Lade das Bild
+rgb_path = r".\Icons\icon_rgb.png"  # Lade das Bild
 rgb_original = Image.open(rgb_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 rgb_image = rgb_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(rgb_image)
 rgb_button = customtkinter.CTkButton(standard_frame, text="Farbkanäle", image=tk_image)
-rgb_button.place(x=15, y=415)
+rgb_button.place(x=15, y=395)#415
 
-sepia_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_sepia.png"  # Lade das Bild
+sepia_path = r".\Icons\icon_sepia.png"  # Lade das Bild
 sepia_original = Image.open(sepia_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 sepia_image = sepia_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(sepia_image)
 sepia_button = customtkinter.CTkButton(standard_frame, text="Sepia", image=tk_image)
-sepia_button.place(x=200, y=415)
+sepia_button.place(x=200, y=395)#415
 
-sättigung_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_sättigung.png"  # Lade das Bild
+sättigung_path = r".\Icons\icon_sättigung.png"  # Lade das Bild
 sättigung_original = Image.open(sättigung_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 sättigung_image = sättigung_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(sättigung_image)
 sättigung_button = customtkinter.CTkButton(standard_frame, text="Sättigung", image=tk_image)
-sättigung_button.place(x=385, y=415)
+sättigung_button.place(x=385, y=395)#415
 
 # Label für die Bilderkennung erzeugen und positionieren
 label_erweitert = customtkinter.CTkLabel(standard_frame, text="---------- BILDERKENNUNG UND OBJEKTSUCHE ----------",
                                          fg_color="transparent")
-label_erweitert.place(x=15, y=495)
+label_erweitert.place(x=15, y=465) #495
 
-gesicht_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_gesicht.png"  # Lade das Bild
+gesicht_path = r".\Icons\icon_gesicht.png"  # Lade das Bild
 gesicht_original = Image.open(gesicht_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 gesicht_image = gesicht_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(gesicht_image)
 gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n erkennung", image=tk_image)
-gesicht_button.place(x=15, y=530)
+gesicht_button.place(x=15, y=500)#530
 
-objekte_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_objekterkennung.png"  # Lade das Bild
+objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
 objekte_original = Image.open(objekte_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 objekte_image = objekte_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(objekte_image)
 objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n erkennung", image=tk_image)
-objekte_button.place(x=200, y=530)
+objekte_button.place(x=200, y=500) #530
 
-selfie_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_selfie.png"  # Lade das Bild
+selfie_path = r".\Icons\icon_selfie.png"  # Lade das Bild
 selfie_original = Image.open(selfie_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 selfie_image = selfie_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(selfie_image)
 selfie_button = customtkinter.CTkButton(standard_frame, text="Selfie", image=tk_image)
-selfie_button.place(x=385, y=530)
+selfie_button.place(x=385, y=500) #530
 
 # Label für die Bilderkennung erzeugen und positionieren
 label_erweitert = customtkinter.CTkLabel(standard_frame, text="---------- OCR ERKENNUNG UND AUSGABE ----------",
                                          fg_color="transparent")
-label_erweitert.place(x=15, y=610)
+label_erweitert.place(x=15, y=570)   #610
 
-ocrstart_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_ocrstart.png"  # Lade das Bild
+ocr_started = False 
+
+# Funktion, um OCR zu starten und andere Buttons zu aktivieren
+def handle_ocr_start(original_image):
+    global ocr_started, text2speech_button, sprache_button
+    result = start_ocr(original_image)
+    if result == None:
+        ocr_started = True
+        text2speech_button.configure(state="normal")
+        sprache_button.configure(state="normal")
+
+# Funktion, um Text 2 Speech zu starten und andere Buttons zu aktivieren
+def on_text_to_speech_click():
+    text_to_speech()
+    pause_button.configure(state="normal")
+    resume_button.configure(state="normal")
+    stop_button.configure(state="normal")
+
+# Funktion, um Sprache anzeigen zu lassen
+def on_sprache_button_click():
+    detected_language = detect_language(use_conditions=True)
+    language_label.configure(text=f"Erkannte Sprache: {detected_language}")
+
+ocrstart_path = r".\Icons\icon_ocrstart.png"  # Lade das Bild
 ocrstart_original = Image.open(ocrstart_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 ocrstart_image = ocrstart_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(ocrstart_image)
-ocrstart_button = customtkinter.CTkButton(standard_frame, text="OCR Start", image=tk_image)
-ocrstart_button.place(x=15, y=645)
+ocrstart_button = customtkinter.CTkButton(standard_frame, text="OCR Start", image=tk_image, command= lambda: handle_ocr_start(original_image))
+ocrstart_button.place(x=15, y=605)  #645
 
-text2speech_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_text2speech.png"  # Lade das Bild
+text2speech_path = r".\Icons\icon_text2speech.png"  # Lade das Bild
 text2speech_original = Image.open(text2speech_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 text2speech_image = text2speech_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(text2speech_image)
-text2speech_button = customtkinter.CTkButton(standard_frame, text="Text 2 Speech", image=tk_image)
-text2speech_button.place(x=200, y=645)
+text2speech_button = customtkinter.CTkButton(standard_frame, text="Text 2 Speech", image=tk_image, command=on_text_to_speech_click, state="disabled")
+text2speech_button.place(x=200, y=605)  #645
 
-sprache_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_sprache.png"  # Lade das Bild
+pause_button = customtkinter.CTkButton(standard_frame, text="Pause", command=on_pause_click, width=20, height=25, state="disabled")
+pause_button.place(x=198, y=645)
+
+resume_button = customtkinter.CTkButton(standard_frame, text="Weiter", command=on_resume_click, width=20, height=25, state="disabled")
+resume_button.place(x=250, y=645)
+
+stop_button = customtkinter.CTkButton(standard_frame, text="Stop", command=on_stop_click, width=20, height=25, state="disabled")
+stop_button.place(x=302, y=645)
+
+
+sprache_path = r".\Icons\icon_sprache.png"  # Lade das Bild
 sprache_original = Image.open(sprache_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 sprache_image = sprache_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(sprache_image)
-sprache_button = customtkinter.CTkButton(standard_frame, text="Sprache\n anzeigen", image=tk_image)
-sprache_button.place(x=385, y=645)
+sprache_button = customtkinter.CTkButton(standard_frame, text="Sprache\n anzeigen", image=tk_image, command=on_sprache_button_click, state="disabled")
+sprache_button.place(x=385, y=605)   #645
+
+language_label = customtkinter.CTkLabel(standard_frame, text=f'', font=("Arial", 10))
+language_label.place(x=385, y=645)
 
 root.mainloop()

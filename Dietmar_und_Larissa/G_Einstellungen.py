@@ -111,7 +111,7 @@ def standard_einstellungen():
     image_frame.place(x=350, y=150)  # Neue Frame-Position
 
     # Hier soll das Bild eingefügt werden, passe den Dateipfad entsprechend an
-    image_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_Abbildung.png"
+    image_path = r".\Icons\icon_Abbildung.png"
 
     # Verwende PIL, um das Bild zu öffnen
     pil_image = PIL.Image.open(image_path)
@@ -201,7 +201,7 @@ def objekte_einstellungen():
     image_frame.place(x=270, y=50)  # Neue Frame-Position
 
     # Hier soll das Bild eingefügt werden, passe den Dateipfad entsprechend an
-    image_path = r"C:\Users\dietm\PycharmProjects\Icons\icon_yolomodelle.png"
+    image_path = r".\Icons\icon_yolomodelle.png"
 
     # Verwende PIL, um das Bild zu öffnen
     pil_image = PIL.Image.open(image_path)
