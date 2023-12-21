@@ -1,0 +1,1 @@
+# Hier OCR Erkennung und Ausgabe abbilden #
