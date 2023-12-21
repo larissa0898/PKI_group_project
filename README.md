@@ -1,4 +1,4 @@
-# PKI_group_project
+# PKI Gruppenprojekt - Gruppe A1_1
 Dieses Projekt ist ein Bildbearbeitungstool, das eine Vielzahl von Funktionen f체r Bildmanipulation, Effekte und Erkennung bietet.
 
 #### Inhaltsverzeichnis
@@ -10,7 +10,7 @@ Dieses Projekt ist ein Bildbearbeitungstool, das eine Vielzahl von Funktionen f�
 ## Installation
 Um das Bildbearbeitungstool lokal zu installieren und auszuf체hren, m체ssen die folgenden Schritte ausgef체hrt werden:
 1. **Tesseract OCR installieren:**
-   Zun채chst sollte Tesseract unter 'C:\Program Files\Tesseract-OCR\tesseract.exe' installiert sein. Wenn dies nicht der Fall ist, kann Tesseract [hier](https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.3.20231005.exe) heruntergeladen werden.
+   Zun채chst sollte Tesseract unter ```C:\Program Files\Tesseract-OCR\tesseract.exe``` installiert sein. Wenn dies nicht der Fall ist, kann Tesseract [hier](https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.3.20231005.exe) heruntergeladen werden.
 
 2. **Klonen des Repositories**
    ```bash
