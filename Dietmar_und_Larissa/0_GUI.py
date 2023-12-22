@@ -27,6 +27,7 @@ from H_Info import show_info_dialog
 from H_Info import show_version_dialog
 
 from D_OCR import *
+from C_Objekterkennung import *
 
 # Variablen für Bildeigenschaften global definieren
 label_Bildbreite = None
@@ -34,7 +35,8 @@ label_Bildhöhe = None
 label_Dateipfad = None
 
 def print_me():
-    print(f"Datei: {file_path.get()}")
+    #print(f"Datei: {filename.get()}")
+    print(f"Datei: ")
 
 #Funktion, um das Programm zu schließen
 def close_program():
@@ -55,6 +57,53 @@ def show_file_dialog():
     file_types = [('JPEG Files', '*.jpg'), ('PNG Files', '*.png'), ('BMP Files', '*.bmp')]
     filename = filedialog.askopenfilename(filetypes=file_types)
     show_image(filename)
+
+def resize_image(image, max_width, max_height):
+    '''Funktion skaliert das Bild auf eine max.Breite oder Höhe, ohne das Format zu ändern
+    1:1 aus ChatGPT 3.5'''
+    # Get the original image dimensions
+    height, width = image.shape[:2]
+
+    # Calculate the aspect ratio
+    aspect_ratio = width / height
+
+    # Calculate new dimensions while maintaining aspect ratio
+    new_width = min(width, max_width)
+    new_height = int(new_width / aspect_ratio)
+
+    # If the calculated height exceeds the maximum height, recalculate dimensions
+    if new_height > max_height:
+        new_height = max_height
+        new_width = int(new_height * aspect_ratio)
+
+    # Resize the image
+    resized_image = cv2.resize(image, (new_width, new_height))
+
+    return resized_image
+
+
+#Funktion zum Anzeigen des live verarbeiten Bildes, ohne speichern
+def show_image_live(image):
+    #original_image = cv2.imread(image_path)
+    #resized_image = cv2.resize(image, (495, 600))
+    global resized_image
+    global rgb_image #OpenCV konvertiertes Bild - Speichern (Originalgröße)
+    global tk_image #Ausgabebild
+    resized_image = resize_image(image, 495, 600)
+    # Konvertiere das Bild von BGR zu RGB (für die Anzeige in Tkinter)
+    #rgb_image = cv2.cvtColor(resized_image, cv2.COLOR_BGR2RGB)
+    rgb_image = resized_image
+    # Erstelle ein PhotoImage-Objekt aus dem Numpy-Array
+    tk_image = ImageTk.PhotoImage(Image.fromarray(rgb_image))
+
+    # Erstelle ein Canvas und zeige das Bild darin an
+    canvas = tk.Canvas(root, width=tk_image.width(), height=tk_image.height())
+    canvas.place(x=35, y=65)
+    canvas.create_image(0, 0, anchor=tk.NW, image=tk_image)
+
+    # Halte das Tkinter-Fenster offen
+    root.mainloop()
+
 
 # Funktion um das ausgewählte Bild zu laden und die Dateieigenschaften zuzuweisen
 def show_image(image_path):
@@ -354,8 +403,14 @@ objekte_original = Image.open(objekte_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 objekte_image = objekte_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(objekte_image)
-objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n erkennung", image=tk_image)
+objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n erkennung", image=tk_image, command= lambda:handle_yolo_1Bild(original_image))
 objekte_button.place(x=200, y=500) #530
+
+# Funktion, um YOLO Objekterkennung mit Segmentierung zu starten
+def handle_yolo_1Bild(original_image):
+    model = YOLO("yolov8m-seg.pt")
+    image = Yolo_run(original_image,model)
+    show_image_live(image)
 
 selfie_path = r".\Icons\icon_selfie.png"  # Lade das Bild
 selfie_original = Image.open(selfie_path)
