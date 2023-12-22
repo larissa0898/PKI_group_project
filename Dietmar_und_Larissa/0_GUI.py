@@ -28,14 +28,20 @@ from H_Info import show_version_dialog
 
 from D_OCR import *
 from C_Objekterkennung import *
+from C_Gesichtswiedererkennung import *
+from C_Selfie import *
+
 
 # Variablen für Bildeigenschaften global definieren
 label_Bildbreite = None
 label_Bildhöhe = None
 label_Dateipfad = None
 
+original_image = None
+original_image_path = None
+
 def print_me():
-    #print(f"Datei: {filename.get()}")
+    print(f"Datei: {original_image.get()}")
     print(f"Datei: ")
 
 #Funktion, um das Programm zu schließen
@@ -54,8 +60,10 @@ def center_window(window):
 
 # Funktion, um den Dateidialog zu öffnen und ein Bild zu laden
 def show_file_dialog():
+    global original_image_path
     file_types = [('JPEG Files', '*.jpg'), ('PNG Files', '*.png'), ('BMP Files', '*.bmp')]
     filename = filedialog.askopenfilename(filetypes=file_types)
+    original_image_path = filename
     show_image(filename)
 
 def resize_image(image, max_width, max_height):
@@ -76,20 +84,20 @@ def resize_image(image, max_width, max_height):
         new_height = max_height
         new_width = int(new_height * aspect_ratio)
 
-    # Resize the image
+    # Größenanpassung des Bildes
     resized_image = cv2.resize(image, (new_width, new_height))
 
     return resized_image
 
 
 #Funktion zum Anzeigen des live verarbeiten Bildes, ohne speichern
-def show_image_live(image):
+def show_image_live(image, width=495, height=600):
     #original_image = cv2.imread(image_path)
     #resized_image = cv2.resize(image, (495, 600))
     global resized_image
     global rgb_image #OpenCV konvertiertes Bild - Speichern (Originalgröße)
     global tk_image #Ausgabebild
-    resized_image = resize_image(image, 495, 600)
+    resized_image = resize_image(image, width, height)
     # Konvertiere das Bild von BGR zu RGB (für die Anzeige in Tkinter)
     #rgb_image = cv2.cvtColor(resized_image, cv2.COLOR_BGR2RGB)
     rgb_image = resized_image
@@ -137,6 +145,46 @@ def show_image(image_path):
 
     # Halte das Tkinter-Fenster offen
     root.mainloop()
+
+
+    #########################################################################
+    #Hilfsfunktionen für die Multi-Bilder Suche nach bestimmten Objekten
+
+    #Funktion zum Öffnen eines Auswahldialogs
+def select_object():
+    # Create a new tkinter window
+    select_window = tk.Toplevel()
+    select_window.title("Objekt auswählen")
+
+    # Create a label
+    label = tk.Label(select_window, text="Suche Objekt:")
+    label.pack(padx=10, pady=10)
+
+    # Create a combobox (dropdown) widget
+    selected_object = tk.StringVar()
+    object_list = get_Suchoptionen()  # Lade die Liste verfügbarer Optionen
+    combobox = ttk.Combobox(select_window, textvariable=selected_object, values=object_list)
+    combobox.pack(padx=10, pady=10)
+
+    result = None  # Variable für die Auswahlübernahme
+
+    # Funktion für den OK Button
+    def ok_button_click():
+        nonlocal result
+        result = selected_object.get()
+        print("Gewählt: " + result)
+        select_window.destroy()  # Schließe das Auswahlfenster
+
+    # "OK" Button
+    ok_button = tk.Button(select_window, text="OK", command=ok_button_click)
+    ok_button.pack(padx=10, pady=10)
+
+    # Warte bis Fenster geschlossen wurde und gib die gewählte Auswahl zurück
+    select_window.wait_window()
+    return result
+    #########################################################################
+
+
 
 # CustomTkinter root window erzeugen und Einstellungen vornehmen
 root = customtkinter.CTk()
@@ -388,15 +436,92 @@ sättigung_button.place(x=385, y=395)#415
 # Label für die Bilderkennung erzeugen und positionieren
 label_erweitert = customtkinter.CTkLabel(standard_frame, text="---------- BILDERKENNUNG UND OBJEKTSUCHE ----------",
                                          fg_color="transparent")
-label_erweitert.place(x=15, y=465) #495
+label_erweitert.place(x=15, y=445) #495
 
 gesicht_path = r".\Icons\icon_gesicht.png"  # Lade das Bild
 gesicht_original = Image.open(gesicht_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 gesicht_image = gesicht_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(gesicht_image)
-gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n erkennung", image=tk_image)
-gesicht_button.place(x=15, y=500)#530
+gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n erkennung", image=tk_image, command=lambda:FaceRecognition(original_image_path))
+gesicht_button.place(x=15, y=470)#530
+
+def FaceRecognitionTraining():
+    '''Funktion zur Wiedererkennung von Personen im Bild, basierend auf den gespeicherten Trainingsdaten, die ausgewählt werden können'''
+    try:
+        # Laden der trainierten Label Daten aus einer JSON Datei
+        file_path_training = filedialog.askdirectory(title="Verzeichnis der Trainingsdaten in Ordnern")
+        print("Ordner Trainingsdaten:", file_path_training)
+
+        # Dateipfad für die Speicherung des Modells wählen
+        file_path_save = filedialog.askdirectory(title="Speicherort für trainiertes Datenmodell")
+        print("Speicherordner:", file_path_save)
+
+        Gesichtswiedererkennung_Trainieren(file_path_training,file_path_save)
+
+        print("Training durchgeführt")
+
+    except Exception as err_face_recognition_training:
+        print("Error Face Recognition Training: ", err_face_recognition_training)
+
+#Funktion zum Wiedererkennen von bekannten Gesichtern im geladenen Bild
+def FaceRecognition(image):
+    '''Funktion zur Wiedererkennung von Personen im Bild, basierend auf den gespeicherten Trainingsdaten, die ausgewählt werden können'''
+    print("Dateipfad: "+image)
+    try:
+        # Laden der trainierten Label und Modell Daten aus einer JSON und XML Datei
+        file_path = filedialog.askdirectory(title="Pfad der vortrainierten Daten (Verzeichnis) wählen")
+        print("Selected Folder:", file_path)
+        trained_recognizer, label_map_load = Lade_TrainiertesModell(file_path)
+
+        # Test mit bekannten Bildern auf Basis der bekannten Gesichtsdatenbank
+        #test_image_path = filedialog.askopenfilename(title="Bild mit Gesichtern auswählen")
+
+        #Gesichtswiedererkennung mit Rückgabe der wesentlichen Eigenschaften
+        #img,img_path,name,confidence = Gesichtswiedererkennung(trained_recognizer, test_image_path, label_map_load)
+        print("START1")
+        img, img_path, name, confidence = Gesichtswiedererkennung(trained_recognizer, image, label_map_load)
+
+        #Ausgabe des Bildes mit markierten bekannten Personen
+        show_image_live(img)
+
+    except Exception as err_face_recognition:
+        print("Error Face Recognition: ", err_face_recognition)
+
+#Funktion zum durchsuchen von Ordnern mit Bildern nach bekannten Gesichtern
+def FaceRecognitionOrdner():
+    '''Funktion zur Wiedererkennung von Personen in Bildern eines Verzeichnisses,
+    basierend auf den gespeicherten Trainingsdaten, die ausgewählt werden können'''
+
+    # Create a new tkinter window
+    select_window = tk.Toplevel()
+    select_window.title("Ausgabe Bilder Gesichtswiedererkennung")
+    try:
+        # Laden der trainierten Label und Modell Daten aus einer JSON und XML Datei
+        suchordner = filedialog.askdirectory(title="Verzeichnis der Trainingsdaten:")
+        trained_recognizer, label_map_load = Lade_TrainiertesModell(suchordner)
+        #print("Geladenes Modell: "+trained_recognizer)
+        if trained_recognizer is not None:
+            print("OK 1")
+
+        # Test mit bekannten Bildern auf Basis der bekannten Gesichtsdatenbank
+        folder_path = filedialog.askdirectory(title="Zu durchsuchendes Verzeichnis mit Bildern")
+        print("Dateipfad: "+folder_path)
+        # Gesichtswiedererkennung mit Rückgabe der wesentlichen Eigenschaften
+        counter, gefundene_gesichter = Suche_Bildinhalt_Bekannte_Gesichter(trained_recognizer,label_map_load,folder_path)
+        # Ausgabe eines Bildes mit markierten bekannten Personen
+        display_images(gefundene_gesichter)
+
+    except Exception as err_face_recognition:
+        print("Error Face Recognition: ", err_face_recognition)
+
+gesicht_path = r".\Icons\icon_gesicht.png"  # Lade das Bild
+gesicht_original = Image.open(gesicht_path)
+# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+gesicht_image = gesicht_original.resize(size=[30, 30])
+tk_image = ImageTk.PhotoImage(gesicht_image)
+gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n erkennung- \n training", image=tk_image)
+gesicht_button.place(x=15, y=515)#530
 
 objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
 objekte_original = Image.open(objekte_path)
@@ -404,21 +529,75 @@ objekte_original = Image.open(objekte_path)
 objekte_image = objekte_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(objekte_image)
 objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n erkennung", image=tk_image, command= lambda:handle_yolo_1Bild(original_image))
-objekte_button.place(x=200, y=500) #530
+objekte_button.place(x=200, y=470) #530
+
+def display_images(image_data):
+    root2 = tk.Toplevel()
+    root2.title("Image Preview")
+    root2.geometry('600x600')
+    image_cache = []
+    for i,(image_path, confidence) in image_data.items():
+        image_path = image_path.replace('\\', '/')
+        print(f"SubFunc: Eintrag Nr.: {i}: Bild: = {image_path}, Übereinstimmung: = {confidence}")
+        img = Image.open(image_path)
+        img.thumbnail((100, 100))  # Resize the image to a small preview size
+        img = ImageTk.PhotoImage(img)
+
+        # Append the PhotoImage object to the cache list
+        image_cache.append(img)
+
+        label = tk.Label(root2, image=img)
+        label.image = img
+        label.grid(row=i, column=0, padx=10, pady=10)
+
+        confidence_label = tk.Label(root2, text=f"Übereinstimmung: {confidence:.2f}\nPfad: {image_path}")
+        confidence_label.grid(row=i, column=1, padx=10, pady=10)
+
+    root2.mainloop()
+def Suche_Bilder_mit_Objekten():
+    model = YOLO("yolov8m-seg.pt")  # ggf. bereits bei Programmstart initialisieren, da woanders auch verwendet
+    suchordner = filedialog.askdirectory(title="Suchverzeichnis der Bilder auswählen:")
+    selected_value = select_object()
+    if selected_value:
+        print(f"Ausgewähltes Objekt: {selected_value}")
+    ergenis = Suche_Bilinhalt(model,selected_value,suchordner)
+    display_images(ergenis)
+
+objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
+objekte_original = Image.open(objekte_path)
+# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+objekte_image = objekte_original.resize(size=[30, 30])
+tk_image = ImageTk.PhotoImage(objekte_image)
+objekte_button = customtkinter.CTkButton(standard_frame, text="Bilder\n Objekt-\n suche", image=tk_image, command= lambda:Suche_Bilder_mit_Objekten())
+objekte_button.place(x=200, y=515) #530
 
 # Funktion, um YOLO Objekterkennung mit Segmentierung zu starten
 def handle_yolo_1Bild(original_image):
+    #Lade die Default Yolo Segmentierung
     model = YOLO("yolov8m-seg.pt")
+    #Führe die Erkennung und Segmentierung aus
     image = Yolo_run(original_image,model)
+    #Zeige das Bild im Vorschaufenster
     show_image_live(image)
+
+#Funktion zum Abrufen der Webcam mit/ohne Hintergrund
+def Hintergrund_Ausblendung_Fkt():
+    global original_image_path
+    image = None
+    if original_image_path is not None:
+        image = Hintergrund_Ausblendung(0,original_image_path)
+    else:
+        image = Hintergrund_Ausblendung()
+    show_image_live(image)
+
 
 selfie_path = r".\Icons\icon_selfie.png"  # Lade das Bild
 selfie_original = Image.open(selfie_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 selfie_image = selfie_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(selfie_image)
-selfie_button = customtkinter.CTkButton(standard_frame, text="Selfie", image=tk_image)
-selfie_button.place(x=385, y=500) #530
+selfie_button = customtkinter.CTkButton(standard_frame, text="Selfie", image=tk_image, command=lambda: Hintergrund_Ausblendung_Fkt())
+selfie_button.place(x=385, y=470) #530
 
 # Label für die Bilderkennung erzeugen und positionieren
 label_erweitert = customtkinter.CTkLabel(standard_frame, text="---------- OCR ERKENNUNG UND AUSGABE ----------",

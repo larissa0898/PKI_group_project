@@ -214,8 +214,11 @@ def Yolo_run(img, model, background=None, segment_out_path=None):
                 plot_one_box([xmin, ymin, xmax, ymax], img, colors[int(box.cls)],
                              f'{Klassen_Namen[int(box.cls)]} {float(box.conf):.3}')
 
+                out_img = cv2.cvtColor(out_img, cv2.COLOR_BGR2RGB)
+
             else:
-                out_img = img
+                out_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
     #Wandlung der Klassen + Anzahl in Text
     text_labels =""
     for word, count in erkannte_Objekte.items():
