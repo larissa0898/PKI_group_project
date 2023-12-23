@@ -6,7 +6,7 @@ from tkinter import StringVar, ttk
 from CTkColorPicker import *
 
 #Funktion für die Settings der Standardeinstellungen#
-def standard_einstellungen():
+def standard_einstellungen(root):
     # CustomTkinter root window erzeugen und Einstellungen vornehmen
     root = customtkinter.CTk()
     root.title("STANDARDEINSTELLUNGEN")

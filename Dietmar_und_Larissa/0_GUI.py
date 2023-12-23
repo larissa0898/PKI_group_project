@@ -11,9 +11,10 @@ from tkinter import messagebox
 from tkinter import StringVar, ttk
 from CTkColorPicker import *
 
+# Import Standardfunktionen-Modul
+import A_Standardfunktionen
+
 # Import Funktionen Menupunkt Bearbeiten
-from E_Allg_Funktionen import save_file_callback
-from E_Allg_Funktionen import save_file_as_callback
 from E_Allg_Funktionen import reset_canvas
 from E_Allg_Funktionen import print_to_pdf
 
@@ -37,8 +38,25 @@ label_Bildbreite = None
 label_Bildhöhe = None
 label_Dateipfad = None
 
-original_image = None
-original_image_path = None
+#Globale Variablen und Konstanten
+original_image = None # original image object opencv
+original_image_path = None #path of original image
+original_image_copy = None #copy of original image to enable a reset
+resized_image = None # image resized (just for GUI view)
+rgb_image = None #image in RGB converted
+tk_image = None # tkinter visual object
+file_types = [('JPEG Files', '*.jpg'), ('PNG Files', '*.png'), ('BMP Files', '*.bmp')]
+#filename = None
+
+#Variables for basic effects
+rotation_angle = 90
+scale_factor = 0.5
+cut_x_pos = 30
+cut_y_pos = 140
+cut_width = 150
+cut_height = 150
+frame_thickness = 20
+frame_color = (0, 200, 0)
 
 def print_me():
     print(f"Datei: {original_image.get()}")
@@ -61,10 +79,9 @@ def center_window(window):
 # Funktion, um den Dateidialog zu öffnen und ein Bild zu laden
 def show_file_dialog():
     global original_image_path
-    file_types = [('JPEG Files', '*.jpg'), ('PNG Files', '*.png'), ('BMP Files', '*.bmp')]
-    filename = filedialog.askopenfilename(filetypes=file_types)
-    original_image_path = filename
-    show_image(filename)
+    original_image_path = filedialog.askopenfilename(filetypes=file_types)
+    print("Datei:", original_image_path, "geladen.")
+    show_image(original_image_path)
 
 def resize_image(image, max_width, max_height):
     '''Funktion skaliert das Bild auf eine max.Breite oder Höhe, ohne das Format zu ändern
@@ -94,13 +111,14 @@ def resize_image(image, max_width, max_height):
 def show_image_live(image, width=495, height=600):
     #original_image = cv2.imread(image_path)
     #resized_image = cv2.resize(image, (495, 600))
+    global original_image
     global resized_image
     global rgb_image #OpenCV konvertiertes Bild - Speichern (Originalgröße)
     global tk_image #Ausgabebild
-    resized_image = resize_image(image, width, height)
-    # Konvertiere das Bild von BGR zu RGB (für die Anzeige in Tkinter)
-    #rgb_image = cv2.cvtColor(resized_image, cv2.COLOR_BGR2RGB)
-    rgb_image = resized_image
+
+    rgb_image = image
+    resized_image = resize_image(rgb_image, width, height)
+
     # Erstelle ein PhotoImage-Objekt aus dem Numpy-Array
     tk_image = ImageTk.PhotoImage(Image.fromarray(rgb_image))
 
@@ -116,11 +134,22 @@ def show_image_live(image, width=495, height=600):
 # Funktion um das ausgewählte Bild zu laden und die Dateieigenschaften zuzuweisen
 def show_image(image_path):
     global original_image
+    global original_image_copy
+    global resized_image
+    global rgb_image
+    global tk_image
+
+    # Lade bild und speichere es in objekt für weitere Nutzung
     original_image = cv2.imread(image_path)
-    resized_image = cv2.resize(original_image, (495, 600))
+
+    # Speichere Originalbild für Reset-Funktion
+    original_image_copy = original_image
 
     # Konvertiere das Bild von BGR zu RGB (für die Anzeige in Tkinter)
-    rgb_image = cv2.cvtColor(resized_image, cv2.COLOR_BGR2RGB)
+    rgb_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+
+    # Skalierung des Bildes für die Anzeige in GUI
+    resized_image = cv2.resize(rgb_image, (495, 600))
 
     # Erstelle ein PhotoImage-Objekt aus dem Numpy-Array
     tk_image = ImageTk.PhotoImage(Image.fromarray(rgb_image))
@@ -184,7 +213,84 @@ def select_object():
     return result
     #########################################################################
 
+######### Callback-Funktionen für Datei-Handling ###############
+#-----------------------------------------------------------------
 
+#Speichern
+def save_file_callback():
+    if original_image_path:
+        export_img = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
+        cv2.imwrite(original_image_path, export_img)
+        print(f"Datei gespeichert: {original_image_path}")
+
+#Funktion, um speichern unter aufzurufen
+def save_file_as_callback():
+    file_path = filedialog.asksaveasfilename(defaultextension=".*", filetypes=file_types)
+    if file_path:
+        export_img = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
+        cv2.imwrite(file_path, export_img)
+        print(f"Datei gespeichert unter: {file_path}")
+
+#-----------------------------------------------------------------
+######### Callback-Funktionen für A_Standardfunktionen ###############
+#-----------------------------------------------------------------
+# Callback-Funktion für Reset zum Ursprungsbild
+def reset2original_callback():
+    print("Reset aufgerufen.")
+    if original_image_copy is not None:
+        reset_img = cv2.cvtColor(original_image_copy, cv2.COLOR_BGR2RGB)
+        show_image_live(reset_img)
+
+# Callback-Funktion zum Bild spiegeln H
+def mirror_h_callback():
+    print("Funktion Spiegeln H aufgerufen.")
+    global rgb_image
+    if rgb_image is not None:
+        show_image_live(A_Standardfunktionen.mirror_img_h(rgb_image))
+
+# Callback-Funktion zum Bild spiegeln V
+def mirror_v_callback():
+    print("Funktion Spiegeln V aufgerufen.")
+    global rgb_image
+    if rgb_image is not None:
+        show_image_live(A_Standardfunktionen.mirror_img_v(rgb_image))
+
+# Callback-Funktion zum Bild rotieren
+def rotate_callback():
+    print("Funktion Rotieren aufgerufen.")
+    global rgb_image
+    if rgb_image is not None:
+        show_image_live(A_Standardfunktionen.rotate_img(rgb_image, rotation_angle))
+
+# Callback-Funktion zum Bild skalieren
+def scale_callback():
+    print("Funktion Skalieren aufgerufen.")
+    global rgb_image
+    if rgb_image is not None:
+        show_image_live(A_Standardfunktionen.scale_img(rgb_image, scale_factor))
+
+# Callback-Funktion zum Bild in Graustufen umwandeln
+def img2greyscale_callback():
+    print("Funktion Graustufen aufgerufen.")
+    global rgb_image
+    if rgb_image is not None:
+        show_image_live(A_Standardfunktionen.grayscale_img(rgb_image))
+
+# Callback-Funktion zum Bild Ausschneiden
+def crop_callback():
+    print("Funktion Ausschneiden aufgerufen.")
+    global rgb_image
+    if rgb_image is not None:
+        show_image_live(A_Standardfunktionen.crop_img(rgb_image, cut_x_pos, cut_y_pos, cut_width, cut_height))
+
+# Callback-Funktion zum Rahmen hinzufügen
+def addFrame_callback():
+    print("Funktion Rahmen Hinzufügen aufgerufen.")
+    global rgb_image
+    if rgb_image is not None:
+        show_image_live(A_Standardfunktionen.add_frame(rgb_image, frame_thickness, frame_color))
+
+#-----------------------------------------------------------------
 
 # CustomTkinter root window erzeugen und Einstellungen vornehmen
 root = customtkinter.CTk()
@@ -218,7 +324,7 @@ edit_menu = tk.Menu(menu_bar, tearoff=0)
 edit_menu.add_command(label="Default Werte", command=print_me)
 
 settings_menu = tk.Menu(menu_bar, tearoff=0)
-settings_menu.add_command(label="Standardeinstellungen", command=standard_einstellungen)
+settings_menu.add_command(label="Standardeinstellungen", command=lambda:standard_einstellungen(root))
 settings_menu.add_command(label="Erweiterte Einstellungen", command=print_me)
 settings_menu.add_command(label="Bilderkennung /\n Objektsuche", command=objekte_einstellungen)
 settings_menu.add_command(label="OCR und Video", command=print_me)
@@ -236,8 +342,12 @@ menu_bar.add_cascade(label="Info", menu=info_menu)
 root.config(menu=menu_bar)
 
 # Button zum Zurücksetzen des Canvas hinzufügen
-reset_button = customtkinter.CTkButton(root, width=30, text="Reset Bild", command=lambda: reset_canvas(canvas_list, anzeigen_Bildbreite, anzeigen_Bildhöhe, anzeigen_Dateipfad))
+reset_button = customtkinter.CTkButton(root, width=30, text="Ansicht leeren", command=lambda: reset_canvas(canvas_list, anzeigen_Bildbreite, anzeigen_Bildhöhe, anzeigen_Dateipfad))
 reset_button.place(x=30, y=30)
+
+# Button zum Zurücksetzen des Canvas hinzufügen
+reset_button = customtkinter.CTkButton(root, width=30, text="Reset zum Original", command=reset2original_callback)
+reset_button.place(x=130, y=30)
 
 # Liste für die Canvas-Objekte erstellen
 canvas_list = []
@@ -266,7 +376,7 @@ rotieren_original = Image.open(rotieren_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 rotieren_image = rotieren_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(rotieren_image)
-rotieren_button = customtkinter.CTkButton(standard_frame, text="Rotieren", image=tk_image)
+rotieren_button = customtkinter.CTkButton(standard_frame, text="Rotieren", image=tk_image, command=rotate_callback)
 rotieren_button.place(x=15, y=50)
 
 skalieren_path = r".\Icons\icon_skalieren.png"  # Lade das Bild
@@ -274,7 +384,7 @@ skalieren_original = Image.open(skalieren_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 skalieren_image = skalieren_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(skalieren_image)
-skalieren_button = customtkinter.CTkButton(standard_frame, text="Skalieren", image=tk_image)
+skalieren_button = customtkinter.CTkButton(standard_frame, text="Skalieren", image=tk_image, command=scale_callback)
 skalieren_button.place(x=200, y=50)
 
 spiegelhor_path = r".\Icons\icon_spiegeln_horizontal.png"  # Lade das Bild
@@ -282,7 +392,7 @@ spiegelhor_original = Image.open(spiegelhor_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 spiegelhor_image = spiegelhor_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(spiegelhor_image)
-spiegelhor_button = customtkinter.CTkButton(standard_frame, text="Spiegeln\n horizontal", image=tk_image)
+spiegelhor_button = customtkinter.CTkButton(standard_frame, text="Spiegeln\n horizontal", image=tk_image, command=mirror_h_callback)
 spiegelhor_button.place(x=385, y=50)
 
 vertikal_path = r".\Icons\icon_spiegeln_vertikal.png"  # Lade das Bild
@@ -290,7 +400,7 @@ vertikal_original = Image.open(vertikal_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 vertikal_image = vertikal_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(vertikal_image)
-spiegelver_button = customtkinter.CTkButton(standard_frame, text="Spiegeln\n vertikal", image=tk_image)
+spiegelver_button = customtkinter.CTkButton(standard_frame, text="Spiegeln\n vertikal", image=tk_image, command=mirror_v_callback)
 spiegelver_button.place(x=15, y=100)
 
 ausschneiden_path = r".\Icons\icon_ausschneiden.png"  # Lade das Bild
@@ -298,7 +408,7 @@ ausschneiden_original = Image.open(ausschneiden_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 ausschneiden_image = ausschneiden_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(ausschneiden_image)
-ausschneiden_button = customtkinter.CTkButton(standard_frame, text="Ausschneiden", image=tk_image)
+ausschneiden_button = customtkinter.CTkButton(standard_frame, text="Ausschneiden", image=tk_image, command=crop_callback)
 ausschneiden_button.place(x=200, y=100)
 
 rahmen_path = r".\Icons\icon_Rahmen_hinzufügen.png"  # Lade das Bild
@@ -306,7 +416,7 @@ rahmen_original = Image.open(rahmen_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 rahmen_image = rahmen_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(rahmen_image)
-rahmen_button = customtkinter.CTkButton(standard_frame, text="Rahmen\n hinzufügen", image=tk_image)
+rahmen_button = customtkinter.CTkButton(standard_frame, text="Rahmen\n hinzufügen", image=tk_image, command=addFrame_callback)
 rahmen_button.place(x=385, y=100)
 
 # Label für die Erweiterten Funktionen erzeugen und positionieren
