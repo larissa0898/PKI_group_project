@@ -8,11 +8,11 @@ from CTkColorPicker import *
 #Funktion für die Settings der Standardeinstellungen#
 def standard_einstellungen(root):
     # CustomTkinter root window erzeugen und Einstellungen vornehmen
-    root = customtkinter.CTk()
+    #root = customtkinter.CTk()
     root.title("STANDARDEINSTELLUNGEN")
 
-    customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
-    customtkinter.set_appearance_mode("dark")
+    #customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
+    #customtkinter.set_appearance_mode("dark")
 
     # Hauptfenster in der Bildschirmmitte positionieren
     screen_width = root.winfo_screenwidth()

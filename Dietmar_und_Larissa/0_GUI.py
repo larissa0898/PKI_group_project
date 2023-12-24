@@ -57,6 +57,8 @@ cut_width = 150
 cut_height = 150
 frame_thickness = 20
 frame_color = (0, 200, 0)
+MAX_IMAGE_WIDTH = 800
+MAX_IMAGE_HEIGHT = 600
 
 def print_me():
     print(f"Datei: {original_image.get()}")
@@ -79,9 +81,13 @@ def center_window(window):
 # Funktion, um den Dateidialog zu öffnen und ein Bild zu laden
 def show_file_dialog():
     global original_image_path
-    original_image_path = filedialog.askopenfilename(filetypes=file_types)
-    print("Datei:", original_image_path, "geladen.")
-    show_image(original_image_path)
+    try:
+        original_image_path = filedialog.askopenfilename(filetypes=file_types)
+        img = cv2.imread(str(original_image_path))
+        print("Datei:", str(original_image_path), "geladen.")
+        show_image(img)
+    except Exception as exc:
+        print("Keine Datei geladen: ",exc)
 
 def resize_image(image, max_width, max_height):
     '''Funktion skaliert das Bild auf eine max.Breite oder Höhe, ohne das Format zu ändern
@@ -108,9 +114,7 @@ def resize_image(image, max_width, max_height):
 
 
 #Funktion zum Anzeigen des live verarbeiten Bildes, ohne speichern
-def show_image_live(image, width=495, height=600):
-    #original_image = cv2.imread(image_path)
-    #resized_image = cv2.resize(image, (495, 600))
+def show_image_live(image, width=MAX_IMAGE_WIDTH, height=MAX_IMAGE_HEIGHT):
     global original_image
     global resized_image
     global rgb_image #OpenCV konvertiertes Bild - Speichern (Originalgröße)
@@ -120,7 +124,7 @@ def show_image_live(image, width=495, height=600):
     resized_image = resize_image(rgb_image, width, height)
 
     # Erstelle ein PhotoImage-Objekt aus dem Numpy-Array
-    tk_image = ImageTk.PhotoImage(Image.fromarray(rgb_image))
+    tk_image = ImageTk.PhotoImage(Image.fromarray(resized_image))
 
     # Erstelle ein Canvas und zeige das Bild darin an
     canvas = tk.Canvas(root, width=tk_image.width(), height=tk_image.height())
@@ -132,27 +136,26 @@ def show_image_live(image, width=495, height=600):
 
 
 # Funktion um das ausgewählte Bild zu laden und die Dateieigenschaften zuzuweisen
-def show_image(image_path):
+def show_image(image):
     global original_image
     global original_image_copy
     global resized_image
     global rgb_image
     global tk_image
 
-    # Lade bild und speichere es in objekt für weitere Nutzung
-    original_image = cv2.imread(image_path)
-
     # Speichere Originalbild für Reset-Funktion
-    original_image_copy = original_image
+    original_image = original_image_copy = image
 
     # Konvertiere das Bild von BGR zu RGB (für die Anzeige in Tkinter)
     rgb_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 
     # Skalierung des Bildes für die Anzeige in GUI
-    resized_image = cv2.resize(rgb_image, (495, 600))
+    #resized_image = cv2.resize(rgb_image, (495, 600))
+    resized_image = resize_image(rgb_image, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT)
 
     # Erstelle ein PhotoImage-Objekt aus dem Numpy-Array
-    tk_image = ImageTk.PhotoImage(Image.fromarray(rgb_image))
+    #tk_image = ImageTk.PhotoImage(Image.fromarray(rgb_image))
+    tk_image = ImageTk.PhotoImage(Image.fromarray(resized_image))
 
     # Erstelle ein Canvas und zeige das Bild darin an
     canvas = tk.Canvas(root, width=tk_image.width(), height=tk_image.height())
@@ -205,7 +208,7 @@ def select_object():
         select_window.destroy()  # Schließe das Auswahlfenster
 
     # "OK" Button
-    ok_button = tk.Button(select_window, text="OK", command=ok_button_click)
+    ok_button = tk.Button(select_window, text="OK", command=lambda: ok_button_click)
     ok_button.pack(padx=10, pady=10)
 
     # Warte bis Fenster geschlossen wurde und gib die gewählte Auswahl zurück
@@ -589,7 +592,6 @@ def FaceRecognition(image):
 
         #Gesichtswiedererkennung mit Rückgabe der wesentlichen Eigenschaften
         #img,img_path,name,confidence = Gesichtswiedererkennung(trained_recognizer, test_image_path, label_map_load)
-        print("START1")
         img, img_path, name, confidence = Gesichtswiedererkennung(trained_recognizer, image, label_map_load)
 
         #Ausgabe des Bildes mit markierten bekannten Personen
