@@ -12,5 +12,3 @@ def reset_canvas(canvas_list, anzeigen_Bildbreite, anzeigen_Bildhöhe, anzeigen_
     anzeigen_Bildhöhe.configure(text="Bildhöhe: ")
     anzeigen_Dateipfad.configure(text="Dateipfad: ")
 
-def print_to_pdf():
-    pass

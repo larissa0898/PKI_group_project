@@ -9,23 +9,20 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 from tkinter import messagebox
 from tkinter import StringVar, ttk
+from tkinter import DISABLED, NORMAL
 from CTkColorPicker import *
 
 # Import Standardfunktionen-Modul
 import A_Standardfunktionen
 
 # Import Funktionen Menupunkt Bearbeiten
-from E_Allg_Funktionen import reset_canvas
-from E_Allg_Funktionen import print_to_pdf
+from E_Allg_Funktionen import *
 
 #Import Funktionen Menupunkt Einstellungen
-from G_Einstellungen import standard_einstellungen
-from G_Einstellungen import objekte_einstellungen
+from G_Einstellungen import *
 
 # Import Funktionen Menupunkt Info
-from H_Info import show_help_dialog
-from H_Info import show_info_dialog
-from H_Info import show_version_dialog
+from H_Info import *
 
 from D_OCR import *
 from C_Objekterkennung import *
@@ -319,7 +316,10 @@ file_menu.add_command(label="Datei öffnen", command=show_file_dialog)
 file_menu.add_command(label="Datei speichern", command=save_file_callback)
 file_menu.add_command(label="Datei speichern unter", command=save_file_as_callback)
 file_menu.add_separator()
-file_menu.add_command(label="PDF Drucken", command=print_to_pdf())
+file_menu.add_command(label="OCR-Text als PDF speichern", command=lambda: text_to_pdf(original_image_path))
+file_menu.entryconfigure("OCR-Text als PDF speichern", state=DISABLED)  # Deaktiviere den Menüpunkt
+
+# ... andere Menüpunkte usw.
 file_menu.add_separator()
 file_menu.add_command(label="Ende", command=lambda: close_program())
 
@@ -666,6 +666,8 @@ def display_images(image_data):
         confidence_label.grid(row=i, column=1, padx=10, pady=10)
 
     root2.mainloop()
+
+
 def Suche_Bilder_mit_Objekten():
     model = YOLO("yolov8m-seg.pt")  # ggf. bereits bei Programmstart initialisieren, da woanders auch verwendet
     suchordner = filedialog.askdirectory(title="Suchverzeichnis der Bilder auswählen:")
@@ -721,11 +723,16 @@ ocr_started = False
 # Funktion, um OCR zu starten und andere Buttons zu aktivieren
 def handle_ocr_start(original_image):
     global ocr_started, text2speech_button, sprache_button
-    result = start_ocr(original_image)
-    if result == None:
+    status, result = start_ocr(original_image)
+    if status == 'Erfolg' and isinstance(result, np.ndarray):
         ocr_started = True
         text2speech_button.configure(state="normal")
         sprache_button.configure(state="normal")
+        file_menu.entryconfigure("OCR-Text als PDF speichern", state=NORMAL)
+        show_image_live(result)
+    else:
+        print('Fehler bei der Texterkennung.')
+
 
 # Funktion, um Text 2 Speech zu starten und andere Buttons zu aktivieren
 def on_text_to_speech_click():
@@ -744,7 +751,7 @@ ocrstart_original = Image.open(ocrstart_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 ocrstart_image = ocrstart_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(ocrstart_image)
-ocrstart_button = customtkinter.CTkButton(standard_frame, text="OCR Start", image=tk_image, command= lambda: handle_ocr_start(original_image))
+ocrstart_button = customtkinter.CTkButton(standard_frame, text="OCR Start", image=tk_image, command= lambda: handle_ocr_start(rgb_image))
 ocrstart_button.place(x=15, y=605)  #645
 
 text2speech_path = r".\Icons\icon_text2speech.png"  # Lade das Bild
