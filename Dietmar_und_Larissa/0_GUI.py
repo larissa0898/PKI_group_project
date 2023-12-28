@@ -726,7 +726,7 @@ sepia_original = Image.open(sepia_path)
 sepia_image = sepia_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(sepia_image)
 sepia_button = customtkinter.CTkButton(standard_frame, text="Sepia", image=tk_image, command= lambda : sepia_callback())
-sepia_button.place(x=200, y=395)#415
+sepia_button.place(x=200, y=395)
 
 sättigung_path = r".\Icons\icon_sättigung.png"  # Lade das Bild
 sättigung_original = Image.open(sättigung_path)
@@ -739,7 +739,7 @@ sättigung_button.place(x=385, y=395)#415
 # Label für die Bilderkennung erzeugen und positionieren
 label_erweitert = customtkinter.CTkLabel(standard_frame, text="---------- BILDERKENNUNG UND OBJEKTSUCHE ----------",
                                          fg_color="transparent")
-label_erweitert.place(x=15, y=445) #495
+label_erweitert.place(x=15, y=445)
 
 gesicht_path = r".\Icons\icon_gesicht.png"  # Lade das Bild
 gesicht_original = Image.open(gesicht_path)
@@ -860,9 +860,11 @@ def display_images(image_data, root):
         # Append the PhotoImage object to the cache list
         image_cache.append(img)
 
+        #Label zur Bildanzeige, dass auch als Button verwendet wird:
         label = tk.Label(custom_window, image=img, text="")
         label.image = img
-        label.bind("<Button-1>", lambda event,path=image_path: button_clicked(path))
+        #Event bei Linksklick auf Label anlegen
+        label.bind("<Button-1>", lambda event,path=image_path: l_button_clicked(path))
         labelbuttons.append(label)
         label.grid(row=i, column=0, padx=10, pady=10)
 
@@ -870,19 +872,24 @@ def display_images(image_data, root):
         confidence_label.grid(row=i, column=1, padx=10, pady=10)
 
 #Event_ Button links gedrückt
-#Hier in Verwendung für die Label/Bilder
-def button_clicked(path):
-    print(f"Button clicked: {path}")
+#Hier in Verwendung für die Label/Bilder zur vergrößerten Vorschau Anzeige
+def l_button_clicked(path):
+    print(f"Bild Pfad: {path}")
+    screen_width, screen_height = window_width, window_height
     datei = cv2.imread(path)
+    #Bild in der Größe anpassen, so dass es auf dem Bildschirm voll ausgegeben werden kann
+    datei = cv2.resize(datei,(screen_width,screen_height))
     cv2.imshow("Ausgewähltes Bild",datei )
 
 def Suche_Bilder_mit_Objekten(root):
+    '''Funktion zur Suche nach Objekten in Bildern eines auszuwählenden Verzeichnisses'''
     model = YOLO("yolov8m-seg.pt")  # ggf. bereits bei Programmstart initialisieren, da woanders auch verwendet
     suchordner = filedialog.askdirectory(title="Suchverzeichnis der Bilder auswählen:")
     selected_value = objekte_einstellungen(root)
     if selected_value:
         print(f"Ausgewähltes Objekt: {selected_value}")
-    ergebnis = Suche_Bilinhalt(model,selected_value,suchordner)
+    ergebnis = Suche_Bilinhalt(model,selected_value,suchordner,root)
+    #Ausgabe des Ergebnisses der gefundenen Bilder
     display_images(ergebnis,root)
 
 

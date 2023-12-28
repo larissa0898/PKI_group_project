@@ -4,6 +4,7 @@ import PIL.Image, PIL.ImageTk
 from PIL import Image
 from tkinter import StringVar, ttk
 from CTkColorPicker import *
+from C_Objekterkennung import *
 
 #Funktion für die Settings der Standardeinstellungen#
 def standard_einstellungen(root):
@@ -138,13 +139,12 @@ def standard_einstellungen(root):
 
 
 #Funktion für die Settings der Bildtransformation und Objekterkennung#
-#Funktion für die Settings der Bildtransformation und Objekterkennung#
 def objekte_einstellungen(root):
     # CustomTkinter root window erzeugen und Einstellungen vornehmen
     #Erstellen eines Unterfensters
     custom_window = customtkinter.CTkToplevel(root)
     custom_window.title("BILDERKENNUNG UND OBJEKTSUCHE")
-
+    custom_window.attributes('-topmost', 1) #Fenster in den Vordergrund holen
     customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
     customtkinter.set_appearance_mode("dark")
 
@@ -165,22 +165,10 @@ def objekte_einstellungen(root):
     objekt_label.place(x=0, y=0)
 
     # Dropdown-Liste mit den gewünschten Objekten
-    objekt_options = {
-        0: 'Person', 1: 'Fahrrad', 2: 'Auto', 3: 'Motorrad', 4: 'Flugzeug', 5: 'Bus', 6: 'Zug', 7: 'LKW',
-        8: 'Boot', 9: 'Ampel', 10: 'Feuerhydrant', 11: 'Stoppschild', 12: 'Parkuhr', 13: 'Bank', 14: 'Vogel',
-        15: 'Katze', 16: 'Hund', 17: 'Pferd', 18: 'Schaf', 19: 'Kuh', 20: 'Elefant', 21: 'Bär', 22: 'Zebra',
-        23: 'Giraffe', 24: 'Rucksack', 25: 'Regenschirm', 26: 'Handtasche', 27: 'Krawatte', 28: 'Koffer',
-        29: 'Frisbee', 30: 'Skier', 31: 'Snowboard', 32: 'Sportball', 33: 'Drachen', 34: 'Baseballschläger',
-        35: 'Baseballhandschuh', 36: 'Skateboard', 37: 'Surfbrett', 38: 'Tennisschläger', 39: 'Flasche',
-        40: 'Weinglas', 41: 'Tasse', 42: 'Gabel', 43: 'Messer', 44: 'Löffel', 45: 'Schüssel', 46: 'Banane',
-        47: 'Apfel', 48: 'Sandwich', 49: 'Orange', 50: 'Brokkoli', 51: 'Karotte', 52: 'Hot Dog', 53: 'Pizza',
-        54: 'Donut', 55: 'Kuchen', 56: 'Stuhl', 57: 'Couch', 58: 'Topfpflanze', 59: 'Bett', 60: 'Esstisch',
-        61: 'Toilette', 62: 'Fernseher', 63: 'Laptop', 64: 'Maus', 65: 'Fernbedienung', 66: 'Tastatur',
-        67: 'Handy', 68: 'Mikrowelle', 69: 'Ofen', 70: 'Toaster', 71: 'Spülbecken', 72: 'Kühlschrank',
-        73: 'Buch', 74: 'Uhr', 75: 'Vase', 76: 'Schere', 77: 'Teddybär', 78: 'Haartrockner', 79: 'Zahnbürste'
-    }
+    # Laden der Liste aus den Einträgen der C_Objekterkennung
+    listenrtrys = get_Suchoptionen_values()
 
-    objekt_combobox = customtkinter.CTkComboBox(custom_window, values=list(objekt_options.values()))
+    objekt_combobox = customtkinter.CTkComboBox(custom_window,values=listenrtrys )
     objekt_combobox.place(x=100, y=50)
 
     #Frame für die Auswahl vom YOLO Modell
@@ -202,7 +190,7 @@ def objekte_einstellungen(root):
     image_frame = customtkinter.CTkFrame(custom_window, width=600)
     image_frame.place(x=270, y=50)  # Neue Frame-Position
 
-    # Hier soll das Bild eingefügt werden, passe den Dateipfad entsprechend an
+    # Anzeigebild laden - Yolo
     image_path = r".\Icons\icon_yolomodelle.png"
 
     # Verwende PIL, um das Bild zu öffnen
@@ -221,18 +209,19 @@ def objekte_einstellungen(root):
     image_label = customtkinter.CTkLabel(image_frame, image=tk_image)
     image_label.place(x=0, y=0)
 
-    # Function to handle the "OK" button click
+    # Funktion für Frame eigenen OK-Button
     result = None
     def ok_button_click():
         result = objekt_combobox.get()
         print("Gewählt: " + result)
-        custom_window.destroy()  # Close the window
+        custom_window.destroy()  # Fenster schließen
 
     objekte_button = customtkinter.CTkButton(custom_window, text="OK",command=lambda:ok_button_click())
     result = objekt_combobox.get()
     objekte_button.place(x=20, y=200)  # 530
-    custom_window.wait_window()  # Wait for the selection window to be closed
-    #return objekt_combobox.get()
+    custom_window.wait_window()  # Warte bis das Fenster geschlossen wird
+    if result is None:
+        result = ""
     return result
 
 if __name__ == "__main__":

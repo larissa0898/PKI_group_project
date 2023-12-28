@@ -5,7 +5,9 @@ import os
 import cv2
 import numpy as np
 from ultralytics import YOLO
-
+import customtkinter
+import tkinter as tk
+from tkinter import ttk
 # QUELLE der Grundlage: https://github.com/ultralytics/ultralytics/issues/561
 
 
@@ -29,8 +31,13 @@ Klassen_Namen = {0: 'Person', 1: 'Fahrrad', 2: 'Auto', 3: 'Motorrad', 4: 'Flugze
 
 
 
-def get_Suchoptionen():
+def get_Suchoptionen_values():
+    '''Abruf der gespeicherten Values der Liste'''
     return(list(Klassen_Namen.values()))
+
+def get_Suchoptionen():
+    '''Abruf der Liste'''
+    return(Klassen_Namen.values())
 
 #Suche nach Bildern in einem übergeben Verzeichnis
 #Rückgabe als Liste
@@ -47,9 +54,21 @@ def find_images(directory):
 
     return image_files
 
-def Suche_Bilinhalt(model, suchobjekt, suchordner=""):
+def Suche_Bilinhalt(model, suchobjekt, suchordner="",root=None):
     print("Suchobjekt: ", suchobjekt)
     gefundene_bilder_Objektliste = {}
+
+    #Fortschrittsanzeige berücksichtigen, falls root mit übergeben wird
+    progressbar=None
+    custom_window = None
+    if root is not None:
+        custom_window = customtkinter.CTkToplevel(root)
+        custom_window.title("Fortschritt")
+        custom_window.attributes('-topmost', 1) #Anzeige in den Vordergrund bringen
+        progressbar = customtkinter.CTkProgressBar(master = custom_window, width = 300, height = 25)
+        progressbar.pack(padx=20, pady=20)
+        progressbar.set(0.0)
+        #progressbar["value"] = 0
     gefundene_bilderliste = find_images(suchordner)
     counter = 0
     for bild in gefundene_bilderliste:
@@ -77,7 +96,18 @@ def Suche_Bilinhalt(model, suchobjekt, suchordner=""):
                     confidence = float(r.boxes.conf[i].item())
                     print("Objekt: " + name + " " + str(confidence))
                     gefundene_bilder_Objektliste[counter]=(bild,confidence)
+         #Wenn die Fortschrittsanzeige verwendet wird, diese aktualisieren
+        if progressbar is not None:
+            print("Fortschritt: "+str(counter/len(gefundene_bilderliste)))
+            progressbar.set(float(counter/len(gefundene_bilderliste)))
+            progressbar.update()
+            custom_window.update()
+            root.update()
 
+    #Nach Abschluss der Suche
+    if custom_window is not None:
+        #Fortschrittsanzeige schließen
+        custom_window.destroy()
     return(gefundene_bilder_Objektliste)
 
 def overlay(image, mask, color, alpha, resize=None):
