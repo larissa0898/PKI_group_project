@@ -15,6 +15,9 @@ from CTkColorPicker import *
 # Import Standardfunktionen-Modul
 import A_Standardfunktionen
 
+# Import erweiterte Funktionen-Modul
+from B_Erweiterte_Funktionen import *
+
 # Import Funktionen Menupunkt Bearbeiten
 from E_Allg_Funktionen import *
 
@@ -292,6 +295,193 @@ def addFrame_callback():
 
 #-----------------------------------------------------------------
 
+#-----------------------------------------------------------------
+######### Callback-Funktionen für B_Erweiterte_Funktionen ###############
+#-----------------------------------------------------------------
+
+
+# Callback-Funktion Markup
+def markup_image_function_callback():
+    if rgb_image is not None:
+        return_image = markup_image_function(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+
+# Callback-Funktion Filter
+def filter_effect_callback():
+    if rgb_image is not None:
+        return_image = filter_effect(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+
+# Callback-Funktion Schwarzweiß 
+def black_white_callback():
+    if rgb_image is not None:
+        return_image = black_white(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+
+# Callback-Funktion Weichzeichner
+def blur_callback():
+    if rgb_image is not None:
+        return_image = blur(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+
+# Callback-Funktion Text auf Bild
+def text_effect_callback():
+    if rgb_image is not None:
+        return_image = text_effect(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+
+# Callback-Funktion Kontrast
+def contrast_callback():
+    if rgb_image is not None:
+        return_image = contrast(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+
+# Callback-Funktion Helligkeit
+def brightness_callback():
+    if rgb_image is not None:
+        return_image = brightness(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+
+# Callback-Funktion Dunkel
+def darken_callback():
+    if rgb_image is not None:
+        return_image = darken(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+
+# Callback-Funktion Verpixelung 
+def pixelate_callback():
+    if rgb_image is not None:
+        return_image = pixelate(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+
+# Callback-Funktion Weißabgleich
+def white_balance_callback():
+    if rgb_image is not None:
+        return_image = white_balance(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+
+# Callback-Funktion Licht
+def add_light_callback():
+    if rgb_image is not None:
+        return_image = add_light(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+
+# Callback-Funktion Schatten
+def shadow_callback():
+    if rgb_image is not None:
+        return_image = add_shadow(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+
+# Callback-Funktion Farbkanäle
+def color_balance_callback():
+    if rgb_image is not None:
+        return_image = color_balance(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+
+# Callback-Funktion Sepia
+def sepia_callback():
+    if rgb_image is not None:
+        return_image = sepia(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+
+    else:
+        return
+
+
+# Callback-Funktion Sättigung
+def saturation_callback():
+    if rgb_image is not None:
+        return_image = saturation(rgb_image)
+        if return_image is not None:
+            show_image_live(return_image)
+        else:
+            return
+    else:
+        return
+
+#-----------------------------------------------------------------
+
 # CustomTkinter root window erzeugen und Einstellungen vornehmen
 root = customtkinter.CTk()
 root.title("BILDBEARBEITUNG UND BILDANALYSE")
@@ -431,7 +621,7 @@ markup_original = Image.open(markup_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 markup_image = markup_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(markup_image)
-markup_button = customtkinter.CTkButton(standard_frame, text="Markup", image=tk_image)
+markup_button = customtkinter.CTkButton(standard_frame, text="Markup", image=tk_image, command= lambda : markup_image_function_callback())
 markup_button.place(x=15, y=195)#215
 
 filter_path = r".\Icons\icon_filter.png"  # Lade das Bild
@@ -439,7 +629,7 @@ filter_original = Image.open(filter_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 filter_image = filter_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(filter_image)
-filter_button = customtkinter.CTkButton(standard_frame, text="Filter", image=tk_image)
+filter_button = customtkinter.CTkButton(standard_frame, text="Filter", image=tk_image, command= lambda : filter_effect_callback())
 filter_button.place(x=200, y=195)#215
 
 blackwhite_path = r".\Icons\icon_blackwhite.png"  # Lade das Bild
@@ -447,7 +637,7 @@ blackwhite_original = Image.open(blackwhite_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 blackwhite_image = blackwhite_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(blackwhite_image)
-blackwhite_button = customtkinter.CTkButton(standard_frame, text="Schwarz\n Weiß", image=tk_image)
+blackwhite_button = customtkinter.CTkButton(standard_frame, text="Schwarz\n Weiß", image=tk_image, command= lambda : black_white_callback())
 blackwhite_button.place(x=385, y=195)#215
 
 blur_path = r".\Icons\icon_blur.png"  # Lade das Bild
@@ -455,7 +645,7 @@ blur_original = Image.open(blur_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 blur_image = blur_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(blur_image)
-blur_button = customtkinter.CTkButton(standard_frame, text="Blur Effekt", image=tk_image)
+blur_button = customtkinter.CTkButton(standard_frame, text="Blur Effekt", image=tk_image, command= lambda : blur_callback())
 blur_button.place(x=15, y=245)#265
 
 text_path = r".\Icons\icon_text.png"  # Lade das Bild
@@ -463,7 +653,7 @@ text_original = Image.open(text_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 text_image = text_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(text_image)
-text_button = customtkinter.CTkButton(standard_frame, text="Text", image=tk_image)
+text_button = customtkinter.CTkButton(standard_frame, text="Text", image=tk_image, command= lambda : text_effect_callback())
 text_button.place(x=200, y=245)#265
 
 kontrast_path = r".\Icons\icon_kontrast.png"  # Lade das Bild
@@ -471,7 +661,7 @@ kontrast_original = Image.open(kontrast_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 kontrast_image = kontrast_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(kontrast_image)
-kontrast_button = customtkinter.CTkButton(standard_frame, text="Kontrast", image=tk_image)
+kontrast_button = customtkinter.CTkButton(standard_frame, text="Kontrast", image=tk_image, command= lambda : contrast_callback())
 kontrast_button.place(x=385, y=245)#265
 
 helligkeit_path = r".\Icons\icon_Helligkeit.png"  # Lade das Bild
@@ -479,7 +669,7 @@ helligkeit_original = Image.open(helligkeit_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 helligkeit_image = helligkeit_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(helligkeit_image)
-helligkeit_button = customtkinter.CTkButton(standard_frame, text="Kontrast", image=tk_image)
+helligkeit_button = customtkinter.CTkButton(standard_frame, text="Helligkeit", image=tk_image, command= lambda : brightness_callback())
 helligkeit_button.place(x=15, y=295)#315
 
 dunkel_path = r".\Icons\icon_dunkel.png"  # Lade das Bild
@@ -487,7 +677,7 @@ dunkel_original = Image.open(dunkel_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 dunkel_image = dunkel_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(dunkel_image)
-dunkel_button = customtkinter.CTkButton(standard_frame, text="Dunkel", image=tk_image)
+dunkel_button = customtkinter.CTkButton(standard_frame, text="Dunkel", image=tk_image, command= lambda : darken_callback())
 dunkel_button.place(x=200, y=295)#315
 
 pixel_path = r".\Icons\icon_pixel.png"  # Lade das Bild
@@ -495,7 +685,7 @@ pixel_original = Image.open(pixel_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 pixel_image = pixel_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(pixel_image)
-pixel_button = customtkinter.CTkButton(standard_frame, text="Pixel", image=tk_image)
+pixel_button = customtkinter.CTkButton(standard_frame, text="Pixel", image=tk_image, command= lambda : pixelate_callback())
 pixel_button.place(x=385, y=295) #315
 
 konvertieren_path = r".\Icons\icon_konvertieren.png"  # Lade das Bild
@@ -503,7 +693,7 @@ konvertieren_original = Image.open(konvertieren_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 konvertieren_image = konvertieren_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(konvertieren_image)
-konvertieren_button = customtkinter.CTkButton(standard_frame, text="Konvertieren", image=tk_image)
+konvertieren_button = customtkinter.CTkButton(standard_frame, text="Weißabgleich", image=tk_image, command= lambda : white_balance_callback())
 konvertieren_button.place(x=15, y=345)#365
 
 licht_path = r".\Icons\icon_Licht.png"  # Lade das Bild
@@ -511,7 +701,7 @@ licht_original = Image.open(licht_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 licht_image = licht_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(licht_image)
-licht_button = customtkinter.CTkButton(standard_frame, text="Licht", image=tk_image)
+licht_button = customtkinter.CTkButton(standard_frame, text="Licht", image=tk_image, command= lambda : add_light_callback())
 licht_button.place(x=200, y=345)#365
 
 schatten_path = r".\Icons\icon_schatten.png"  # Lade das Bild
@@ -519,7 +709,7 @@ schatten_original = Image.open(schatten_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 schatten_image = schatten_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(schatten_image)
-schatten_button = customtkinter.CTkButton(standard_frame, text="Schatten", image=tk_image)
+schatten_button = customtkinter.CTkButton(standard_frame, text="Schatten", image=tk_image, command= lambda : shadow_callback())
 schatten_button.place(x=385, y=345) #365
 
 rgb_path = r".\Icons\icon_rgb.png"  # Lade das Bild
@@ -527,7 +717,7 @@ rgb_original = Image.open(rgb_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 rgb_image = rgb_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(rgb_image)
-rgb_button = customtkinter.CTkButton(standard_frame, text="Farbkanäle", image=tk_image)
+rgb_button = customtkinter.CTkButton(standard_frame, text="Farbkanäle", image=tk_image, command= lambda : color_balance_callback())
 rgb_button.place(x=15, y=395)#415
 
 sepia_path = r".\Icons\icon_sepia.png"  # Lade das Bild
@@ -535,7 +725,7 @@ sepia_original = Image.open(sepia_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 sepia_image = sepia_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(sepia_image)
-sepia_button = customtkinter.CTkButton(standard_frame, text="Sepia", image=tk_image)
+sepia_button = customtkinter.CTkButton(standard_frame, text="Sepia", image=tk_image, command= lambda : sepia_callback())
 sepia_button.place(x=200, y=395)#415
 
 sättigung_path = r".\Icons\icon_sättigung.png"  # Lade das Bild
@@ -543,7 +733,7 @@ sättigung_original = Image.open(sättigung_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 sättigung_image = sättigung_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(sättigung_image)
-sättigung_button = customtkinter.CTkButton(standard_frame, text="Sättigung", image=tk_image)
+sättigung_button = customtkinter.CTkButton(standard_frame, text="Sättigung", image=tk_image, command= lambda : saturation_callback())
 sättigung_button.place(x=385, y=395)#415
 
 # Label für die Bilderkennung erzeugen und positionieren
