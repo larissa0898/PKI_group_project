@@ -184,6 +184,7 @@ def objekte_einstellungen(root):
     }
 
     yolo_combobox = customtkinter.CTkComboBox(custom_window, values=list(yolo_options.values()))
+    yolo_combobox.set("YOLOv8m")
     yolo_combobox.place(x=100, y=100)
 
     # Bild einfügen
@@ -217,7 +218,7 @@ def objekte_einstellungen(root):
         custom_window.destroy()  # Fenster schließen
 
     objekte_button = customtkinter.CTkButton(custom_window, text="OK",command=lambda:ok_button_click())
-    result = objekt_combobox.get()
+    result = objekt_combobox.get(), yolo_combobox.get()
     objekte_button.place(x=20, y=200)  # 530
     custom_window.wait_window()  # Warte bis das Fenster geschlossen wird
     if result is None:

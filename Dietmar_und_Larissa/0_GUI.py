@@ -81,6 +81,7 @@ def center_window(window):
 # Funktion, um den Dateidialog zu öffnen und ein Bild zu laden
 def show_file_dialog():
     global original_image_path
+    img = None
     try:
         original_image_path = filedialog.askopenfilename(filetypes=file_types)
         img = cv2.imread(str(original_image_path))
@@ -88,6 +89,7 @@ def show_file_dialog():
         show_image(img)
     except Exception as exc:
         print("Keine Datei geladen: ",exc)
+    return(img)
 
 def resize_image(image, max_width, max_height):
     '''Funktion skaliert das Bild auf eine max.Breite oder Höhe, ohne das Format zu ändern
@@ -715,8 +717,8 @@ schatten_button.place(x=385, y=345) #365
 rgb_path = r".\Icons\icon_rgb.png"  # Lade das Bild
 rgb_original = Image.open(rgb_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
-rgb_image = rgb_original.resize(size=[30, 30])
-tk_image = ImageTk.PhotoImage(rgb_image)
+rgb_image_pic = rgb_original.resize(size=[30, 30])
+tk_image = ImageTk.PhotoImage(rgb_image_pic)
 rgb_button = customtkinter.CTkButton(standard_frame, text="Farbkanäle", image=tk_image, command= lambda : color_balance_callback())
 rgb_button.place(x=15, y=395)#415
 
@@ -770,18 +772,12 @@ def FaceRecognitionTraining():
 #Funktion zum Wiedererkennen von bekannten Gesichtern im geladenen Bild
 def FaceRecognition(image):
     '''Funktion zur Wiedererkennung von Personen im Bild, basierend auf den gespeicherten Trainingsdaten, die ausgewählt werden können'''
-    print("Dateipfad: "+image)
     try:
         # Laden der trainierten Label und Modell Daten aus einer JSON und XML Datei
         file_path = filedialog.askdirectory(title="Pfad der vortrainierten Daten (Verzeichnis) wählen")
-        print("Selected Folder:", file_path)
         trained_recognizer, label_map_load = Lade_TrainiertesModell(file_path)
 
-        # Test mit bekannten Bildern auf Basis der bekannten Gesichtsdatenbank
-        #test_image_path = filedialog.askopenfilename(title="Bild mit Gesichtern auswählen")
-
         #Gesichtswiedererkennung mit Rückgabe der wesentlichen Eigenschaften
-        #img,img_path,name,confidence = Gesichtswiedererkennung(trained_recognizer, test_image_path, label_map_load)
         img, img_path, name, confidence = Gesichtswiedererkennung(trained_recognizer, image, label_map_load)
 
         #Ausgabe des Bildes mit markierten bekannten Personen
@@ -830,10 +826,12 @@ objekte_original = Image.open(objekte_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 objekte_image = objekte_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(objekte_image)
-objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n erkennung", image=tk_image, command= lambda:handle_yolo_1Bild(original_image))
+#objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n erkennung", image=tk_image, command= lambda:handle_yolo_1Bild(original_image))
+objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n erkennung", image=tk_image, command= lambda:handle_yolo_1Bild(rgb_image))
 objekte_button.place(x=200, y=470) #530
 
 def display_images(image_data, root):
+    '''Funktion zur Ausgabe der gefundenen Bilder'''
     custom_window = customtkinter.CTkToplevel(root)
     custom_window.title("ERGEBNIS DER OBJEKT IN BILDSUCHE")
 
@@ -849,15 +847,20 @@ def display_images(image_data, root):
     y_position = (screen_height - window_height) // 2
 
     image_cache = []
-    labelbuttons = []
-    for i,(image_path, confidence) in image_data.items():
+    labelbuttons= []
+    sortiert = dict(sorted(image_data.items(), key=lambda item: item[1][1], reverse=True))
+
+    for i, entrys in enumerate(sortiert.values(), start=1):
+        image_path = entrys[0]
+        confi = entrys[1]
+        print(f"Eintrag Nr. {i}: Bildpfad: {image_path}, Übereinstimmung: {confi}")
         image_path = image_path.replace('\\', '/')
-        print(f"Eintrag Nr.: {i}: Bild: = {image_path}, Übereinstimmung: = {confidence}")
+
         img = Image.open(image_path)
-        img.thumbnail((100, 100))  # Resize the image to a small preview size
+        img.thumbnail((100, 100))  # Bild auf ansprechende Vorschaugröße reduzieren
         img = ImageTk.PhotoImage(img)
 
-        # Append the PhotoImage object to the cache list
+        # Foto der Liste hinzufügen
         image_cache.append(img)
 
         #Label zur Bildanzeige, dass auch als Button verwendet wird:
@@ -868,7 +871,7 @@ def display_images(image_data, root):
         labelbuttons.append(label)
         label.grid(row=i, column=0, padx=10, pady=10)
 
-        confidence_label = tk.Label(custom_window, text=f"Übereinstimmung: {confidence:.2f}\nPfad: {image_path}")
+        confidence_label = tk.Label(custom_window, text=f"Übereinstimmung: {confi:.2f}\nPfad: {image_path}")
         confidence_label.grid(row=i, column=1, padx=10, pady=10)
 
 #Event_ Button links gedrückt
@@ -883,15 +886,21 @@ def l_button_clicked(path):
 
 def Suche_Bilder_mit_Objekten(root):
     '''Funktion zur Suche nach Objekten in Bildern eines auszuwählenden Verzeichnisses'''
-    model = YOLO("yolov8m-seg.pt")  # ggf. bereits bei Programmstart initialisieren, da woanders auch verwendet
     suchordner = filedialog.askdirectory(title="Suchverzeichnis der Bilder auswählen:")
-    selected_value = objekte_einstellungen(root)
-    if selected_value:
-        print(f"Ausgewähltes Objekt: {selected_value}")
-    ergebnis = Suche_Bilinhalt(model,selected_value,suchordner,root)
+    suchobjekt, modelwahl = objekte_einstellungen(root)
+    if suchobjekt:
+        print(f"Ausgewähltes Objekt: {suchobjekt}")
+    model = None
+    if modelwahl is None:
+        model = YOLO("yolov8m-seg.pt")  # ggf. bereits bei Programmstart initialisieren, da woanders auch verwendet
+    else:
+        try:
+            model = YOLO(modelwahl+"-seg.pt")
+        except:
+            print("Modell konnte nicht geladen werden")
+    ergebnis = Suche_Bilinhalt(model,suchobjekt,suchordner,root)
     #Ausgabe des Ergebnisses der gefundenen Bilder
     display_images(ergebnis,root)
-
 
 objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
 objekte_original = Image.open(objekte_path)
@@ -905,6 +914,9 @@ objekte_button.place(x=200, y=515) #530
 def handle_yolo_1Bild(original_image):
     #Lade die Default Yolo Segmentierung
     model = YOLO("yolov8m-seg.pt")
+    if original_image is None:
+        original_image = show_file_dialog()
+        original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
     #Führe die Erkennung und Segmentierung aus
     image = Yolo_run(original_image,model)
     #Zeige das Bild im Vorschaufenster

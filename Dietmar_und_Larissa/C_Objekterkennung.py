@@ -8,7 +8,9 @@ from ultralytics import YOLO
 import customtkinter
 import tkinter as tk
 from tkinter import ttk
-# QUELLE der Grundlage: https://github.com/ultralytics/ultralytics/issues/561
+# QUELLEN der Grundlage:
+# https://github.com/ultralytics/ultralytics/issues/561
+# https://docs.ultralytics.com/de/modes/predict/
 
 
 #Modifikationen:
@@ -55,7 +57,7 @@ def find_images(directory):
     return image_files
 
 def Suche_Bilinhalt(model, suchobjekt, suchordner="",root=None):
-    print("Suchobjekt: ", suchobjekt)
+    print("Suchobjekt in Bildern: ", suchobjekt)
     gefundene_bilder_Objektliste = {}
 
     #Fortschrittsanzeige berücksichtigen, falls root mit übergeben wird
@@ -67,15 +69,18 @@ def Suche_Bilinhalt(model, suchobjekt, suchordner="",root=None):
         custom_window.attributes('-topmost', 1) #Anzeige in den Vordergrund bringen
         progressbar = customtkinter.CTkProgressBar(master = custom_window, width = 300, height = 25)
         progressbar.pack(padx=20, pady=20)
-        progressbar.set(0.0)
-        #progressbar["value"] = 0
+        progressbar.set(0.0) #Startwert setzen
+    #Durchsuche das Verzeichnis nach Bildern
     gefundene_bilderliste = find_images(suchordner)
     counter = 0
+    #Für jedes gefundene Bild den Inhalt ermitteln und auswerten
     for bild in gefundene_bilderliste:
         counter += 1
+        #Bild laden
         img = cv2.imread(bild)
+        #Bild nach Objekten durchsuchen
         results = model.predict(img, stream=False)
-
+        print("Fortschritt: " + str(counter / len(gefundene_bilderliste)))
         # Für jedes erkannte Objekt
         for r in results:
             boxes = r.boxes  # Boxes object for bbox outputs
@@ -98,7 +103,6 @@ def Suche_Bilinhalt(model, suchobjekt, suchordner="",root=None):
                     gefundene_bilder_Objektliste[counter]=(bild,confidence)
          #Wenn die Fortschrittsanzeige verwendet wird, diese aktualisieren
         if progressbar is not None:
-            print("Fortschritt: "+str(counter/len(gefundene_bilderliste)))
             progressbar.set(float(counter/len(gefundene_bilderliste)))
             progressbar.update()
             custom_window.update()
@@ -154,7 +158,6 @@ def plot_one_box(x, img, color=None, label=None, line_thickness=3):
         c2 = c1[0] + t_size[0], c1[1] - t_size[1] - 3
         cv2.rectangle(img, c1, c2, color, -1, cv2.LINE_AA)  # filled
         cv2.putText(img, label, (c1[0], c1[1] - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
-
 
 def Yolo_run(img, model, background=None, segment_out_path=None):
     '''Funktion zur Detektion und Markierung von klassifizierten Objekten
@@ -248,7 +251,8 @@ def Yolo_run(img, model, background=None, segment_out_path=None):
                 out_img = cv2.cvtColor(out_img, cv2.COLOR_BGR2RGB)
 
             else:
-                out_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                #out_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                out_img = img
 
     #Wandlung der Klassen + Anzahl in Text
     text_labels =""

@@ -36,7 +36,7 @@ def Hintergrund_Ausblendung(videoquelle=0, background_img_path=None, width=640, 
     - OpenCV
     - Numpy
 
-    Paramter:
+    Parameter:
     videoquelle - default: 0 - integrierte Kamera
     background_img_path - Pfad der das Bild zum Hintergrund beinhaltet - ohne Angabe: schwarzer Hintergrund
     """
@@ -98,6 +98,7 @@ def Hintergrund_Ausblendung(videoquelle=0, background_img_path=None, width=640, 
                         [0, 255, 0], int(height / 300))
             cv2.imshow("Selfie",output)
 
+    output = cv2.cvtColor(output,cv2.COLOR_BGR2RGB)
     return(output)
 
 if __name__ == "__main__":
