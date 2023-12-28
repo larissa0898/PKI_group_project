@@ -833,14 +833,26 @@ tk_image = ImageTk.PhotoImage(objekte_image)
 objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n erkennung", image=tk_image, command= lambda:handle_yolo_1Bild(original_image))
 objekte_button.place(x=200, y=470) #530
 
-def display_images(image_data):
-    root2 = tk.Toplevel()
-    root2.title("Image Preview")
-    root2.geometry('600x600')
+def display_images(image_data, root):
+    custom_window = customtkinter.CTkToplevel(root)
+    custom_window.title("ERGEBNIS DER OBJEKT IN BILDSUCHE")
+
+    customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
+    customtkinter.set_appearance_mode("dark")
+
+    # Hauptfenster in der Bildschirmmitte positionieren
+    screen_width = custom_window.winfo_screenwidth()
+    screen_height = custom_window.winfo_screenheight()
+    window_width = 680 # Breite des Fensters erhöht
+    window_height = 280
+    x_position = (screen_width - window_width) // 2
+    y_position = (screen_height - window_height) // 2
+
     image_cache = []
+    labelbuttons = []
     for i,(image_path, confidence) in image_data.items():
         image_path = image_path.replace('\\', '/')
-        print(f"SubFunc: Eintrag Nr.: {i}: Bild: = {image_path}, Übereinstimmung: = {confidence}")
+        print(f"Eintrag Nr.: {i}: Bild: = {image_path}, Übereinstimmung: = {confidence}")
         img = Image.open(image_path)
         img.thumbnail((100, 100))  # Resize the image to a small preview size
         img = ImageTk.PhotoImage(img)
@@ -848,31 +860,38 @@ def display_images(image_data):
         # Append the PhotoImage object to the cache list
         image_cache.append(img)
 
-        label = tk.Label(root2, image=img)
+        label = tk.Label(custom_window, image=img, text="")
         label.image = img
+        label.bind("<Button-1>", lambda event,path=image_path: button_clicked(path))
+        labelbuttons.append(label)
         label.grid(row=i, column=0, padx=10, pady=10)
 
-        confidence_label = tk.Label(root2, text=f"Übereinstimmung: {confidence:.2f}\nPfad: {image_path}")
+        confidence_label = tk.Label(custom_window, text=f"Übereinstimmung: {confidence:.2f}\nPfad: {image_path}")
         confidence_label.grid(row=i, column=1, padx=10, pady=10)
 
-    root2.mainloop()
+#Event_ Button links gedrückt
+#Hier in Verwendung für die Label/Bilder
+def button_clicked(path):
+    print(f"Button clicked: {path}")
+    datei = cv2.imread(path)
+    cv2.imshow("Ausgewähltes Bild",datei )
 
-
-def Suche_Bilder_mit_Objekten():
+def Suche_Bilder_mit_Objekten(root):
     model = YOLO("yolov8m-seg.pt")  # ggf. bereits bei Programmstart initialisieren, da woanders auch verwendet
     suchordner = filedialog.askdirectory(title="Suchverzeichnis der Bilder auswählen:")
-    selected_value = select_object()
+    selected_value = objekte_einstellungen(root)
     if selected_value:
         print(f"Ausgewähltes Objekt: {selected_value}")
-    ergenis = Suche_Bilinhalt(model,selected_value,suchordner)
-    display_images(ergenis)
+    ergebnis = Suche_Bilinhalt(model,selected_value,suchordner)
+    display_images(ergebnis,root)
+
 
 objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
 objekte_original = Image.open(objekte_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 objekte_image = objekte_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(objekte_image)
-objekte_button = customtkinter.CTkButton(standard_frame, text="Bilder\n Objekt-\n suche", image=tk_image, command= lambda:Suche_Bilder_mit_Objekten())
+objekte_button = customtkinter.CTkButton(standard_frame, text="Bilder\n Objekt-\n suche", image=tk_image, command= lambda:Suche_Bilder_mit_Objekten(root))
 objekte_button.place(x=200, y=515) #530
 
 # Funktion, um YOLO Objekterkennung mit Segmentierung zu starten

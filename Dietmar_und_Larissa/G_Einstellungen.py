@@ -138,25 +138,27 @@ def standard_einstellungen(root):
 
 
 #Funktion für die Settings der Bildtransformation und Objekterkennung#
-def objekte_einstellungen():
+#Funktion für die Settings der Bildtransformation und Objekterkennung#
+def objekte_einstellungen(root):
     # CustomTkinter root window erzeugen und Einstellungen vornehmen
-    root = customtkinter.CTk()
-    root.title("BILDERKENNUNG UND OBJEKTSUCHE")
+    #Erstellen eines Unterfensters
+    custom_window = customtkinter.CTkToplevel(root)
+    custom_window.title("BILDERKENNUNG UND OBJEKTSUCHE")
 
     customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
     customtkinter.set_appearance_mode("dark")
 
     # Hauptfenster in der Bildschirmmitte positionieren
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
+    screen_width = custom_window.winfo_screenwidth()
+    screen_height = custom_window.winfo_screenheight()
     window_width = 680 # Breite des Fensters erhöht
     window_height = 280
     x_position = (screen_width - window_width) // 2
     y_position = (screen_height - window_height) // 2
-    root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
+    custom_window.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
 
     # Frame für die Objektauswahl
-    objekt_frame = customtkinter.CTkFrame(root, width=200, height=50)
+    objekt_frame = customtkinter.CTkFrame(custom_window, width=200, height=50)
     objekt_frame.place(x=50, y=50)
 
     objekt_label = customtkinter.CTkLabel(objekt_frame, text="Objekt:")
@@ -178,11 +180,11 @@ def objekte_einstellungen():
         73: 'Buch', 74: 'Uhr', 75: 'Vase', 76: 'Schere', 77: 'Teddybär', 78: 'Haartrockner', 79: 'Zahnbürste'
     }
 
-    objekt_combobox = customtkinter.CTkComboBox(root, values=list(objekt_options.values()))
+    objekt_combobox = customtkinter.CTkComboBox(custom_window, values=list(objekt_options.values()))
     objekt_combobox.place(x=100, y=50)
 
     #Frame für die Auswahl vom YOLO Modell
-    objekt_frame = customtkinter.CTkFrame(root, width=600, height=50)
+    objekt_frame = customtkinter.CTkFrame(custom_window, width=600, height=50)
     objekt_frame.place(x=50, y=100)
 
     objekt_label = customtkinter.CTkLabel(objekt_frame, text="YOLO:")
@@ -193,11 +195,11 @@ def objekte_einstellungen():
         0: 'YOLOv8n', 1: 'YOLOv8s', 2: 'YOLOv8m', 3: 'YOLOv8l', 4: 'YOLOv8x'
     }
 
-    yolo_combobox = customtkinter.CTkComboBox(root, values=list(yolo_options.values()))
+    yolo_combobox = customtkinter.CTkComboBox(custom_window, values=list(yolo_options.values()))
     yolo_combobox.place(x=100, y=100)
 
     # Bild einfügen
-    image_frame = customtkinter.CTkFrame(root, width=600)
+    image_frame = customtkinter.CTkFrame(custom_window, width=600)
     image_frame.place(x=270, y=50)  # Neue Frame-Position
 
     # Hier soll das Bild eingefügt werden, passe den Dateipfad entsprechend an
@@ -219,7 +221,19 @@ def objekte_einstellungen():
     image_label = customtkinter.CTkLabel(image_frame, image=tk_image)
     image_label.place(x=0, y=0)
 
-    root.mainloop()
+    # Function to handle the "OK" button click
+    result = None
+    def ok_button_click():
+        result = objekt_combobox.get()
+        print("Gewählt: " + result)
+        custom_window.destroy()  # Close the window
+
+    objekte_button = customtkinter.CTkButton(custom_window, text="OK",command=lambda:ok_button_click())
+    result = objekt_combobox.get()
+    objekte_button.place(x=20, y=200)  # 530
+    custom_window.wait_window()  # Wait for the selection window to be closed
+    #return objekt_combobox.get()
+    return result
 
 if __name__ == "__main__":
     # Die Funktion wird nur aufgerufen, wenn das Skript direkt ausgeführt wird

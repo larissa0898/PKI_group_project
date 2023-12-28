@@ -48,6 +48,7 @@ def find_images(directory):
     return image_files
 
 def Suche_Bilinhalt(model, suchobjekt, suchordner=""):
+    print("Suchobjekt: ", suchobjekt)
     gefundene_bilder_Objektliste = {}
     gefundene_bilderliste = find_images(suchordner)
     counter = 0
