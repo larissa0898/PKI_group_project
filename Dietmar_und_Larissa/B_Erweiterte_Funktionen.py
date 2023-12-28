@@ -1,834 +1,1125 @@
-# Hier erweiterte Funktionen abbilden #
-
-from tkinter import Tk, Label, Frame, Button, filedialog, Scale, HORIZONTAL
-
+import customtkinter
 import cv2
 import numpy as np
-from PIL import Image, ImageTk
+from CTkColorPicker import AskColor
+from customtkinter import CTk, HORIZONTAL
 
-# Create the Label widget outside the open_image function
-image_label = None
+# globale variablen
 img = None
-image_path = None
+color = None
+thickness = None
 
+# Markup Draw Funktion globale Variablen
 drawing = False  # true if mouse is pressed
 ix, iy = -1, -1
 
-# mouse callback function
-def draw(event, x, y, flags, param):
-    global ix, iy, drawing
 
+# Farbauswahlfunktion
+def choose_color():
+    # globale variablen
+    global color
+    # Öffne den Farbwähler und rufe die Farbzeichenfolge ab
+    pick_color = AskColor(title="Farbauswahlfunktion")
+    color = pick_color.get()
+    return color
+
+
+# Maus-Callback-Funktion
+def draw(event, x, y, flags, param):
+    # globale variablen
+    global ix, iy, drawing, thickness
+
+    # Falls keine Farbe ausgewählt ist, Default ist Schwarz
+    if param is not None:
+        blue, green, red = tuple(int(param[i:i + 2], 16) for i in (1, 3, 5))
+    else:
+        red = 0
+        green = 0
+        blue = 0
+
+    # Falls keine Schriftstärke ausgewählt ist, Default ist 7
+    if thickness is None:
+        thickness = 7
+
+    # Maus Events
+    # lenke Maustaste ist gedrückt, malen ist erlaubt!
     if event == cv2.EVENT_LBUTTONDOWN:
         drawing = True
         ix, iy = x, y
 
+    # lenke Maustaste ist gedrückt, malen!
     elif event == cv2.EVENT_MOUSEMOVE:
-        if drawing == True:
-            cv2.line(img, (ix, iy), (x, y), (255, 0, 0), 5)
+        if drawing:
+            cv2.line(img, (ix, iy), (x, y), (red, green, blue), thickness)
             ix = x
             iy = y
 
+    # lenke Maustaste ist losgelassen, malen ist NICHT erlaubt!
     elif event == cv2.EVENT_LBUTTONUP:
         drawing = False
-        cv2.line(img, (ix, iy), (x, y), (255, 0, 0), 5)
 
-def open_image():
-    global image_label
-    global img
-    global image_path
-    # Open a file dialog to select the image
-    image_path = filedialog.askopenfilename(filetypes=[
-        ("JPEG", "*.jpg"),
-        ("PNG", "*.png"),
-        ("GIF", "*.gif"),
-        ("All Files", "*.*")
-    ])
 
-    # Load the image with OpenCV
-    image = cv2.imread(image_path)
-    img = cv2.imread(image_path)
-    # Convert the image to RGB
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+# Funktion zum Freischreiben bzw. Malen auf einem Bild
+def markup_image_function(image):
+    # globale variablen
+    global img, color, thickness
 
-    # Convert the image to a PIL image
-    image = Image.fromarray(image)
+    # lokale variablen
+    adjusted = None
 
-    # Scale the image to the size of the frame
-    image = image.resize((frame_width, frame_height), Image.LANCZOS)
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    # Convert the PIL image to a Tkinter-compatible PhotoImage object
-    tk_image = ImageTk.PhotoImage(image)
+    # Schriftstärke Funktion
+    def font_thickness():
+        # globale variablen
+        global thickness
 
-    # Update the image of the existing Label widget
-    image_label.config(image=tk_image)
-    image_label.image = tk_image  # Store the PhotoImage object in the .image property of the label
+        # Bearbeitung bzw. Einstellung beenden
+        def finish_thickness():
+            global thickness
+            thickness = int(thickness_scale.get())
+            sub_root.quit()  # Schließe das Tkinter-Fenster
+            sub_root.destroy()
 
-def update(image):
-    # Convert the image to a PIL image
-    image = Image.fromarray(image)
+        # GUI erstellen
+        sub_root = CTk()
+        sub_root.title('Markup Funktion Schriftstärke')
 
-    # Scale the image to the size of the frame
-    image = image.resize((frame_width, frame_height), Image.LANCZOS)
+        # Einstellung der Größe des Fensters
+        sub_root_screen_width = 350
+        sub_root_screen_height = 145
+        sub_root.geometry(f"{sub_root_screen_width}x{sub_root_screen_height}")
+        sub_root.resizable(False, False)
 
-    # Convert the PIL image to a Tkinter-compatible PhotoImage object
-    tk_image = ImageTk.PhotoImage(image)
+        # Label hinzufügen
+        customtkinter.CTkLabel(sub_root, text="Schriftstärke (0 - 100):").place(x=30, y=10)
 
-    # Update the image of the existing Label widget
-    image_label.config(image=tk_image)
-    image_label.image = tk_image  # Store the PhotoImage object in the .image property of the label
+        # Slider hinzufügen
+        thickness_scale = customtkinter.CTkSlider(sub_root, from_=1, to=100, number_of_steps=99, orientation=HORIZONTAL,
+                                                  width=290)
+        thickness_scale.set(1)
+        thickness_scale.place(x=27, y=43)
 
-def save_image():
-    global img
-    if img is not None:
-        # filename = filedialog.asksaveasfilename(defaultextension=".jpg")
-        filename = filedialog.asksaveasfilename(defaultextension=".jpg",
-                                                filetypes=[
-                                                    ("JPEG", "*.jpg"),
-                                                    ("PNG", "*.png"),
-                                                    ("GIF", "*.gif"),
-                                                    ("All Files", "*.*")
-                                                ])
-        cv2.imwrite(filename, img)
-    else:
-        return
+        # Button hinzufügen
+        customtkinter.CTkButton(sub_root, text='Fertig', command=finish_thickness, width=290).place(x=30, y=109)
 
-def original_image():
-    global img
-    global image_path
-    if img is not None:
-        # Load the image with OpenCV
-        img = cv2.imread(image_path)
-        update(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-    else:
-        return
+        # GUI starten
+        sub_root.mainloop()
 
-def markup_image():
-    global img
-    if img is not None:
+    def markup():
+        # globale variablen
+        global img, color
+
+        # lokale variablen
+        nonlocal adjusted
 
         # Fenster erstellen und Größe anpassen
-        cv2.namedWindow('markup image', cv2.WINDOW_NORMAL)
-        cv2.resizeWindow('markup image', int(frame_width / 1.5), int(frame_height / 1.5))
+        cv2.namedWindow('Markup Funktion Bild Vorschau', cv2.WINDOW_NORMAL)
 
-        while (1):
-            cv2.imshow('markup image', img)
-            cv2.setMouseCallback('markup image', draw)
+        while 1:
+            # zeige das Bild, um es zu bearbeiten
+            cv2.imshow('Markup Funktion Bild Vorschau', img)
+            cv2.setMouseCallback('Markup Funktion Bild Vorschau', draw, param=color)
 
-            if cv2.waitKey(1) & 0xFF == 27:  # hit esc to exit
-                # Convert the image to RGB
-                update(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-                break
-            if cv2.getWindowProperty('markup image', cv2.WND_PROP_VISIBLE) < 1:
+            # Drücke Esc, um den Vorgang zu beenden
+            if cv2.waitKey(1) & 0xFF == 27:
+                adjusted = img
+                return
+
+            # Fall das Fenster nicht mit Esc zugemacht wird, wieder anzeigen
+            if cv2.getWindowProperty('Markup Funktion Bild Vorschau', cv2.WND_PROP_VISIBLE) < 1:
                 # Fenster erstellen und Größe anpassen
-                cv2.namedWindow('markup image', cv2.WINDOW_NORMAL)
-                cv2.resizeWindow('markup image', int(frame_width / 1.5), int(frame_height / 1.5))
+                cv2.namedWindow('Markup Funktion Bild Vorschau', cv2.WINDOW_NORMAL)
 
+    # Bearbeitung bzw. Einstellung beenden
+    def finish_image():
+        # globale variablen
+        global color
+
+        # Reset Farbe beim Beenden
+        color = None
+        root.quit()  # Schließe Tkinter-Fenster
+        root.destroy()
+
+    # GUI erstellen
+    root = CTk()
+    root.title("Markup Funktion")
+
+    # Einstellung der Größe des Fensters
+    screen_width = 350
+    screen_height = 145
+    root.geometry(f"{screen_width}x{screen_height}")
+    root.resizable(False, False)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Farbe", command=choose_color, width=290).place(x=30, y=10)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Schriftstärke", command=font_thickness, width=290).place(x=30, y=43)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Markup", command=markup, width=290).place(x=30, y=76)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Fertig", command=finish_image, width=290).place(x=30, y=109)
+
+    # GUI starten
+    root.mainloop()
+    if adjusted is None:
+        return None
     else:
-        return
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
 
-def filter_effect():
+
+# Cany-Filter - Kantenerkennung
+def filter_effect(image):
+    # globale Variablen
     global img
-    if img is not None:
+
+    # lokale Variablen
+    adjusted = None
+
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    def cany_filter(cany_filter_image, threshold_1, threshold_2):
+        # lokale Variablen
+        nonlocal adjusted
+
         # Filtereffekte
-        img = cv2.Canny(img, 100, 200)
-        update(img)  # Beispiel für einen Filter
-    else:
-        return
+        adjusted = cv2.Canny(cany_filter_image, threshold_1, threshold_2)
 
-def black_white():
+        # Fenster erstellen und Größe anpassen
+        cv2.namedWindow('Filtereffekt Funktion Vorschau', cv2.WINDOW_NORMAL)
+
+        # Bild anzeigen
+        cv2.imshow('Filtereffekt Funktion Vorschau', adjusted)
+        cv2.waitKey(0)
+
+    # Bearbeitung bzw. Einstellung beenden
+    def finish_image():
+        root.quit()  # Schließe Tkinter-Fenster
+        root.destroy()
+
+    # GUI erstellen
+    root = CTk()
+    root.title("Filtereffekt Funktion")
+
+    # Einstellung der Größe des Fensters
+    screen_width = 350
+    screen_height = 287
+    root.geometry(f"{screen_width}x{screen_height}")
+    root.resizable(False, False)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Grenzwert 1: (1 - 1000):").place(x=30, y=10)
+
+    # Slider hinzufügen
+    Grenzwert_1 = customtkinter.CTkSlider(root, from_=0, to=1000, number_of_steps=1000, orientation=HORIZONTAL,
+                                          width=290)
+    Grenzwert_1.set(100)
+    Grenzwert_1.place(x=27, y=43)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Grenzwert 2: (1 - 1000):").place(x=30, y=109)
+
+    # Slider hinzufügen
+    Grenzwert_2 = customtkinter.CTkSlider(root, from_=0, to=1000, number_of_steps=1000, orientation=HORIZONTAL,
+                                          width=290)
+    Grenzwert_2.set(200)
+    Grenzwert_2.place(x=27, y=142)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text='Filtereffekt',
+                            command=lambda: cany_filter(img, int(Grenzwert_1.get()), int(Grenzwert_2.get())),
+                            width=290).place(x=30, y=208)
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Fertig", command=finish_image, width=290).place(x=30, y=241)
+
+    # GUI starten
+    root.mainloop()
+
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
+    else:
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
+
+
+# Schwarz-weiße Filter
+def black_white(image):
+    # globale Variablen
     global img
-    if img is not None:
-        # Farbeffekte
-        # Umwandlung in Schwarzweiß
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        update(img)
-    else:
-        return
 
-def blur():
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    # Umwandlung in Schwarzweiß
+    adjusted = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
+    else:
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
+
+
+# Funktion zum Weichzeichnen eines Bildes
+def blur(image):
+    # globale variablen
     global img
-    if img is not None:
-        # Weichzeichner für Hintergrund
-        wz = cv2.GaussianBlur(img, (5, 5), 0)
-        img = cv2.cvtColor(wz, cv2.COLOR_BGR2RGB)
-        update(img)
-    else:
-        return
 
-def text_effect():
+    # lokale variablen
+    adjusted = None
+
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    # #Verwischfunktion Einstellungen
+    def adjust_blur(k1, k2, sigma_x, blur_image):
+        # lokale variablen
+        nonlocal adjusted
+
+        adjusted = cv2.GaussianBlur(blur_image, (k1, k2), sigma_x)  # GaussianBlur
+
+        # Fenster erstellen und Größe anpassen
+        cv2.namedWindow('Blur Funktion Vorschau', cv2.WINDOW_NORMAL)
+        cv2.imshow('Blur Funktion Vorschau', adjusted)
+        cv2.waitKey()
+
+    # Bearbeitung bzw. Einstellung beenden
+    def finish_image():
+        root.quit()  # Schließe Tkinter-Fenster
+        root.destroy()
+
+    # GUI erstellen
+    root = CTk()
+    root.title("Blur Funktion")
+
+    screen_width = 350
+    screen_height = 376
+    root.geometry(f"{screen_width}x{screen_height}")
+    root.resizable(False, False)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="K1 (0 - 100):").place(x=30, y=10)
+
+    # Slider hinzufügen
+    k1_slider = customtkinter.CTkSlider(root, from_=1, to=99, number_of_steps=49, orientation=HORIZONTAL, width=290)
+    k1_slider.set(1)
+    k1_slider.place(x=27, y=43)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="K2 (0 - 100):").place(x=30, y=109)
+
+    # Slider hinzufügen
+    k2_slider = customtkinter.CTkSlider(root, from_=1, to=99, number_of_steps=49, orientation=HORIZONTAL, width=290)
+    k2_slider.set(1)
+    k2_slider.place(x=27, y=142)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="sigmaX (0 - 100):").place(x=30, y=208)
+
+    # Slider hinzufügen
+    sigma_x_slider = customtkinter.CTkSlider(root, from_=0, to=100, number_of_steps=100, orientation=HORIZONTAL,
+                                             width=290)
+    sigma_x_slider.set(0)
+    sigma_x_slider.place(x=27, y=241)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text='Blur Effekt',
+                            command=lambda: adjust_blur(int(k1_slider.get()), int(k2_slider.get()),
+                                                        int(sigma_x_slider.get()), img),
+                            width=290).place(x=30, y=307)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Fertig", command=finish_image, width=290).place(x=30, y=340)
+
+    # GUI starten
+    root.mainloop()
+
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
+    else:
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
+
+
+# Funktion zum Schreiben auf einem Bild
+def text_effect(image):
+    # globale Variablen
+    global img, color
+
+    # lokale Variablen
+    adjusted = None
+
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    # Einstellungen des Schreibens
+    def text(text_image, text_color, font_scale, font_thickness):
+
+        # Fenster erstellen und Größe anpassen
+        cv2.namedWindow('Texteffekt Funktion Vorschau', cv2.WINDOW_NORMAL)
+        cv2.imshow('Texteffekt Funktion Vorschau', text_image)
+
+        # Maus-Callback Funktion
+        def write_text(event, x, y, flags, param):
+            # lokale Variablen
+            nonlocal adjusted
+
+            # Schriftart
+            font = cv2.FONT_HERSHEY_SIMPLEX
+
+            # Falls keine Farbe ausgewählt ist, Default ist Schwarz
+            if text_color is None:
+                red = 0
+                green = 0
+                blue = 0
+            else:
+                blue, green, red = tuple(int(text_color[i:i + 2], 16) for i in (1, 3, 5))
+
+            # Maus-Event prüfen
+            if event == cv2.EVENT_LBUTTONDOWN:
+                i = 0
+
+                while True:
+                    # Initialisierung
+                    k = cv2.waitKey(0)
+
+                    # Nur zeichnen, wenn die gedrückte Taste ein druckbares Zeichen ist
+                    if 32 <= k <= 126:
+                        adjusted = cv2.putText(text_image, chr(k), (x + i, y), font, font_scale,
+                                               (red, green, blue), font_thickness, cv2.LINE_AA)
+                        cv2.imshow('Texteffekt Funktion Vorschau', text_image)
+
+                    i += 10
+
+                    # Drücke Esc, um den Vorgang zu beenden
+                    if k == 27:
+                        break
+
+                    # Falls es keine Tastatureingabe gibt, BREAK
+                    if k == -1:
+                        break
+
+        cv2.namedWindow('Texteffekt Funktion Vorschau')
+        cv2.setMouseCallback('Texteffekt Funktion Vorschau', write_text)
+
+    # Bearbeitung bzw. Einstellung beenden
+    def finish_image():
+        # globale variablen
+        global color
+
+        # Reset Farbe beim Beenden
+        color = None
+        cv2.destroyAllWindows()
+        root.quit()  # Schließe Tkinter-Fenster
+        root.destroy()
+
+    # GUI erstellen
+    root = CTk()
+    root.title("Texteffekt Funktion")
+
+    # Einstellung der Größe des Fensters
+    screen_width = 350
+    screen_height = 312
+    root.geometry(f"{screen_width}x{screen_height}")
+    root.resizable(False, False)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Schriftskala (1 - 100):").place(x=30, y=10)
+
+    # Slider hinzufügen
+    font_scale_slider = customtkinter.CTkSlider(root, from_=1, to=100, number_of_steps=99, orientation=HORIZONTAL,
+                                                width=290)
+    font_scale_slider.set(1)
+    font_scale_slider.place(x=27, y=43)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Schriftstärke (1 - 100):").place(x=30, y=112)
+
+    # Slider hinzufügen
+    font_thickness_slider = customtkinter.CTkSlider(root, from_=1, to=100, number_of_steps=99, orientation=HORIZONTAL,
+                                                    width=290)
+    font_thickness_slider.set(1)
+    font_thickness_slider.place(x=27, y=145)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Farbe", command=choose_color, width=290).place(x=30, y=211)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text='Text Effekt',
+                            command=lambda: text(img, color, int(font_scale_slider.get()),
+                                                 int(font_thickness_slider.get())),
+                            width=290).place(x=30, y=243)
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Fertig", command=finish_image, width=290).place(x=30, y=276)
+
+    # GUI starten
+    root.mainloop()
+
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
+    else:
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
+
+
+# Kontrast Verbesserung
+def contrast(image):
+    # globale Variablen
     global img
-    a = None
-    if img is not None:
-        # Funktion zum Anpassen des Kontrasts
-        def text(img, blue, green, red, font_scale, font_thickness):
-            # Fenster erstellen und Größe anpassen
-            cv2.namedWindow('text on image', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('text on image', int(frame_width / 1.5), int(frame_height / 1.5))
 
-            cv2.imshow('text on image', img)
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-            # mouse callback function
-            def draw_circle(event, x, y, flags, param):
-                global a
-                font = cv2.FONT_HERSHEY_SIMPLEX
-                if event == cv2.EVENT_LBUTTONDBLCLK:
-                    i = 0
+    # Ermittel den minimalen und maximalen Pixelwert
+    minimumColor = np.amin(img)
+    maximumColor = np.amax(img)
 
-                    while True:
-                        k = cv2.waitKey(0)
-                        # Only draw if the key pressed is a printable character
-                        if 32 <= k <= 126:
-                            a = cv2.putText(img, chr(k), (x + i, y), font, font_scale, (blue, green, red),
-                                            font_thickness, cv2.LINE_AA)
-                            cv2.imshow('text on image', img)
-                        i += 10
-                        # Press 'q' to stop writing
-                        if k == 27:
-                            break
+    # Erstelle zwei Matrizen basierend auf dem Durchschnittspixelwert
+    avg = np.mean(img)
+    colorDownMatrix = img < avg
+    colorUpMatrix = img > avg
 
-            cv2.namedWindow('text on image')
-            cv2.setMouseCallback('text on image', draw_circle)
+    # Passen Sie den Bildkontrast an
+    adjusted = img - minimumColor * colorDownMatrix
+    adjusted = adjusted + maximumColor * colorUpMatrix
 
-        def finish_image():
-            global a, img
-            img = a
-            update(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    # Sicherstellen, dass die Pixelwerte im richtigen Bereich bleiben
+    lessThen0 = adjusted < 0
+    moreThen255 = adjusted > 255
+    adjusted[lessThen0] = 0
+    adjusted[moreThen255] = 255
 
-        # GUI erstellen
-        root = Tk()
-        root.title("Text")
-
-        # Set the size of the window to the size of the screen
-        screen_width = 250
-        screen_height = 500
-        root.geometry(f"{screen_width}x{screen_height}")
-
-        # Labels und Schieberegler erstellen
-        Label(root, text="Enter your text:").pack()
-
-        # Labels und Schieberegler erstellen
-        Label(root, text="blue (0-255):").pack()
-        blue = Scale(root, from_=0, to=255, resolution=1, orient=HORIZONTAL)
-        blue.pack()
-
-        Label(root, text="green (0-255):").pack()
-        green = Scale(root, from_=0, to=255, resolution=1, orient=HORIZONTAL)
-        green.pack()
-
-        Label(root, text="red (0-255):").pack()
-        red = Scale(root, from_=0, to=255, resolution=1, orient=HORIZONTAL)
-        red.pack()
-
-        Label(root, text="font scale (1-100):").pack()
-        font_scale = Scale(root, from_=1, to=100, resolution=1, orient=HORIZONTAL)
-        font_scale.pack()
-
-        Label(root, text="font thickness (1-100):").pack()
-        font_thickness = Scale(root, from_=1, to=100, resolution=1, orient=HORIZONTAL)
-        font_thickness.pack()
-
-        # Button zum Öffnen der Dateiauswahl und Anpassen des Kontrasts
-        Button(root, text='show picture',
-               command=lambda: text(img, blue.get(), green.get(), red.get(), font_scale.get(),
-                                    font_thickness.get())).pack()
-        Button(root, text="finish", command=finish_image).pack()
-        # GUI starten
-        root.mainloop()
-
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
     else:
-        return
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
 
-def contrast():
+
+# Helligkeit Anpassung Funktion
+def brightness(image):
+    # globale Variablen
     global img
-    a = None
-    if img is not None:
-        # Funktion zum Anpassen des Kontrasts
-        def adjust_contrast(alpha, beta, img):
-            global a
-            # Anpassung durchführen
-            adjusted = cv2.convertScaleAbs(img, alpha=float(alpha), beta=int(beta))
-            a = adjusted
 
-            # Fenster erstellen und Größe anpassen
-            cv2.namedWindow('contrast', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('contrast', int(frame_width / 1.5), int(frame_height / 1.5))
+    # lokale Variablen
+    adjusted = None
 
-            # Ergebnis anzeigen
-            cv2.imshow('contrast', adjusted)
-            cv2.waitKey()
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        def finish_image():
-            global a, img
-            img = a
-            update(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    # Funktion zum Anpassen des Kontrasts
+    def adjust_brightness(alpha, beta, brightness_image):
+        nonlocal adjusted
 
-        # GUI erstellen
-        root = Tk()
-        root.title("Contrast")
+        # Anpassung durchführen
+        if alpha == 1:  # Nur Aufhellen
+            adjusted = cv2.convertScaleAbs(brightness_image, alpha=float(1), beta=float(beta))
+        else:
+            adjusted = cv2.convertScaleAbs(brightness_image, alpha=float(alpha) / 100.0, beta=float(beta))
 
-        # Set the size of the window to the size of the screen
-        screen_width = 250
-        screen_height = 250
-        root.geometry(f"{screen_width}x{screen_height}")
+        # Fenster erstellen und Größe anpassen
+        cv2.namedWindow('Helligkeit Funktion Vorschau', cv2.WINDOW_NORMAL)
 
-        # Labels und Schieberegler erstellen
-        Label(root, text="Alpha (1.0-3.0):").pack()
-        alpha = Scale(root, from_=1.0, to=3.0, resolution=0.1, orient=HORIZONTAL)
-        alpha.pack()
+        # Ergebnis anzeigen
+        cv2.imshow('Helligkeit Funktion Vorschau', adjusted)
+        cv2.waitKey()
 
-        Label(root, text="Beta (0-100):").pack()
-        beta = Scale(root, from_=0, to=100, resolution=1, orient=HORIZONTAL)
-        beta.pack()
+    # Bearbeitung bzw. Einstellung beenden
+    def finish_image():
+        root.quit()  # Schließe Tkinter-Fenster
+        root.destroy()
 
-        # Button zum Öffnen der Dateiauswahl und Anpassen des Kontrasts
-        Button(root, text='show picture',
-               command=lambda: adjust_contrast(alpha.get(), beta.get(), img)).pack()
-        Button(root, text="finish", command=finish_image).pack()
-        # GUI starten
-        root.mainloop()
+    # GUI erstellen
+    root = CTk()
+    root.title("Helligkeit Funktion")
 
+    # Einstellung der Größe des Fensters
+    screen_width = 350
+    screen_height = 343
+    root.geometry(f"{screen_width}x{screen_height}")
+    root.resizable(False, False)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Zum Aufhellen Alpha = 1 ein und ändern Beta!").place(x=30, y=10)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Zum Abdunkeln Beta = 0 und ändern Alpha!").place(x=30, y=43)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Alpha (1 - 100):").place(x=30, y=76)
+
+    # Slider hinzufügen
+    alpha_slider = customtkinter.CTkSlider(root, from_=1, to=100, number_of_steps=99, orientation=HORIZONTAL, width=290)
+    alpha_slider.set(1.0)
+    alpha_slider.place(x=27, y=109)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Beta (0 - 100):").place(x=30, y=175)
+
+    # Slider hinzufügen
+    beta_slider = customtkinter.CTkSlider(root, from_=0, to=100, number_of_steps=100, orientation=HORIZONTAL, width=290)
+    beta_slider.set(0)
+    beta_slider.place(x=27, y=208)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text='Helligkeit',
+                            command=lambda: adjust_brightness(int(alpha_slider.get()), int(beta_slider.get()), img),
+                            width=290).place(
+        x=30, y=274)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Fertig", command=finish_image, width=290).place(x=30, y=307)
+
+    # GUI starten
+    root.mainloop()
+
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
     else:
-        return
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
 
-def brightness():
+
+# Schatten hinzufügen Funktion
+def darken(image):
+    # globale Variablen
     global img
-    a = None
-    if img is not None:
-        # Funktion zum Anpassen des Kontrasts
-        def adjust_contrast(beta, img):
-            global a
-            # Anpassung durchführen
-            adjusted = cv2.convertScaleAbs(img, alpha=float(1), beta=int(beta))
-            a = adjusted
 
-            # Fenster erstellen und Größe anpassen
-            cv2.namedWindow('brightness', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('brightness', int(frame_width / 1.5), int(frame_height / 1.5))
+    # lokale Variablen
+    adjusted = None
 
-            # Ergebnis anzeigen
-            cv2.imshow('brightness', adjusted)
-            cv2.waitKey()
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        def finish_image():
-            global a, img
-            img = a
-            update(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    def darken_image_function(darken_img, intensity):
+        nonlocal adjusted
 
-        # GUI erstellen
-        root = Tk()
-        root.title("Brightness")
+        # Bild in float32 konvertieren
+        edit_image = np.float32(darken_img)
 
-        # Set the size of the window to the size of the screen
-        screen_width = 250
-        screen_height = 250
-        root.geometry(f"{screen_width}x{screen_height}")
+        # Schatteneffekt erstellen
+        darken_image = edit_image * intensity
 
-        # Labels und Schieberegler erstellen
-        Label(root, text="Beta (0-100):").pack()
-        beta = Scale(root, from_=0, to=100, resolution=1, orient=HORIZONTAL)
-        beta.pack()
+        # Werte auf den Bereich 0-255 begrenzen
+        darken_image = np.clip(darken_image, 0, 255)
 
-        # Button zum Öffnen der Dateiauswahl und Anpassen des Kontrasts
-        Button(root, text='show picture',
-               command=lambda: adjust_contrast(beta.get(), img)).pack()
-        Button(root, text="finish", command=finish_image).pack()
-        # GUI starten
-        root.mainloop()
+        # Bild in uint8 konvertieren und zurückgeben
+        adjusted = np.uint8(darken_image)
 
+        # Fenster erstellen und Größe anpassen
+        cv2.namedWindow('Dunkel Funktion Vorschau', cv2.WINDOW_NORMAL)
+        # cv2.resizeWindow('Image with Shadow', int (frame_width/1.5), int (frame_height/1.5))
+
+        # Bild anzeigen
+        cv2.imshow('Dunkel Funktion Vorschau', adjusted)
+        cv2.waitKey(0)
+
+    # Bearbeitung bzw. Einstellung beenden
+    def finish_image():
+        root.quit()  # Schließe Tkinter-Fenster
+        root.destroy()
+
+    # GUI erstellen
+    root = CTk()
+    root.title("Dunkel Funktion")
+
+    # Set the size of the window to the size of the screen
+    screen_width = 350
+    screen_height = 176
+    root.geometry(f"{screen_width}x{screen_height}")
+    root.resizable(False, False)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Intensität (0 - 1):").place(x=30, y=10)
+
+    # Slider hinzufügen
+    intensity_slider = customtkinter.CTkSlider(root, from_=0, to=1, number_of_steps=100, orientation=HORIZONTAL,
+                                               width=290)
+    intensity_slider.set(0)
+    intensity_slider.place(x=28, y=43)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text='Dunkel',
+                            command=lambda: darken_image_function(img, float(intensity_slider.get())), width=290).place(
+        x=30, y=109)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Fertig", command=finish_image, width=290).place(x=30, y=142)
+
+    # GUI starten
+    root.mainloop()
+
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
     else:
-        return
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
 
-def darken():
+
+# Verpixelung Funktion
+def pixelate(image):
+    # globale Variablen
     global img
-    a = None
-    if img is not None:
-        # Funktion zum Anpassen des Kontrasts
-        def adjust_contrast(alpha, img):
-            global a
-            # Anpassung durchführen
-            adjusted = cv2.convertScaleAbs(img, alpha=float(alpha) / 100.0, beta=int(0))
-            a = adjusted
 
-            # Fenster erstellen und Größe anpassen
-            cv2.namedWindow('darken', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('darken', int(frame_width / 1.5), int(frame_height / 1.5))
+    # lokale Variablen
+    adjusted = None
 
-            # Ergebnis anzeigen
-            cv2.imshow('darken', adjusted)
-            cv2.waitKey()
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        def finish_image():
-            global a, img
-            img = a
-            update(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    # Verpixelung Funktion Einstellungen
+    def pixelate_image(pixel_image, pixel_size):
+        # lokale Variablen
+        nonlocal adjusted
 
-        # GUI erstellen
-        root = Tk()
-        root.title("Darken")
+        pixelate_img = pixel_image
 
-        # Set the size of the window to the size of the screen
-        screen_width = 250
-        screen_height = 250
-        root.geometry(f"{screen_width}x{screen_height}")
+        # Bildgröße ermitteln
+        height, width = pixelate_img.shape[:2]
 
-        # Labels und Schieberegler erstellen
-        Label(root, text="alpha (0-100):").pack()
-        alpha = Scale(root, from_=0, to=100, resolution=1, orient=HORIZONTAL)
-        alpha.pack()
+        # Bild verkleinern
+        img_small = cv2.resize(pixelate_img, (pixel_size, pixel_size), interpolation=cv2.INTER_LINEAR)
 
-        # Button zum Öffnen der Dateiauswahl und Anpassen des Kontrasts
-        Button(root, text='show picture',
-               command=lambda: adjust_contrast(alpha.get(), img)).pack()
-        Button(root, text="finish", command=finish_image).pack()
-        # GUI starten
-        root.mainloop()
+        # Verkleinertes Bild wieder vergrößern
+        adjusted = cv2.resize(img_small, (width, height), interpolation=cv2.INTER_NEAREST)
 
+        # Fenster erstellen und Größe anpassen
+        cv2.namedWindow('Pixel Funktion Vorschau', cv2.WINDOW_NORMAL)
+
+        # Ergebnis anzeigen
+        cv2.imshow('Pixel Funktion Vorschau', adjusted)
+        cv2.waitKey()
+
+    # Bearbeitung bzw. Einstellung beenden
+    def finish_image():
+        root.quit()  # Schließe Tkinter-Fenster
+        root.destroy()
+
+    # GUI erstellen
+    root = CTk()
+    root.title("Pixel Funktion")
+
+    # Einstellung der Größe des Fensters
+    screen_width = 350
+    screen_height = 178
+    root.geometry(f"{screen_width}x{screen_height}")
+    root.resizable(False, False)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Pixelgröße (1 - 100):").place(x=30, y=10)
+
+    # Slider hinzufügen
+    pixel_size_slider = customtkinter.CTkSlider(root, from_=1, to=100, number_of_steps=99, orientation=HORIZONTAL,
+                                                width=290)
+    pixel_size_slider.set(1)
+    pixel_size_slider.place(x=28, y=43)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text='Pixel',
+                            command=lambda: pixelate_image(img, int(pixel_size_slider.get())), width=290).place(x=30,
+                                                                                                                y=109)
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Fertig", command=finish_image, width=290).place(x=30, y=142)
+
+    # GUI starten
+    root.mainloop()
+
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
     else:
-        return
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
 
-def pixelate():
+
+# Weißabgleich Funktion
+def white_balance(image):
+    # globale Variablen
     global img
-    a = None
-    if img is not None:
-        def pixelate_image(img, pixel_size):
-            global a
-            # Bildgröße ermitteln
-            height, width = img.shape[:2]
 
-            # Bild verkleinern
-            img_small = cv2.resize(img, (pixel_size, pixel_size), interpolation=cv2.INTER_LINEAR)
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-            # Verkleinertes Bild wieder vergrößern
-            img_pixelated = cv2.resize(img_small, (width, height), interpolation=cv2.INTER_NEAREST)
+    adjusted = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 
-            a = img_pixelated
+    avg_a = np.average(adjusted[:, :, 1])
+    avg_b = np.average(adjusted[:, :, 2])
+    adjusted[:, :, 1] = adjusted[:, :, 1] - ((avg_a - 128) * (adjusted[:, :, 0] / 255.0) * 1.1)
+    adjusted[:, :, 2] = adjusted[:, :, 2] - ((avg_b - 128) * (adjusted[:, :, 0] / 255.0) * 1.1)
 
-            # Fenster erstellen und Größe anpassen
-            cv2.namedWindow('pixelate', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('pixelate', int(frame_width / 1.5), int(frame_height / 1.5))
+    adjusted = cv2.cvtColor(adjusted, cv2.COLOR_LAB2BGR)
 
-            # Ergebnis anzeigen
-            cv2.imshow('pixelate', img_pixelated)
-            cv2.waitKey()
-
-        def finish_image():
-            global a, img
-            img = a
-            update(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-
-        # GUI erstellen
-        root = Tk()
-        root.title("Pixelate")
-
-        # Set the size of the window to the size of the screen
-        screen_width = 250
-        screen_height = 250
-        root.geometry(f"{screen_width}x{screen_height}")
-
-        # Labels und Schieberegler erstellen
-        Label(root, text="pixel size (1-100):").pack()
-        pixel_size = Scale(root, from_=1, to=100, resolution=1, orient=HORIZONTAL)
-        pixel_size.pack()
-
-        # Button zum Öffnen der Dateiauswahl und Anpassen des Kontrasts
-        Button(root, text='show picture',
-               command=lambda: pixelate_image(img, pixel_size.get())).pack()
-        Button(root, text="finish", command=finish_image).pack()
-        # GUI starten
-        root.mainloop()
-
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
     else:
-        return
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
 
-def white_balance():
+
+# Licht hinzufügen Funktion
+def add_light(image):
+    # globale Variablen
     global img
-    if img is not None:
-        result = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-        avg_a = np.average(result[:, :, 1])
-        avg_b = np.average(result[:, :, 2])
-        result[:, :, 1] = result[:, :, 1] - ((avg_a - 128) * (result[:, :, 0] / 255.0) * 1.1)
-        result[:, :, 2] = result[:, :, 2] - ((avg_b - 128) * (result[:, :, 0] / 255.0) * 1.1)
-        result = cv2.cvtColor(result, cv2.COLOR_LAB2BGR)
-        img = result
-        update(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-    else:
-        return
 
-def add_light():
+    # lokale Variablen
+    adjusted = None
+
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    def light(light_image, radius, center_x, center_y, intensity):
+        # lokale Variablen
+        nonlocal adjusted
+
+        # Lichtquelle hinzufügen
+        center = (center_x, center_y)  # Zentrum der Lichtquelle
+
+        # Bild in float32 konvertieren
+        edit_image = np.float32(light_image)
+
+        # Lichtquelle erstellen
+        mask = np.zeros(edit_image.shape, dtype=np.float32)
+        cv2.circle(mask, center, radius, (intensity, intensity, intensity), -1)
+
+        # Lichtquelle zum Bild hinzufügen
+        edit_image += mask
+
+        # Werte auf den Bereich 0-255 begrenzen
+        edit_image = np.clip(edit_image, 0, 255)
+
+        # Bild in uint8 konvertieren und zurückgeben
+        adjusted = np.uint8(edit_image)
+
+        # Fenster erstellen und Größe anpassen
+        cv2.namedWindow('Licht Hinzufuegen Funktion Vorschau', cv2.WINDOW_NORMAL)
+
+        # Bild anzeigen
+        cv2.imshow('Licht Hinzufuegen Funktion Vorschau', adjusted)
+        cv2.waitKey(0)
+
+    # Bearbeitung bzw. Einstellung beenden
+    def finish_image():
+        root.quit()  # Schließe Tkinter-Fenster
+        root.destroy()
+
+    # GUI erstellen
+    root = CTk()
+    root.title("Licht Hinzufuegen Funktion")
+
+    # Einstellung der Größe des Fensters
+    screen_width = 350
+    screen_height = 478
+    root.geometry(f"{screen_width}x{screen_height}")
+    root.resizable(False, False)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Lichtradius (1 - 5000):").place(x=30, y=10)
+
+    # Slider hinzufügen
+    radius_slider = customtkinter.CTkSlider(root, from_=1, to=5000, number_of_steps=4999, orientation=HORIZONTAL,
+                                            width=290)
+    radius_slider.set(0)
+    radius_slider.place(x=28, y=43)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Mittelpunkt des Lichtkreises X (1-Frame Width):").place(x=30, y=109)
+
+    # Slider hinzufügen
+    center_x_slider = customtkinter.CTkSlider(root, from_=0, to=500, number_of_steps=500, orientation=HORIZONTAL,
+                                              width=290)
+    center_x_slider.set(0)
+    center_x_slider.place(x=28, y=142)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Mittelpunkt des Lichtkreises Y (1-Frame Height):").place(x=30, y=208)
+
+    # Slider hinzufügen
+    center_y_slider = customtkinter.CTkSlider(root, from_=0, to=500, number_of_steps=500, orientation=HORIZONTAL,
+                                              width=290)
+    center_y_slider.set(0)
+    center_y_slider.place(x=28, y=241)
+
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Lichtintensität (1 - 255):").place(x=30, y=307)
+
+    # Slider hinzufügen
+    intensity_slider = customtkinter.CTkSlider(root, from_=1, to=255, number_of_steps=255, orientation=HORIZONTAL,
+                                               width=290)
+    intensity_slider.set(0)
+    intensity_slider.place(x=28, y=340)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text='Licht',
+                            command=lambda: light(img, int(radius_slider.get()), int(center_x_slider.get()),
+                                                  int(center_y_slider.get()),
+                                                  int(intensity_slider.get())), width=290).place(x=30, y=409)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Fertig", command=finish_image, width=290).place(x=30, y=442)
+
+    # GUI starten
+    root.mainloop()
+
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
+    else:
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
+
+
+# Schatten Funktion
+def add_shadow(image):
+    # globle Variablen
     global img
-    a = None
 
-    if img is not None:
-        def light(img, radius, center_x, center_y, intensity):
-            global a
+    # lokale Variablen
+    adjusted = None
 
-            # Lichtquelle hinzufügen
-            center = (center_x, center_y)  # Zentrum der Lichtquelle
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-            # Bild in float32 konvertieren
-            image = np.float32(img)
+    def adjust_shadows(shadow_image, gamma, clip_limit):
+        # lokale Variablen
+        nonlocal adjusted
 
-            # Lichtquelle erstellen
-            mask = np.zeros(image.shape, dtype=np.float32)
-            cv2.circle(mask, center, radius, (intensity, intensity, intensity), -1)
+        # Konvertierung in das Lab-Farbraumformat
+        lab = cv2.cvtColor(shadow_image, cv2.COLOR_BGR2LAB)
 
-            # Lichtquelle zum Bild hinzufügen
-            image += mask
+        # Aufteilen in Kanäle
+        l, a, b = cv2.split(lab)
 
-            # Werte auf den Bereich 0-255 begrenzen
-            image = np.clip(image, 0, 255)
+        # Gamma-Korrektur auf dem L-Kanal (Helligkeit)
+        l = cv2.pow(l / 255.0, gamma)
+        l = np.uint8(l * 255)
 
-            # Bild in uint8 konvertieren und zurückgeben
-            image_edited = np.uint8(image)
-            a = image_edited
+        # Kontrast Limited Adaptive Histogram Equalization (CLAHE) auf dem L-Kanal
+        clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(8, 8))
+        l = clahe.apply(l)
 
-            # Fenster erstellen und Größe anpassen
-            cv2.namedWindow('Image with Light', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('Image with Light', int(frame_width / 1.5), int(frame_height / 1.5))
+        # Zusammenführen der Kanäle
+        lab = cv2.merge((l, a, b))
 
-            # Bild anzeigen
-            cv2.imshow('Image with Light', image_edited)
-            cv2.waitKey(0)
+        # Zurückkonvertieren in das BGR-Farbraumformat
+        adjusted = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
 
-        def finish_image():
-            global a, img
-            img = a
-            update(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        # Fenster erstellen und Größe anpassen
+        cv2.namedWindow('Schatten Funktion Vorschau', cv2.WINDOW_NORMAL)
 
-        # GUI erstellen
-        root = Tk()
-        root.title("Add Light")
+        # Bild anzeigen
+        cv2.imshow('Schatten Funktion Vorschau', adjusted)
+        cv2.waitKey(0)
 
-        # Set the size of the window to the size of the screen
-        screen_width = 250
-        screen_height = 500
-        root.geometry(f"{screen_width}x{screen_height}")
+    # Bearbeitung bzw. Einstellung beenden
+    def finish_image():
+        root.quit()  # Schließe Tkinter-Fenster
+        root.destroy()
 
-        # Labels und Schieberegler erstellen
-        Label(root, text="light radius (1-5000):").pack()
-        radius = Scale(root, from_=0, to=5000, resolution=10, orient=HORIZONTAL)
-        radius.pack()
+    # GUI erstellen
+    root = CTk()
+    root.title("Schatten Funktion")
 
-        Label(root, text="center x(1-Frame Width):").pack()
-        center_x = Scale(root, from_=0, to=frame_width, resolution=1, orient=HORIZONTAL)
-        center_x.pack()
+    # Einstellung der Größe des Fensters
+    screen_width = 350
+    screen_height = 287
+    root.geometry(f"{screen_width}x{screen_height}")
+    root.resizable(False, False)
 
-        Label(root, text="center y (1-Frame Height):").pack()
-        center_y = Scale(root, from_=0, to=frame_height, resolution=1, orient=HORIZONTAL)
-        center_y.pack()
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Gamma (0.1 - 3):").place(x=30, y=10)
 
-        Label(root, text="light intensity (1-255):").pack()
-        intensity = Scale(root, from_=0, to=255, resolution=1, orient=HORIZONTAL)
-        intensity.pack()
+    # Slider hinzufügen
+    gamma_slider = customtkinter.CTkSlider(root, from_=0.1, to=3, number_of_steps=290, orientation=HORIZONTAL,
+                                           width=290)
+    gamma_slider.set(0)
+    gamma_slider.place(x=28, y=43)
 
-        # Button zum Öffnen der Dateiauswahl und Anpassen des Kontrasts
-        Button(root, text='show picture',
-               command=lambda: light(img, radius.get(), center_x.get(), center_y.get(), intensity.get())).pack()
-        Button(root, text="finish", command=finish_image).pack()
-        # GUI starten
-        root.mainloop()
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="clip limit (2 - 4):").place(x=30, y=109)
 
+    # Slider hinzufügen
+    clip_limit_slider = customtkinter.CTkSlider(root, from_=2, to=4, number_of_steps=200, orientation=HORIZONTAL,
+                                                width=290)
+    clip_limit_slider.set(0)
+    clip_limit_slider.place(x=28, y=142)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text='Schatten',
+                            command=lambda: adjust_shadows(img, float(gamma_slider.get()),
+                                                           float(clip_limit_slider.get())), width=290).place(x=30,
+                                                                                                             y=208)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Fertig", command=finish_image, width=290).place(x=30, y=241)
+
+    # GUI starten
+    root.mainloop()
+
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
     else:
-        return
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
 
-def add_shadow():
+
+# Farbeffekte Funktion
+def color_balance(image):
+    # globale Variablen
+    global img, color
+
+    # lokale Variablen
+    adjusted = None
+
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    # Farbeffekte Funktion Einstellungen
+    def adjust_color_balance(adjust_color_img, adjust_color):
+        # lokale Variablen
+        nonlocal adjusted
+
+        b, g, r = cv2.split(adjust_color_img)
+
+        # Falls keine Farbe ausgewählt ist, Default ist Schwarz
+        if adjust_color is None:
+            red = 100
+            green = 100
+            blue = 100
+        else:
+            red, green, blue = tuple(int(adjust_color[i:i + 2], 16) for i in (1, 3, 5))
+
+        b = cv2.convertScaleAbs(b, alpha=blue)  # Blau
+        g = cv2.convertScaleAbs(g, alpha=green)  # Grün
+        r = cv2.convertScaleAbs(r, alpha=red)  # Rot
+
+        # Bild in uint8 konvertieren und zurückgeben
+        adjusted = cv2.merge([b, g, r])
+
+        # Fenster erstellen und Größe anpassen
+        cv2.namedWindow('Farbeffekte Funktion Vorschau', cv2.WINDOW_NORMAL)
+
+        # Bild anzeigen
+        cv2.imshow('Farbeffekte Funktion Vorschau', adjusted)
+        cv2.waitKey(0)
+
+    # Bearbeitung bzw. Einstellung beenden
+    def finish_image():
+        # globale variablen
+        global color
+
+        # Reset Farbe beim Beenden
+        color = None
+        root.quit()  # Schließe Tkinter-Fenster
+        root.destroy()
+
+    # GUI erstellen
+    root = CTk()
+    root.title("Farbeffekte Funktion")
+
+    # Einstellung der Größe des Fensters
+    screen_width = 350
+    screen_height = 112
+    root.geometry(f"{screen_width}x{screen_height}")
+    root.resizable(False, False)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Farbe", command=choose_color, width=290).place(x=30, y=10)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text='Farbeffekte',
+                            command=lambda: adjust_color_balance(img, color), width=290).place(x=30, y=43)
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Fertig", command=finish_image, width=290).place(x=30, y=76)
+
+    # GUI starten
+    root.mainloop()
+
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
+    else:
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
+
+
+# Sepia Filter
+def sepia(image):
+    # globale Variablen
     global img
-    a = None
 
-    if img is not None:
-        def light(img, intensity):
-            global a
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-            # Bild in float32 konvertieren
-            image = np.float32(img)
+    # Sepia-Filter erstellen
+    sepia_filter = np.array([[0.272, 0.534, 0.131],
+                             [0.349, 0.686, 0.168],
+                             [0.393, 0.769, 0.189]])
 
-            # Schatteneffekt erstellen
-            shadow = image * intensity
+    # Sepia-Filter anwenden
+    adjusted = cv2.transform(img, sepia_filter)
 
-            # Werte auf den Bereich 0-255 begrenzen
-            shadow = np.clip(shadow, 0, 255)
-
-            # Bild in uint8 konvertieren und zurückgeben
-            image_edited = np.uint8(shadow)
-            a = image_edited
-
-            # Fenster erstellen und Größe anpassen
-            cv2.namedWindow('Image with Shadow', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('Image with Shadow', int(frame_width / 1.5), int(frame_height / 1.5))
-
-            # Bild anzeigen
-            cv2.imshow('Image with Shadow', image_edited)
-            cv2.waitKey(0)
-
-        def finish_image():
-            global a, img
-            img = a
-            update(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-
-        # GUI erstellen
-        root = Tk()
-        root.title("Add Shadow")
-
-        # Set the size of the window to the size of the screen
-        screen_width = 250
-        screen_height = 250
-        root.geometry(f"{screen_width}x{screen_height}")
-
-        # Labels und Schieberegler erstellen
-        Label(root, text="intensity (0-1):").pack()
-        intensity = Scale(root, from_=0, to=1, resolution=0.01, orient=HORIZONTAL)
-        intensity.pack()
-
-        # Button zum Öffnen der Dateiauswahl und Anpassen des Kontrasts
-        Button(root, text='show picture',
-               command=lambda: light(img, intensity.get())).pack()
-        Button(root, text="finish", command=finish_image).pack()
-        # GUI starten
-        root.mainloop()
-
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
     else:
-        return
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
 
-def color_balance():
+
+# Sättigungsfunktion
+def saturation(image):
+    # globale Variablen
     global img
-    a = None
 
-    if img is not None:
-        def adjust_color_balance(img, blue, green, red):
-            global a
+    # lokale Variablen
+    adjusted = None
 
-            b, g, r = cv2.split(img)
-            b = cv2.convertScaleAbs(b, alpha=blue)
-            g = cv2.convertScaleAbs(g, alpha=green)
-            r = cv2.convertScaleAbs(r, alpha=red)
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-            # Bild in uint8 konvertieren und zurückgeben
-            image_edited = cv2.merge([b, g, r])
-            a = image_edited
+    def saturation_function(saturate_image, saturate_value):
+        # lokale Variablen
+        nonlocal adjusted
 
-            # Fenster erstellen und Größe anpassen
-            cv2.namedWindow('Color Balance', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('Color Balance', int(frame_width / 1.5), int(frame_height / 1.5))
+        # Bild in HSV umwandeln
+        hsv = cv2.cvtColor(saturate_image, cv2.COLOR_RGB2HSV)
 
-            # Bild anzeigen
-            cv2.imshow('Color Balance', image_edited)
-            cv2.waitKey(0)
+        # Sättigung ändern
+        hsv[:, :, 1] = hsv[:, :, 1] * saturate_value
 
-        def finish_image():
-            global a, img
-            img = a
-            update(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        # Bild zurück in RGB umwandeln
+        adjusted = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
 
-        # GUI erstellen
-        root = Tk()
-        root.title("Color Balance")
+        # Fenster erstellen und Größe anpassen
+        cv2.namedWindow('Saetigung Funktion Vorschau', cv2.WINDOW_NORMAL)
 
-        # Set the size of the window to the size of the screen
-        screen_width = 250
-        screen_height = 250
-        root.geometry(f"{screen_width}x{screen_height}")
+        # Ergebnis anzeigen
+        cv2.imshow('Saetigung Funktion Vorschau', adjusted)
+        cv2.waitKey()
 
-        # Labels und Schieberegler erstellen
-        Label(root, text="blue (0-255):").pack()
-        blue = Scale(root, from_=0, to=255, resolution=0.01, orient=HORIZONTAL)
-        blue.pack()
+    # Bearbeitung bzw. Einstellung beenden
+    def finish_image():
+        root.quit()  # Schließe Tkinter-Fenster
+        root.destroy()
 
-        Label(root, text="green (0-255):").pack()
-        green = Scale(root, from_=0, to=255, resolution=0.01, orient=HORIZONTAL)
-        green.pack()
+    # GUI erstellen
+    root = CTk()
+    root.title("Saetigung Funktion")
 
-        Label(root, text="red (0-255):").pack()
-        red = Scale(root, from_=0, to=255, resolution=0.01, orient=HORIZONTAL)
-        red.pack()
+    # Einstellung der Größe des Fensters
+    screen_width = 350
+    screen_height = 178
+    root.geometry(f"{screen_width}x{screen_height}")
+    root.resizable(False, False)
 
-        # Button zum Öffnen der Dateiauswahl und Anpassen des Kontrasts
-        Button(root, text='show picture',
-               command=lambda: adjust_color_balance(img, blue.get(), green.get(), red.get())).pack()
-        Button(root, text="finish", command=finish_image).pack()
-        # GUI starten
-        root.mainloop()
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Saetigung (0 - 2):").place(x=30, y=10)
 
+    # Slider hinzufügen
+    saturation_value = customtkinter.CTkSlider(root, from_=0, to=2, number_of_steps=200, orientation=HORIZONTAL,
+                                               width=290)
+    saturation_value.set(1.25)
+    saturation_value.place(x=28, y=43)
+
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text='Saetigung',
+                            command=lambda: saturation_function(img, float(saturation_value.get())), width=290).place(
+        x=30,
+        y=109)
+    # Button hinzufügen
+    customtkinter.CTkButton(root, text="Fertig", command=finish_image, width=290).place(x=30, y=142)
+
+    # GUI starten
+    root.mainloop()
+
+    # Falls nichts bearbeiten wurde, return Original
+    if adjusted is None:
+        return None
     else:
-        return
-
-
-def Sepia():
-    global img
-    a = None
-
-    if img is not None:
-        def sepia_filter():
-            global a
-
-            # Sepia-Filter erstellen
-            sepia_filter = np.array([[0.272, 0.534, 0.131],
-                                     [0.349, 0.686, 0.168],
-                                     [0.393, 0.769, 0.189]])
-
-            # Sepia-Filter anwenden
-            sepia_img = cv2.transform(img, sepia_filter)
-
-            a = sepia_img
-
-            # Fenster erstellen und Größe anpassen
-            cv2.namedWindow('Sepia', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('Sepia', int(frame_width / 1.5), int(frame_height / 1.5))
-
-            # Bild anzeigen
-            cv2.imshow('Sepia', sepia_img)
-            cv2.waitKey(0)
-
-        def finish_image():
-            global a, img
-            img = a
-            update(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-
-        # GUI erstellen
-        root = Tk()
-        root.title("Sepia")
-
-        # Set the size of the window to the size of the screen
-        screen_width = 250
-        screen_height = 250
-        root.geometry(f"{screen_width}x{screen_height}")
-
-        # Labels und Schieberegler erstellen
-        Label(root, text="sepia filter").pack()
-
-        # Button zum Öffnen der Dateiauswahl und Anpassen des Kontrasts
-        Button(root, text='show picture',
-               command=lambda: sepia_filter()).pack()
-        Button(root, text="finish", command=finish_image).pack()
-        # GUI starten
-        root.mainloop()
-
-    else:
-        return
-
-
-def saturation():
-    global img
-    a = None
-
-    if img is not None:
-        def image_saturation():
-            global a
-
-            # Bild in HSV umwandeln
-            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-            # Sättigung erhöhen
-            hsv[:, :, 1] = hsv[:, :, 1] * 1.25
-
-            # Bild zurück in BGR umwandeln
-            img_saturation = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
-
-            a = img_saturation
-
-            # Fenster erstellen und Größe anpassen
-            cv2.namedWindow('Saturation', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('Saturation', int(frame_width / 1.5), int(frame_height / 1.5))
-
-            # Bild anzeigen
-            cv2.imshow('Saturation', img_saturation)
-            cv2.waitKey(0)
-
-        def finish_image():
-            global a, img
-            img = a
-            update(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-
-        # GUI erstellen
-        root = Tk()
-        root.title("Saturation")
-
-        # Set the size of the window to the size of the screen
-        screen_width = 250
-        screen_height = 250
-        root.geometry(f"{screen_width}x{screen_height}")
-
-        # Labels und Schieberegler erstellen
-        Label(root, text="image saturation").pack()
-
-        # Button zum Öffnen der Dateiauswahl und Anpassen des Kontrasts
-        Button(root, text='show picture',
-               command=lambda: image_saturation()).pack()
-        Button(root, text="finish", command=finish_image).pack()
-        # GUI starten
-        root.mainloop()
-
-    else:
-        return
-
-
-# Create the Tkinter window
-root = Tk()
-root.title("AKI-PROJEKT")
-
-# Set the size of the window to the size of the screen
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
-root.geometry(f"{screen_width}x{screen_height}")
-
-frame_width = screen_width - int(screen_width * 0.1)
-frame_height = screen_height - 80
-
-# Create a Frame widget for the image
-image_frame = Frame(root, width=frame_width, height=frame_height)
-image_frame.pack(side="left", expand=False, fill="both")
-
-# Create the Label widget for the image
-image_label = Label(image_frame)
-image_label.pack()
-
-# Create a Frame widget for other content (e.g., buttons, text fields, etc.)
-content_frame = Frame(root)
-content_frame.pack(side="bottom", expand=True, fill="both")
-
-# Calculate the size and position of the button
-button_width = int(screen_width * 0.1)
-button_height = int(screen_height * 0.05)
-button_x = (screen_width - button_width)
-button_y = 0
-
-# Create the button and place it in the center of the window
-btn_open = Button(root, text="open", width=button_width, height=button_height, command=open_image)
-btn_save = Button(root, text="save", width=button_width, height=button_height, command=save_image)
-btn_original = Button(root, text="original", width=button_width, height=button_height, command=original_image)
-btn_markup = Button(root, text="markup", width=button_width, height=button_height, command=markup_image)
-btn_filter = Button(root, text="filter", width=button_width, height=button_height, command=filter_effect)
-btn_contrast = Button(root, text="contrast", width=button_width, height=button_height, command=contrast)
-btn_invert = Button(root, text="invert", width=button_width, height=button_height, command=black_white)
-btn_blur = Button(root, text="blur", width=button_width, height=button_height, command=blur)
-btn_text = Button(root, text="text", width=button_width, height=button_height, command=text_effect)
-btn_brightness = Button(root, text="brightness", width=button_width, height=button_height, command=brightness)
-btn_darken = Button(root, text="darken", width=button_width, height=button_height, command=darken)
-btn_pixelate = Button(root, text="pixelate", width=button_width, height=button_height, command=pixelate)
-btn_whitebalance = Button(root, text="white balance", width=button_width, height=button_height, command=white_balance)
-btn_addlight = Button(root, text="add light", width=button_width, height=button_height, command=add_light)
-btn_addshadow = Button(root, text="add shadow", width=button_width, height=button_height, command=add_shadow)
-btn_colorbalance = Button(root, text="color balance", width=button_width, height=button_height, command=color_balance)
-btn_sephiafilter = Button(root, text="sepia filter", width=button_width, height=button_height, command=Sepia)
-btn_saetigung = Button(root, text="saturation", width=button_width, height=button_height, command=saturation)
-
-btn_open.place(x=button_x, y=button_y, width=button_width, height=button_height)
-btn_save.place(x=button_x, y=button_y + button_height, width=button_width, height=button_height)
-btn_original.place(x=button_x, y=button_y + 2 * button_height, width=button_width, height=button_height)
-btn_markup.place(x=button_x, y=button_y + 3 * button_height, width=button_width, height=button_height)
-btn_filter.place(x=button_x, y=button_y + 4 * button_height, width=button_width, height=button_height)
-btn_contrast.place(x=button_x, y=button_y + 5 * button_height, width=button_width, height=button_height)
-btn_invert.place(x=button_x, y=button_y + 6 * button_height, width=button_width, height=button_height)
-btn_blur.place(x=button_x, y=button_y + 7 * button_height, width=button_width, height=button_height)
-btn_text.place(x=button_x, y=button_y + 8 * button_height, width=button_width, height=button_height)
-btn_brightness.place(x=button_x, y=button_y + 9 * button_height, width=button_width, height=button_height)
-btn_darken.place(x=button_x, y=button_y + 10 * button_height, width=button_width, height=button_height)
-btn_pixelate.place(x=button_x, y=button_y + 11 * button_height, width=button_width, height=button_height)
-btn_whitebalance.place(x=button_x, y=button_y + 12 * button_height, width=button_width, height=button_height)
-btn_addlight.place(x=button_x, y=button_y + 13 * button_height, width=button_width, height=button_height)
-btn_addshadow.place(x=button_x, y=button_y + 14 * button_height, width=button_width, height=button_height)
-btn_colorbalance.place(x=button_x, y=button_y + 15 * button_height, width=button_width, height=button_height)
-btn_sephiafilter.place(x=button_x, y=button_y + 16 * button_height, width=button_width, height=button_height)
-btn_saetigung.place(x=button_x, y=button_y + 17 * button_height, width=button_width, height=button_height)
-
-# Start the Tkinter event loop
-root.mainloop()
+        return cv2.cvtColor(adjusted, cv2.COLOR_BGR2RGB)
