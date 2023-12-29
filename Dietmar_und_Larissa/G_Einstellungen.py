@@ -5,12 +5,11 @@ from PIL import Image
 from tkinter import StringVar, ttk
 from CTkColorPicker import *
 from C_Objekterkennung import *
+import A_Standardfunktionen
 
 #Funktion für die Settings der Standardeinstellungen#
 def standard_einstellungen(root):
     # CustomTkinter root window erzeugen und Einstellungen vornehmen
-    #root = customtkinter.CTk()
-
     custom_window = customtkinter.CTkToplevel(root)
     custom_window.title("STANDARDEINSTELLUNGEN")
     custom_window.attributes('-topmost', 1)  # Fenster in den Vordergrund holen
@@ -32,82 +31,133 @@ def standard_einstellungen(root):
     rotieren_frame = customtkinter.CTkFrame(custom_window)
     rotieren_frame.place(x=50, y=50)
 
+    # Beschriftungstext für Rotieren-Textfeld
     rotieren_label = customtkinter.CTkLabel(rotieren_frame, text="Rotieren:")
     rotieren_label.place(x=0, y=0)
 
-    rotieren_value_label = customtkinter.CTkLabel(rotieren_frame, text="45°")
+    # Beschriftungstext für Rotieren-Wert-Textfeld
+    rotieren_value_label = customtkinter.CTkLabel(rotieren_frame, text="90°")
     rotieren_value_label.place(x=100, y=0)
 
+    # Callback-Funktion zum Ändern des Values des Schiebreglers
     def update_rotieren_label(value):
         rotieren_value_label.configure(text=f"{int(value)}°")
+        A_Standardfunktionen.rotation_angle = value
+        print("Rotationswinkel geändert auf: ", A_Standardfunktionen.rotation_angle)
 
     rotieren_slider = customtkinter.CTkSlider(rotieren_frame, from_=0, to=360, command=update_rotieren_label)
-    rotieren_slider.set(45)  # Setze den Default-Wert
+    rotieren_slider.set(A_Standardfunktionen.rotation_angle)  # Setze den Default-Wert
     rotieren_slider.place(x=0, y=25)
 
     # Frame für die Skalieren-Einstellungen
     skalieren_frame = customtkinter.CTkFrame(custom_window)
     skalieren_frame.place(x=50, y=150)
 
+    # Beschriftungstext für Skalieren-Textfeld
     skalieren_label = customtkinter.CTkLabel(skalieren_frame, text="Skalieren:")
     skalieren_label.place(x=0, y=0)
 
-    skalieren_value_label = customtkinter.CTkLabel(skalieren_frame, text="1%")
+    # Beschriftungstext für Skalieren-Wert-Textfeld
+    skalieren_value_label = customtkinter.CTkLabel(skalieren_frame, text="0.5")
     skalieren_value_label.place(x=100, y=0)
 
+    # Callback-Funktion zum Ändern des Values des Schiebreglers
     def update_skalieren_label(value):
-        skalieren_value_label.configure(text=f"{int(value)}%")
+        skalieren_value_label.configure(text=f"{value}")
+        A_Standardfunktionen.scale_factor = value
+        print("Skalierungsfaktor geändert auf: ", A_Standardfunktionen.scale_factor)
 
-    skalieren_slider = customtkinter.CTkSlider(skalieren_frame, from_=0, to=100, command=update_skalieren_label)
-    skalieren_slider.set(1)  # Setze den Default-Wert
+    skalieren_slider = customtkinter.CTkSlider(skalieren_frame, from_=0, to=3, command=update_skalieren_label)
+    skalieren_slider.set(A_Standardfunktionen.scale_factor)  # Setze den Default-Wert
     skalieren_slider.place(x=0, y=20)
 
     # Frame für die Rahmen-Einstellungen
     rahmen_frame = customtkinter.CTkFrame(custom_window)
     rahmen_frame.place(x=50, y=250)
 
+    # Beschriftungstext für Rahmendicke-Textfeld
     rahmen_label = customtkinter.CTkLabel(rahmen_frame, text="Rahmen:")
     rahmen_label.place(x=0, y=0)
 
-    rahmen_value_label = customtkinter.CTkLabel(rahmen_frame, text="1")
+    # Beschriftungstext für Rahmendicke-Textfeld
+    rahmen_value_label = customtkinter.CTkLabel(rahmen_frame, text="20pt")
     rahmen_value_label.place(x=100, y=0)
 
+    # Callback-Funktion zum Ändern des Values des Schiebreglers
     def update_rahmen_label(value):
-        rahmen_value_label.configure(text=f"{int(value)}")
+        rahmen_value_label.configure(text=f"{int(value)}pt")
+        A_Standardfunktionen.frame_thickness = value
+        print("Rahmenbreite geändert auf: ", A_Standardfunktionen.frame_thickness)
 
-    rahmen_slider = customtkinter.CTkSlider(rahmen_frame, from_=1, to=5, command=update_rahmen_label)
-    rahmen_slider.set(1)  # Setze den Default-Wert
+    rahmen_slider = customtkinter.CTkSlider(rahmen_frame, from_=1, to=50, command=update_rahmen_label)
+    rahmen_slider.set(A_Standardfunktionen.frame_thickness)  # Setze den Default-Wert
     rahmen_slider.place(x=0, y=20)
 
     # Frame für die Eingabefelder
     eingabe_frame = customtkinter.CTkFrame(custom_window)
     eingabe_frame.place(x=350, y=50)
 
-    x_label = customtkinter.CTkLabel(eingabe_frame, text="X:")
+    # Callback-Funktion wird beim Ändern des Wertes aufgerufen
+    def update_x(*args):
+        if x_var.get() != '':
+            A_Standardfunktionen.cut_x_pos = int(x_var.get())
+        else:
+            A_Standardfunktionen.cut_x_pos = 0
+        print("X geändert auf: ", A_Standardfunktionen.cut_x_pos)
+
+    x_label = customtkinter.CTkLabel(eingabe_frame, text="x:")
     x_label.place(x=0, y=0)
     x_var = StringVar()
-    x_var.set("0")
+    x_var.set(A_Standardfunktionen.cut_x_pos)
+    x_var.trace_add("write", update_x) #Callback-Funktion mit der Variable verknüpfen
     x_entry = customtkinter.CTkEntry(eingabe_frame, width=50, textvariable=x_var)
     x_entry.place(x=30, y=0)  # Auseinanderpositionierung
 
-    y_label = customtkinter.CTkLabel(eingabe_frame, text="Y:")
+    # Callback-Funktion wird beim Ändern des Wertes aufgerufen
+    def update_y(*args):
+        if y_var.get() != '':
+            A_Standardfunktionen.cut_y_pos = int(y_var.get())
+        else:
+            A_Standardfunktionen.cut_y_pos = 0
+        print("Y geändert auf: ", A_Standardfunktionen.cut_y_pos)
+
+    y_label = customtkinter.CTkLabel(eingabe_frame, text="y:")
     y_label.place(x=100, y=0)
     y_var = StringVar()
-    y_var.set("0")
+    y_var.set(A_Standardfunktionen.cut_y_pos)
+    y_var.trace_add("write", update_y) #Callback-Funktion mit der Variable verknüpfen
     y_entry = customtkinter.CTkEntry(eingabe_frame, width=50, textvariable=y_var)
     y_entry.place(x=130, y=0)  # Auseinanderpositionierung
+
+    # Callback-Funktion wird beim Ändern des Wertes aufgerufen
+    def update_w(*args):
+        if w_var.get() != '':
+            A_Standardfunktionen.cut_width = int(w_var.get())
+        else:
+            A_Standardfunktionen.cut_width = 0
+        print("W geändert auf: ", A_Standardfunktionen.cut_width)
 
     w_label = customtkinter.CTkLabel(eingabe_frame, text="w:")
     w_label.place(x=0, y=50)
     w_var = StringVar()
-    w_var.set("100")
+    w_var.set(A_Standardfunktionen.cut_width)
+    w_var.trace_add("write", update_w) #Callback-Funktion mit der Variable verknüpfen
     w_entry = customtkinter.CTkEntry(eingabe_frame, width=50, textvariable=w_var)
     w_entry.place(x=30, y=50)  # Auseinanderpositionierung
+
+    # Callback-Funktion wird beim Ändern des Wertes aufgerufen
+    def update_h(*args):
+        if h_var.get() != '':
+            A_Standardfunktionen.cut_height = int(h_var.get())
+        else:
+            A_Standardfunktionen.cut_height = 0
+        print("H geändert auf: ", A_Standardfunktionen.cut_height)
 
     h_label = customtkinter.CTkLabel(eingabe_frame, text="h:")
     h_label.place(x=100, y=50)
     h_var = StringVar()
-    h_var.set("100")
+    h_var.set(A_Standardfunktionen.cut_height)
+    h_var.trace_add("write", update_h) #Callback-Funktion mit der Variable verknüpfen
     h_entry = customtkinter.CTkEntry(eingabe_frame, width=50, textvariable=h_var)
     h_entry.place(x=130, y=50)  # Auseinanderpositionierung
 
@@ -134,9 +184,24 @@ def standard_einstellungen(root):
     image_label = customtkinter.CTkLabel(image_frame, image=tk_image)
     image_label.place(x=0, y=0)
 
+    # Callback-Funktion wird beim Ändern des Wertes aufgerufen
+    def update_color_from_Picker(*args):
+        # read color from Picker
+        color_in_hex = colorpicker.get()
+        # print(color_in_hex)
+
+        # convert color from hex to RGB-format
+        r = int(color_in_hex[1:3], 16)
+        g = int(color_in_hex[3:5], 16)
+        b = int(color_in_hex[5:], 16)
+
+        # Transform r,g,b into RGB-Tupel and store into global variable
+        A_Standardfunktionen.frame_color = (r, g, b)
+        # print("Farbe geändert auf: ", A_Standardfunktionen.frame_color)
+
     color_label = customtkinter.CTkLabel(custom_window, text="FARBWERTE AUSLESEN")
     color_label.place(x=630, y=40)
-    colorpicker = CTkColorPicker(custom_window, width=50)
+    colorpicker = CTkColorPicker(custom_window, width=50, initial_color='#00c800', command=update_color_from_Picker)
     colorpicker.place(x=600, y=80)
 
     #root.mainloop()
@@ -231,5 +296,6 @@ def objekte_einstellungen(root):
 
 if __name__ == "__main__":
     # Die Funktion wird nur aufgerufen, wenn das Skript direkt ausgeführt wird
-    standard_einstellungen()
-    objekte_einstellungen()
+    #standard_einstellungen(root)
+    #objekte_einstellungen()
+    pass

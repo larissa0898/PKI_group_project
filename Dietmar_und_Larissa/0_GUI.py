@@ -1,4 +1,4 @@
-# Import allgemeiner Bilbliotheken
+# Import allgemeiner Bibliotheken
 import tkinter as tk
 import cv2
 import numpy as np
@@ -48,15 +48,7 @@ tk_image = None # tkinter visual object
 file_types = [('JPEG Files', '*.jpg'), ('PNG Files', '*.png'), ('BMP Files', '*.bmp')]
 #filename = None
 
-#Variables for basic effects
-rotation_angle = 90
-scale_factor = 0.5
-cut_x_pos = 30
-cut_y_pos = 140
-cut_width = 150
-cut_height = 150
-frame_thickness = 20
-frame_color = (0, 200, 0)
+# Variables
 MAX_IMAGE_WIDTH = 800
 MAX_IMAGE_HEIGHT = 600
 
@@ -220,19 +212,23 @@ def select_object():
 
 ######### Callback-Funktionen für Datei-Handling ###############
 #-----------------------------------------------------------------
-
 #Speichern
 def save_file_callback():
     if original_image_path:
+        # convert back from BGR to RGB
         export_img = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
+        # write image to new storage location
         cv2.imwrite(original_image_path, export_img)
         print(f"Datei gespeichert: {original_image_path}")
 
 #Funktion, um speichern unter aufzurufen
 def save_file_as_callback():
+    # Get filedialog to set storage location and filename (=path)
     file_path = filedialog.asksaveasfilename(defaultextension=".*", filetypes=file_types)
     if file_path:
+        # convert back from BGR to RGB
         export_img = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
+        # write image to new storage location
         cv2.imwrite(file_path, export_img)
         print(f"Datei gespeichert unter: {file_path}")
 
@@ -241,60 +237,77 @@ def save_file_as_callback():
 #-----------------------------------------------------------------
 # Callback-Funktion für Reset zum Ursprungsbild
 def reset2original_callback():
-    print("Reset aufgerufen.")
     if original_image_copy is not None:
+        # convert back from BGR to RGB
         reset_img = cv2.cvtColor(original_image_copy, cv2.COLOR_BGR2RGB)
+        # show image
         show_image_live(reset_img)
+        print("Reset durchgeführt.")
+    else:
+        print("Error: Kein Bild geladen.")
 
 # Callback-Funktion zum Bild spiegeln H
 def mirror_h_callback():
-    print("Funktion Spiegeln H aufgerufen.")
     global rgb_image
     if rgb_image is not None:
         show_image_live(A_Standardfunktionen.mirror_img_h(rgb_image))
+        print("Bild horizontal gespiegelt.")
+    else:
+        print("Error: Kein Bild geladen.")
 
 # Callback-Funktion zum Bild spiegeln V
 def mirror_v_callback():
-    print("Funktion Spiegeln V aufgerufen.")
     global rgb_image
     if rgb_image is not None:
         show_image_live(A_Standardfunktionen.mirror_img_v(rgb_image))
+        print("Bild vertikal gespiegelt.")
+    else:
+        print("Error: Kein Bild geladen.")
 
 # Callback-Funktion zum Bild rotieren
 def rotate_callback():
-    print("Funktion Rotieren aufgerufen.")
     global rgb_image
     if rgb_image is not None:
-        show_image_live(A_Standardfunktionen.rotate_img(rgb_image, rotation_angle))
+        show_image_live(A_Standardfunktionen.rotate_img(rgb_image, A_Standardfunktionen.rotation_angle))
+        print("Bild rotiert.")
+    else:
+        print("Error: Kein Bild geladen.")
 
 # Callback-Funktion zum Bild skalieren
 def scale_callback():
-    print("Funktion Skalieren aufgerufen.")
     global rgb_image
     if rgb_image is not None:
-        show_image_live(A_Standardfunktionen.scale_img(rgb_image, scale_factor))
+        show_image_live(A_Standardfunktionen.scale_img(rgb_image, A_Standardfunktionen.scale_factor))
+        print("Bild skaliert.")
+    else:
+        print("Error: Kein Bild geladen.")
 
 # Callback-Funktion zum Bild in Graustufen umwandeln
 def img2greyscale_callback():
-    print("Funktion Graustufen aufgerufen.")
     global rgb_image
     if rgb_image is not None:
         show_image_live(A_Standardfunktionen.grayscale_img(rgb_image))
+        print("Bild in Graustufen umgewandelt.")
+    else:
+        print("Error: Kein Bild geladen.")
 
 # Callback-Funktion zum Bild Ausschneiden
 def crop_callback():
-    print("Funktion Ausschneiden aufgerufen.")
     global rgb_image
     if rgb_image is not None:
-        show_image_live(A_Standardfunktionen.crop_img(rgb_image, cut_x_pos, cut_y_pos, cut_width, cut_height))
+        show_image_live(A_Standardfunktionen.crop_img(rgb_image, A_Standardfunktionen.cut_x_pos, A_Standardfunktionen.cut_y_pos, A_Standardfunktionen.cut_width, A_Standardfunktionen.cut_height))
+        print("Bild ausgeschnitten.")
+    else:
+        print("Error: Kein Bild geladen.")
 
 # Callback-Funktion zum Rahmen hinzufügen
 def addFrame_callback():
-    print("Funktion Rahmen Hinzufügen aufgerufen.")
     global rgb_image
     if rgb_image is not None:
-        show_image_live(A_Standardfunktionen.add_frame(rgb_image, frame_thickness, frame_color))
-
+        show_image_live(A_Standardfunktionen.add_frame(rgb_image, A_Standardfunktionen.frame_thickness, A_Standardfunktionen.frame_color))
+        print("Rahmen hinzugefügt.")
+    else:
+        print("Error: Kein Bild geladen.")
 #-----------------------------------------------------------------
 
 #-----------------------------------------------------------------
