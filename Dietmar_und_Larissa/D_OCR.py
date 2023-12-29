@@ -39,7 +39,8 @@ def add_text_with_pillow(image, text, x, y):
     draw = ImageDraw.Draw(img_pil)
     
     # Verwendung von Arial zur Darstellung deutscher Umlaute und besseren Lesbarkeit
-    font_path = ".\Dietmar_und_Larissa\Arial.ttf"
+    #font_path = ".\Dietmar_und_Larissa\Arial.ttf"
+    font_path = ".\Arial.ttf"
     font = ImageFont.truetype(font_path, size=10)
 
     # Zeichne den Text mit der ausgewählten Schriftart
@@ -60,7 +61,7 @@ def add_text_with_pillow(image, text, x, y):
 
 def start_ocr(image):
     global extracted_text
-
+    cv2.imshow("Test",image)
     try:
         text = pytesseract.image_to_string(image)
 

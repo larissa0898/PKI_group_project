@@ -10,22 +10,26 @@ from C_Objekterkennung import *
 def standard_einstellungen(root):
     # CustomTkinter root window erzeugen und Einstellungen vornehmen
     #root = customtkinter.CTk()
-    root.title("STANDARDEINSTELLUNGEN")
 
+    custom_window = customtkinter.CTkToplevel(root)
+    custom_window.title("STANDARDEINSTELLUNGEN")
+    custom_window.attributes('-topmost', 1)  # Fenster in den Vordergrund holen
+    customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
+    customtkinter.set_appearance_mode("dark")
     #customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
     #customtkinter.set_appearance_mode("dark")
 
     # Hauptfenster in der Bildschirmmitte positionieren
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
+    screen_width = custom_window.winfo_screenwidth()
+    screen_height = custom_window.winfo_screenheight()
     window_width = 820 # Breite des Fensters erhöht
     window_height = 400
     x_position = (screen_width - window_width) // 2
     y_position = (screen_height - window_height) // 2
-    root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
+    custom_window.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
 
     # Frame für die Rotieren-Einstellungen
-    rotieren_frame = customtkinter.CTkFrame(root)
+    rotieren_frame = customtkinter.CTkFrame(custom_window)
     rotieren_frame.place(x=50, y=50)
 
     rotieren_label = customtkinter.CTkLabel(rotieren_frame, text="Rotieren:")
@@ -42,7 +46,7 @@ def standard_einstellungen(root):
     rotieren_slider.place(x=0, y=25)
 
     # Frame für die Skalieren-Einstellungen
-    skalieren_frame = customtkinter.CTkFrame(root)
+    skalieren_frame = customtkinter.CTkFrame(custom_window)
     skalieren_frame.place(x=50, y=150)
 
     skalieren_label = customtkinter.CTkLabel(skalieren_frame, text="Skalieren:")
@@ -59,7 +63,7 @@ def standard_einstellungen(root):
     skalieren_slider.place(x=0, y=20)
 
     # Frame für die Rahmen-Einstellungen
-    rahmen_frame = customtkinter.CTkFrame(root)
+    rahmen_frame = customtkinter.CTkFrame(custom_window)
     rahmen_frame.place(x=50, y=250)
 
     rahmen_label = customtkinter.CTkLabel(rahmen_frame, text="Rahmen:")
@@ -76,7 +80,7 @@ def standard_einstellungen(root):
     rahmen_slider.place(x=0, y=20)
 
     # Frame für die Eingabefelder
-    eingabe_frame = customtkinter.CTkFrame(root)
+    eingabe_frame = customtkinter.CTkFrame(custom_window)
     eingabe_frame.place(x=350, y=50)
 
     x_label = customtkinter.CTkLabel(eingabe_frame, text="X:")
@@ -108,7 +112,7 @@ def standard_einstellungen(root):
     h_entry.place(x=130, y=50)  # Auseinanderpositionierung
 
     # Bild einfügen
-    image_frame = customtkinter.CTkFrame(root)
+    image_frame = customtkinter.CTkFrame(custom_window)
     image_frame.place(x=350, y=150)  # Neue Frame-Position
 
     # Hier soll das Bild eingefügt werden, passe den Dateipfad entsprechend an
@@ -130,12 +134,12 @@ def standard_einstellungen(root):
     image_label = customtkinter.CTkLabel(image_frame, image=tk_image)
     image_label.place(x=0, y=0)
 
-    color_label = customtkinter.CTkLabel(root, text="FARBWERTE AUSLESEN")
+    color_label = customtkinter.CTkLabel(custom_window, text="FARBWERTE AUSLESEN")
     color_label.place(x=630, y=40)
-    colorpicker = CTkColorPicker(root, width=50)
+    colorpicker = CTkColorPicker(custom_window, width=50)
     colorpicker.place(x=600, y=80)
 
-    root.mainloop()
+    #root.mainloop()
 
 
 #Funktion für die Settings der Bildtransformation und Objekterkennung#

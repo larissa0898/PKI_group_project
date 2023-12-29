@@ -8,6 +8,7 @@ import os
 
 GesDatenbank_Datei = r"/GesichtDatenbank.xml"
 GesLabel_Datei= r"/GesichtDatenbank_label.json"
+FACE_FACT = 150
 
 #Suche nach Bildern in einem übergeben Verzeichnis
 #Rückgabe als Liste
@@ -54,6 +55,7 @@ def Suche_Bildinhalt_Bekannte_Gesichter(suchobjekte ,model_label, suchordner="")
 
 '''Funktion zum Testen der Gesichtswiedererkennung - Hier Bildanzeige'''
 def display_image_center(image, window_name='Image Window'):
+
     # Get screen dimensions
     screen_width = 1920  # Set your screen width
     screen_height = 1080  # Set your screen height
@@ -85,28 +87,45 @@ def Gesichtswiedererkennung_Trainieren(data_folder_in,save_file_path_in):
     labels = []
     label_map = {}
     current_label = 1
-
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     print("Folder Data: " + data_folder_in)
     print("Folder Save: " + save_file_path_in)
     try:
         for person_folder in Path(data_folder_in).iterdir():
             if person_folder.is_dir():
                 label_map[current_label] = str(person_folder.name)
-                print("Person Folder Name: "+person_folder.name)
+                counter = 0
                 for image_path in person_folder.glob('*.jpg'):
-                    print("Image Path: "+str(image_path))
+                    print("Bildpfad: "+str(image_path))
                     img = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
-                    images.append(img)
-                    labels.append(current_label)
 
-                current_label += 1
+                    # Gesichtserkennung im Bild, auf Basis von Haarcascade default Werten für Frontale Gesichter
+                    faces = face_cascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=8, minSize=(80, 80))
+                    if faces is not None:
+                        print("Gesicht erkannt")
+                    # Vergleichen der gefundenen Gesichter mit bekannten Gesichtern die angelernt wurden
+
+                    confidence = None
+
+                    for (x, y, w, h) in faces:
+                        counter += 1
+                        face_roi = img[y:y + h, x:x + w]
+                        # Einheitlich in der Größe skalieren
+                        face_roi = cv2.resize(face_roi, (FACE_FACT, int((h / w) * FACE_FACT)))
+                        #cv2.imshow("I" + str(counter)+str(current_label), face_roi)
+
+                        images.append(face_roi)
+                        labels.append(current_label)
+
+                #print("Label Anz.: "+str(current_label))
             else:
                 print("Kein gültiges Verzeichnis")
+            current_label += 1
     except Exception as err:
         print(err)
 
     #Standard Gesichtserkennung von OpenCV initialisieren und trainieren
-    recognizer = cv2.face.LBPHFaceRecognizer_create()
+    recognizer = cv2.face.LBPHFaceRecognizer_create(radius=1, neighbors=8, grid_x=8, grid_y=8, threshold=90)
     recognizer.train(images, np.array(labels))
 
     # Speichern des trainierten Modells unter dem angegebenen Pfad
@@ -114,11 +133,12 @@ def Gesichtswiedererkennung_Trainieren(data_folder_in,save_file_path_in):
     with open(save_file_path_in+GesLabel_Datei, 'w') as file:
         json.dump(label_map, file)
         file.close()
+        print("Datei erfolgreich gespeichert")
     return recognizer, label_map
 
 
 def Lade_TrainiertesModell(save_file_path):
-    recognizer = cv2.face.LBPHFaceRecognizer_create()
+    recognizer = cv2.face.LBPHFaceRecognizer_create(radius=1, neighbors=8, grid_x=8, grid_y=8, threshold=90)
     recognizer.read(save_file_path+GesDatenbank_Datei)
     file_path_map = save_file_path+GesLabel_Datei
     with open(file_path_map, 'r') as file:
@@ -144,29 +164,46 @@ def Gesichtswiedererkennung(trained_recognizer,image_path,label_map_loaded):
         print("Starte Erkennung")
         #Gesichtserkennung im Bild, auf Basis von Haarcascade default Werten für Frontale Gesichter
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=8, minSize=(80, 80))
 
         #Vergleichen der gefundenen Gesichter mit bekannten Gesichtern die angelernt wurden
+        counter = 0
+        confidence = None
+
         for (x, y, w, h) in faces:
+            counter+=1
             face_roi = gray[y:y + h, x:x + w]
+            #Einheitlich in der Größe skalieren
+            face_roi = cv2.resize(face_roi,(FACE_FACT,int((h/w)*FACE_FACT)))
+            cv2.imshow("I"+str(counter),face_roi)
             try:
                 #Prüfung der Übereinstimmung und Genauigkeit
                 label, confidence = trained_recognizer.predict(face_roi)
-
+                if label == -1:
+                    print("Unbekannte Gesichter ")
+                    continue
+                else:
+                    #print("Bekanntes Gesicht")
+                    print("Person: ", label)
+                    print("Confidence: ", confidence)
             except Exception as err3:
-                print("ERR-Trained Recognition: ",err3)
+                print("ERR-Trained Recognition: ", err3)
 
-            #Wenn das Gesicht dem einer angelernten Person entspricht:
-            if confidence < 100:
-                person_name = label_map_loaded[str(label)]
-                print("Person :" +person_name)
-                anz_wiedererkannte_pers+=1
-                #Markierung der Gesichter mit Rechteck, Name und Übereinstimmungsgrad
-                cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                cv2.putText(img, f'{person_name} ({confidence:.2f}%)', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9,
-                            (0, 0, 255), 2)
-            else:
-                person_name = "Unknown"
+            try:
+                #Wenn das Gesicht dem einer angelernten Person entspricht:
+                if (confidence is not None) and (confidence < 100):
+                    person_name = label_map_loaded[str(label)]
+                    print("Person :" +person_name)
+                    print("Confidence: " + str(confidence))
+                    anz_wiedererkannte_pers+=1
+                    #Markierung der Gesichter mit Rechteck, Name und Übereinstimmungsgrad
+                    cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                    cv2.putText(img, f'{person_name} ({confidence:.2f}%)', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9,
+                                (0, 0, 255), 2)
+                else:
+                    person_name = "Unknown"
+            except:
+                print("ERROR - Auswertung Gesichtswiedererkennung")
     else:
         print("Bild konnte nicht geladen werden!")
 

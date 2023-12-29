@@ -777,11 +777,15 @@ def FaceRecognition(image):
         file_path = filedialog.askdirectory(title="Pfad der vortrainierten Daten (Verzeichnis) wählen")
         trained_recognizer, label_map_load = Lade_TrainiertesModell(file_path)
 
+        img = None
         #Gesichtswiedererkennung mit Rückgabe der wesentlichen Eigenschaften
-        img, img_path, name, confidence = Gesichtswiedererkennung(trained_recognizer, image, label_map_load)
-
+        try:
+            img, img_path, name, confidence = Gesichtswiedererkennung(trained_recognizer, image, label_map_load)
+        except:
+            print("Err oder nur unbekannte Gesichter- Gesichtswiedererkennung GUI")
         #Ausgabe des Bildes mit markierten bekannten Personen
-        show_image_live(img)
+        if img is not None:
+            show_image_live(img)
 
     except Exception as err_face_recognition:
         print("Error Face Recognition: ", err_face_recognition)
@@ -798,9 +802,9 @@ def FaceRecognitionOrdner():
         # Laden der trainierten Label und Modell Daten aus einer JSON und XML Datei
         suchordner = filedialog.askdirectory(title="Verzeichnis der Trainingsdaten:")
         trained_recognizer, label_map_load = Lade_TrainiertesModell(suchordner)
-        #print("Geladenes Modell: "+trained_recognizer)
+
         if trained_recognizer is not None:
-            print("OK 1")
+            print("Geladenes Modell: "+trained_recognizer)
 
         # Test mit bekannten Bildern auf Basis der bekannten Gesichtsdatenbank
         folder_path = filedialog.askdirectory(title="Zu durchsuchendes Verzeichnis mit Bildern")
@@ -818,7 +822,7 @@ gesicht_original = Image.open(gesicht_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 gesicht_image = gesicht_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(gesicht_image)
-gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n erkennung- \n training", image=tk_image)
+gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n erkennung- \n training", image=tk_image,command=lambda:FaceRecognitionTraining())
 gesicht_button.place(x=15, y=515)#530
 
 objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
@@ -952,6 +956,7 @@ ocr_started = False
 def handle_ocr_start(original_image):
     global ocr_started, text2speech_button, sprache_button
     status, result = start_ocr(original_image)
+
     if status == 'Erfolg' and isinstance(result, np.ndarray):
         ocr_started = True
         text2speech_button.configure(state="normal")
