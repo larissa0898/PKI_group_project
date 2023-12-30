@@ -533,9 +533,8 @@ edit_menu.add_command(label="Default Werte", command=print_me)
 
 settings_menu = tk.Menu(menu_bar, tearoff=0)
 settings_menu.add_command(label="Standardeinstellungen", command=lambda:standard_einstellungen(root))
-settings_menu.add_command(label="Erweiterte Einstellungen", command=print_me)
-settings_menu.add_command(label="Bilderkennung /\n Objektsuche", command=objekte_einstellungen)
-settings_menu.add_command(label="OCR und Video", command=print_me)
+settings_menu.add_command(label="Objektsuche in Bildern", command=lambda:Suche_Bilder_mit_Objekten(root))
+settings_menu.add_command(label="OCR", command=print_me)
 
 info_menu = tk.Menu(menu_bar, tearoff=0)
 info_menu.add_command(label="Hilfe", command=show_help_dialog)
