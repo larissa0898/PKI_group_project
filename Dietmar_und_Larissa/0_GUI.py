@@ -49,7 +49,7 @@ file_types = [('JPEG Files', '*.jpg'), ('PNG Files', '*.png'), ('BMP Files', '*.
 #filename = None
 
 # Variables
-MAX_IMAGE_WIDTH = 800
+MAX_IMAGE_WIDTH = 495
 MAX_IMAGE_HEIGHT = 600
 
 def print_me():
@@ -115,7 +115,8 @@ def show_image_live(image, width=MAX_IMAGE_WIDTH, height=MAX_IMAGE_HEIGHT):
     global tk_image #Ausgabebild
 
     rgb_image = image
-    resized_image = resize_image(rgb_image, width, height)
+    #resized_image = resize_image(rgb_image, width, height)
+    resized_image = cv2.resize(rgb_image, (495, 600))
 
     # Erstelle ein PhotoImage-Objekt aus dem Numpy-Array
     tk_image = ImageTk.PhotoImage(Image.fromarray(resized_image))
@@ -144,8 +145,8 @@ def show_image(image):
     rgb_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 
     # Skalierung des Bildes für die Anzeige in GUI
-    #resized_image = cv2.resize(rgb_image, (495, 600))
-    resized_image = resize_image(rgb_image, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT)
+    resized_image = cv2.resize(rgb_image, (495, 600))
+    #resized_image = resize_image(rgb_image, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT)
 
     # Erstelle ein PhotoImage-Objekt aus dem Numpy-Array
     #tk_image = ImageTk.PhotoImage(Image.fromarray(rgb_image))
@@ -172,11 +173,10 @@ def show_image(image):
     # Halte das Tkinter-Fenster offen
     root.mainloop()
 
+#########################################################################
+#Hilfsfunktionen für die Multi-Bilder Suche nach bestimmten Objekten
 
-    #########################################################################
-    #Hilfsfunktionen für die Multi-Bilder Suche nach bestimmten Objekten
-
-    #Funktion zum Öffnen eines Auswahldialogs
+#Funktion zum Öffnen eines Auswahldialogs
 def select_object():
     # Create a new tkinter window
     select_window = tk.Toplevel()
@@ -314,7 +314,6 @@ def addFrame_callback():
 ######### Callback-Funktionen für B_Erweiterte_Funktionen ###############
 #-----------------------------------------------------------------
 
-
 # Callback-Funktion Markup
 def markup_image_function_callback():
     if rgb_image is not None:
@@ -325,7 +324,6 @@ def markup_image_function_callback():
             return
     else:
         return
-
 
 # Callback-Funktion Filter
 def filter_effect_callback():
@@ -338,7 +336,6 @@ def filter_effect_callback():
     else:
         return
 
-
 # Callback-Funktion Schwarzweiß 
 def black_white_callback():
     if rgb_image is not None:
@@ -349,7 +346,6 @@ def black_white_callback():
             return
     else:
         return
-
 
 # Callback-Funktion Weichzeichner
 def blur_callback():
@@ -362,7 +358,6 @@ def blur_callback():
     else:
         return
 
-
 # Callback-Funktion Text auf Bild
 def text_effect_callback():
     if rgb_image is not None:
@@ -373,7 +368,6 @@ def text_effect_callback():
             return
     else:
         return
-
 
 # Callback-Funktion Kontrast
 def contrast_callback():
@@ -386,7 +380,6 @@ def contrast_callback():
     else:
         return
 
-
 # Callback-Funktion Helligkeit
 def brightness_callback():
     if rgb_image is not None:
@@ -397,7 +390,6 @@ def brightness_callback():
             return
     else:
         return
-
 
 # Callback-Funktion Dunkel
 def darken_callback():
@@ -410,7 +402,6 @@ def darken_callback():
     else:
         return
 
-
 # Callback-Funktion Verpixelung 
 def pixelate_callback():
     if rgb_image is not None:
@@ -421,7 +412,6 @@ def pixelate_callback():
             return
     else:
         return
-
 
 # Callback-Funktion Weißabgleich
 def white_balance_callback():
@@ -434,7 +424,6 @@ def white_balance_callback():
     else:
         return
 
-
 # Callback-Funktion Licht
 def add_light_callback():
     if rgb_image is not None:
@@ -445,7 +434,6 @@ def add_light_callback():
             return
     else:
         return
-
 
 # Callback-Funktion Schatten
 def shadow_callback():
@@ -458,7 +446,6 @@ def shadow_callback():
     else:
         return
 
-
 # Callback-Funktion Farbkanäle
 def color_balance_callback():
     if rgb_image is not None:
@@ -469,7 +456,6 @@ def color_balance_callback():
             return
     else:
         return
-
 
 # Callback-Funktion Sepia
 def sepia_callback():
@@ -482,7 +468,6 @@ def sepia_callback():
 
     else:
         return
-
 
 # Callback-Funktion Sättigung
 def saturation_callback():
@@ -528,9 +513,6 @@ file_menu.entryconfigure("OCR-Text als PDF speichern", state=DISABLED)  # Deakti
 file_menu.add_separator()
 file_menu.add_command(label="Ende", command=lambda: close_program())
 
-edit_menu = tk.Menu(menu_bar, tearoff=0)
-edit_menu.add_command(label="Default Werte", command=print_me)
-
 settings_menu = tk.Menu(menu_bar, tearoff=0)
 settings_menu.add_command(label="Standardeinstellungen", command=lambda:standard_einstellungen(root))
 settings_menu.add_command(label="Objektsuche in Bildern", command=lambda:Suche_Bilder_mit_Objekten(root))
@@ -542,19 +524,18 @@ info_menu.add_command(label="Entwicklerteam", command=show_info_dialog)
 info_menu.add_command(label="Programmversion", command=show_version_dialog)
 
 menu_bar.add_cascade(label="Datei", menu=file_menu)
-menu_bar.add_cascade(label="Bearbeiten", menu=edit_menu)
 menu_bar.add_cascade(label="Einstellungen", menu=settings_menu)
 menu_bar.add_cascade(label="Info", menu=info_menu)
 
 root.config(menu=menu_bar)
 
 # Button zum Zurücksetzen des Canvas hinzufügen
-reset_button = customtkinter.CTkButton(root, width=30, text="Ansicht leeren", command=lambda: reset_canvas(canvas_list, anzeigen_Bildbreite, anzeigen_Bildhöhe, anzeigen_Dateipfad))
+reset_button = customtkinter.CTkButton(root, width=30, text="Reset", command=lambda: reset_canvas(canvas_list, anzeigen_Bildbreite, anzeigen_Bildhöhe, anzeigen_Dateipfad))
 reset_button.place(x=30, y=30)
 
 # Button zum Zurücksetzen des Canvas hinzufügen
-reset_button = customtkinter.CTkButton(root, width=30, text="Reset zum Original", command=reset2original_callback)
-reset_button.place(x=130, y=30)
+reset_button = customtkinter.CTkButton(root, width=30, text="Original", command=reset2original_callback)
+reset_button.place(x=80, y=30)
 
 # Liste für die Canvas-Objekte erstellen
 canvas_list = []
@@ -751,8 +732,7 @@ sättigung_button = customtkinter.CTkButton(standard_frame, text="Sättigung", i
 sättigung_button.place(x=385, y=395)#415
 
 # Label für die Bilderkennung erzeugen und positionieren
-label_erweitert = customtkinter.CTkLabel(standard_frame, text="---------- BILDERKENNUNG UND OBJEKTSUCHE ----------",
-                                         fg_color="transparent")
+label_erweitert = customtkinter.CTkLabel(standard_frame, text="---------- BILDERKENNUNG UND OBJEKTSUCHE ----------", fg_color="transparent")
 label_erweitert.place(x=15, y=445)
 
 gesicht_path = r".\Icons\icon_gesicht.png"  # Lade das Bild
@@ -834,7 +814,7 @@ gesicht_original = Image.open(gesicht_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 gesicht_image = gesicht_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(gesicht_image)
-gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n erkennung- \n training", image=tk_image,command=lambda:FaceRecognitionTraining())
+gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesicht\n Training", image=tk_image,command=lambda:FaceRecognitionTraining())
 gesicht_button.place(x=15, y=515)#530
 
 objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
@@ -923,7 +903,7 @@ objekte_original = Image.open(objekte_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 objekte_image = objekte_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(objekte_image)
-objekte_button = customtkinter.CTkButton(standard_frame, text="Bilder\n Objekt-\n suche", image=tk_image, command= lambda:Suche_Bilder_mit_Objekten(root))
+objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n suche", image=tk_image, command= lambda:Suche_Bilder_mit_Objekten(root))
 objekte_button.place(x=200, y=515) #530
 
 # Funktion, um YOLO Objekterkennung mit Segmentierung zu starten
@@ -958,8 +938,7 @@ selfie_button = customtkinter.CTkButton(standard_frame, text="Selfie", image=tk_
 selfie_button.place(x=385, y=470) #530
 
 # Label für die Bilderkennung erzeugen und positionieren
-label_erweitert = customtkinter.CTkLabel(standard_frame, text="---------- OCR ERKENNUNG UND AUSGABE ----------",
-                                         fg_color="transparent")
+label_erweitert = customtkinter.CTkLabel(standard_frame, text="---------- OCR ERKENNUNG UND AUSGABE ----------", fg_color="transparent")
 label_erweitert.place(x=15, y=570)   #610
 
 ocr_started = False 
@@ -967,7 +946,7 @@ ocr_started = False
 # Funktion, um OCR zu starten und andere Buttons zu aktivieren
 def handle_ocr_start(original_image):
     global ocr_started, text2speech_button, sprache_button
-    status, result = start_ocr(original_image)
+    status, result,_ = start_ocr(original_image)
 
     if status == 'Erfolg' and isinstance(result, np.ndarray):
         ocr_started = True
@@ -1007,7 +986,12 @@ tk_image = ImageTk.PhotoImage(text2speech_image)
 text2speech_button = customtkinter.CTkButton(standard_frame, text="Text 2 Speech", image=tk_image, command=on_text_to_speech_click, state="disabled")
 text2speech_button.place(x=200, y=605)  #645
 
-pause_button = customtkinter.CTkButton(standard_frame, text="Pause", command=on_pause_click, width=20, height=25, state="disabled")
+text_pause_path = r".\Icons\icon_pause.png"  # Lade das Bild
+text_pause_original = Image.open(text_pause_path)
+# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+text_pause_image = text_pause_original.resize(size=[30, 30])
+tk_image = ImageTk.PhotoImage(text_pause_image)
+pause_button = customtkinter.CTkButton(standard_frame, text="Pause", image=tk_image, command=on_pause_click, width=20, height=25, state="disabled")
 pause_button.place(x=198, y=645)
 
 resume_button = customtkinter.CTkButton(standard_frame, text="Weiter", command=on_resume_click, width=20, height=25, state="disabled")
