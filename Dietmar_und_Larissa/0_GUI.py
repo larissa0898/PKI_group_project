@@ -743,6 +743,23 @@ tk_image = ImageTk.PhotoImage(gesicht_image)
 gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n erkennung", image=tk_image, command=lambda:FaceRecognition(original_image_path))
 gesicht_button.place(x=15, y=470)#530
 
+gesicht_path = r".\Icons\icon_gesicht.png"  # Lade das Bild
+gesicht_original = Image.open(gesicht_path)
+# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+gesicht_image = gesicht_original.resize(size=[30, 30])
+tk_image = ImageTk.PhotoImage(gesicht_image)
+gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n training", image=tk_image,command=lambda:FaceRecognitionTraining())
+gesicht_button.place(x=15, y=515)#530
+
+objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
+objekte_original = Image.open(objekte_path)
+# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+objekte_image = objekte_original.resize(size=[30, 30])
+tk_image = ImageTk.PhotoImage(objekte_image)
+#objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n erkennung", image=tk_image, command= lambda:handle_yolo_1Bild(original_image))
+objekte_button = customtkinter.CTkButton(standard_frame, text="Objekte \n erkennen", image=tk_image, command= lambda:handle_yolo_1Bild(rgb_image))
+objekte_button.place(x=200, y=470) #530
+
 def FaceRecognitionTraining():
     '''Funktion zur Wiedererkennung von Personen im Bild, basierend auf den gespeicherten Trainingsdaten, die ausgewählt werden können'''
     try:
@@ -808,23 +825,6 @@ def FaceRecognitionOrdner():
 
     except Exception as err_face_recognition:
         print("Error Face Recognition: ", err_face_recognition)
-
-gesicht_path = r".\Icons\icon_gesicht.png"  # Lade das Bild
-gesicht_original = Image.open(gesicht_path)
-# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
-gesicht_image = gesicht_original.resize(size=[30, 30])
-tk_image = ImageTk.PhotoImage(gesicht_image)
-gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesicht\n Training", image=tk_image,command=lambda:FaceRecognitionTraining())
-gesicht_button.place(x=15, y=515)#530
-
-objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
-objekte_original = Image.open(objekte_path)
-# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
-objekte_image = objekte_original.resize(size=[30, 30])
-tk_image = ImageTk.PhotoImage(objekte_image)
-#objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n erkennung", image=tk_image, command= lambda:handle_yolo_1Bild(original_image))
-objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n erkennung", image=tk_image, command= lambda:handle_yolo_1Bild(rgb_image))
-objekte_button.place(x=200, y=470) #530
 
 def display_images(image_data, root):
     '''Funktion zur Ausgabe der gefundenen Bilder'''
@@ -903,7 +903,7 @@ objekte_original = Image.open(objekte_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 objekte_image = objekte_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(objekte_image)
-objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n suche", image=tk_image, command= lambda:Suche_Bilder_mit_Objekten(root))
+objekte_button = customtkinter.CTkButton(standard_frame, text="Objektsuche", image=tk_image, command= lambda:Suche_Bilder_mit_Objekten(root))
 objekte_button.place(x=200, y=515) #530
 
 # Funktion, um YOLO Objekterkennung mit Segmentierung zu starten
@@ -988,7 +988,7 @@ text2speech_button.place(x=200, y=605)  #645
 
 text_pause_path = r".\Icons\icon_pause.png"  # Lade das Bild
 text_pause_original = Image.open(text_pause_path)
-# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+#Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 text_pause_image = text_pause_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(text_pause_image)
 pause_button = customtkinter.CTkButton(standard_frame, text="Pause", image=tk_image, command=on_pause_click, width=20, height=25, state="disabled")
@@ -999,7 +999,6 @@ resume_button.place(x=250, y=645)
 
 stop_button = customtkinter.CTkButton(standard_frame, text="Stop", command=on_stop_click, width=20, height=25, state="disabled")
 stop_button.place(x=302, y=645)
-
 
 sprache_path = r".\Icons\icon_sprache.png"  # Lade das Bild
 sprache_original = Image.open(sprache_path)
