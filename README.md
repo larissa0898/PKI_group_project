@@ -1,60 +1,55 @@
-# PKI_group_project
-Dieses Repository beinhaltet den Programmcode des Gruppenprojekts "A1-1" in Programmieren für KI.
-
-## Gruppeneinteilung
-- Frontend, GUI: Dietmar, Larissa
-  ### GUI im Rohentwurf fertig
-  ### ToDo
-  
-- Datenhandler Import/Export: Dietmar
-  ### Zwischenstand
-  Nach Weggang von Anita Thema konzipiert, Umsetzung folgt unmittelbar.
-  ### ToDo
-  
-- Basiseffekte: Phil
-  ### Zwischenstand
-  ### ToDo
-  
-- Spezialeffekte: Anas
-  ### Zwischenstand
-  Entwicklung angefangen!
-  
-  **11.12.2023**
-  1- Markup
-  2- Weichzeichner für Hintergrund
-  3- Licht- und Schatteneffekte: Lichtquellen hinzufügen, um ein Bild realistischer aussehen zu lassen, oder Schatten hinzufügen, um Tiefe zu erzeugen
-  4- Texteffekte: Text zu einem Bild hinzufügen und verschiedene Effekte auf den Text anwenden, wie z.B. Schatten, Glühen, Kontur, und mehr
-  5- Farbeffekte: die Farbbalance eines Bildes ändern, es in Schwarzweiß umwandeln, Sepia-Töne hinzufügen, die Sättigung ändern, und so weiter
-  5- Filtereffekte: verschiedene Filter anwenden, um das Aussehen eines Bildes zu ändern.
-
-  ### ToDo
-  1- Verbesserungen
-  2- andere Effekts?
-  
-  
-- Objekterkennung (YOLO) + Tesseract-OCR: Claus, Larissa
-  ### Zwischenstand
-  14.11. - Upload der Basis Texterkennung
-  18.11. - Einteilung für nächsten Step: Larissa: OCR  Claus: Objektklassifizierung
-  ### ToDo
+# PKI Gruppenprojekt - Gruppe A1_1
+Dieses Projekt ist ein Bildbearbeitungstool, das eine Vielzahl von Funktionen für Bildmanipulation, Effekte und Erkennung bietet.
 
 #### Inhaltsverzeichnis
 - [Installation](#installation)
+- [Funktionen](#funktionen)
 - [Daten](#daten)
 - [Literatur](#literatur)
 
 ## Installation
-- [Verwendete Packages]
-- OpenCV-python
-- Pillow
-- thinker
-- numpy
+Um das Bildbearbeitungstool lokal zu installieren und auszuführen, müssen die folgenden Schritte ausgeführt werden:
+1. **Tesseract OCR installieren:**
+   Zunächst sollte Tesseract unter ```C:\Program Files\Tesseract-OCR\tesseract.exe``` installiert sein. Wenn dies nicht der Fall ist, kann Tesseract [hier](https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.3.20231005.exe) heruntergeladen werden.
+
+2. **Klonen des Repositories**
+   ```bash
+   git clone https://github.com/larissa0898/PKI_group_project.git
+   cd PKI_group_project
+   ```
+
+3. **Optionale Erstellung und Aktivierung einer virtuellen Umgebung:**
+   ```bash
+   python -m venv myenv
+   source myenv/bin/activate  # Unter Windows: myenv\Scripts\activate
+   ```
+
+4. **Installation der erforderlichen Pakete:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Funktionen
+
+- **Standardeffekte:** Enthält grundlegende Bildbearbeitungswerkzeuge wie Rotieren, Skalieren, Spiegeln usw.
+  
+- **Erweiterte Effekte:** Bietet erweiterte Effekte wie Markup, Blur Effekt, Filter usw.
+
+- **Objekt- und Gesichtserkennung:** Ermöglicht die Erkennung von Objekten und Gesichtern in Bildern.
+
+- **OCR (Optical Character Recognition):** Ermöglicht die Erkennung und Extraktion von Text aus Bildern. Aktuell sind folgende Sprachen verfügbar: Deutsch, Englisch, Französisch, Spanisch und Italienisch.
+
+## Verwendung
+Nach der Installation des Projekts kann das Bildbearbeitungstool aus dem Verzeichnis ".\PKI_group_project\" gestartet werden:
+
+```bash
+python main.py
+```
 
 ## Daten
 [Objektklassifikation]
 - YOLO - Fehlende yolov3.weights von: https://github.com/patrick013/Object-Detection---Yolov3/blob/master/model/yolov3.weights
 
-## Farbschema
 - https://imagecolorpicker.com/color-code/eeeee4  
 
 ## Literatur
