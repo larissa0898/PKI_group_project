@@ -32,7 +32,6 @@ from C_Objekterkennung import *
 from C_Gesichtswiedererkennung import *
 from C_Selfie import *
 
-
 # Variablen für Bildeigenschaften global definieren
 label_Bildbreite = None
 label_Bildhöhe = None
@@ -46,7 +45,6 @@ resized_image = None # image resized (just for GUI view)
 rgb_image = None #image in RGB converted
 tk_image = None # tkinter visual object
 file_types = [('JPEG Files', '*.jpg'), ('PNG Files', '*.png'), ('BMP Files', '*.bmp')]
-#filename = None
 
 # Variables
 MAX_IMAGE_WIDTH = 495
@@ -106,7 +104,6 @@ def resize_image(image, max_width, max_height):
 
     return resized_image
 
-
 #Funktion zum Anzeigen des live verarbeiten Bildes, ohne speichern
 def show_image_live(image, width=MAX_IMAGE_WIDTH, height=MAX_IMAGE_HEIGHT):
     global original_image
@@ -129,7 +126,6 @@ def show_image_live(image, width=MAX_IMAGE_WIDTH, height=MAX_IMAGE_HEIGHT):
     # Halte das Tkinter-Fenster offen
     root.mainloop()
 
-
 # Funktion um das ausgewählte Bild zu laden und die Dateieigenschaften zuzuweisen
 def show_image(image):
     global original_image
@@ -145,11 +141,10 @@ def show_image(image):
     rgb_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 
     # Skalierung des Bildes für die Anzeige in GUI
-    resized_image = cv2.resize(rgb_image, (495, 600))
-    #resized_image = resize_image(rgb_image, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT)
+    #resized_image = cv2.resize(rgb_image, (495, 600))
+    resized_image = resize_image(rgb_image, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT)
 
     # Erstelle ein PhotoImage-Objekt aus dem Numpy-Array
-    #tk_image = ImageTk.PhotoImage(Image.fromarray(rgb_image))
     tk_image = ImageTk.PhotoImage(Image.fromarray(resized_image))
 
     # Erstelle ein Canvas und zeige das Bild darin an
@@ -165,10 +160,20 @@ def show_image(image):
     label_Bildhöhe = original_image.shape[0]
     label_Dateipfad = image_path
 
+    print(label_Bildbreite)
+    print(label_Bildhöhe)
+    print(label_Dateipfad)
+
     # Zeige Bildeigenschaften in den globalen Label-Variablen an
-    anzeigen_Bildbreite.configure(text=f"Bildbreite: {label_Bildbreite:,} Pixel")
-    anzeigen_Bildhöhe.configure(text=f"Bildhöhe: {label_Bildhöhe:,} Pixel")
-    anzeigen_Dateipfad.configure(text=f"Dateipfad: {label_Dateipfad.replace(',', '.')}")
+    # Dateieigenschaften anzeigen
+    anzeigen_Bildbreite = customtkinter.CTkLabel(root, text=label_Bildbreite, fg_color="transparent", text_color="yellow")
+    anzeigen_Bildbreite.place(x=150, y=33)
+
+    anzeigen_Bildhöhe = customtkinter.CTkLabel(root, text=label_Bildhöhe, fg_color="transparent", text_color="yellow")
+    anzeigen_Bildhöhe.place(x=300, y=33)
+
+    anzeigen_Dateipfad = customtkinter.CTkLabel(root, text=f"Dateipfad: {label_Dateipfad}", fg_color="transparent", text_color="yellow")
+    anzeigen_Dateipfad.place(x=450, y=33)
 
     # Halte das Tkinter-Fenster offen
     root.mainloop()
@@ -482,6 +487,18 @@ def saturation_callback():
 
 #-----------------------------------------------------------------
 
+# Funktion, um Text 2 Speech zu starten und andere Buttons zu aktivieren
+def on_text_to_speech_click():
+    text_to_speech()
+    pause_button.configure(state="normal")
+    resume_button.configure(state="normal")
+    stop_button.configure(state="normal")
+
+# Funktion, um Sprache anzeigen zu lassen
+def on_sprache_button_click():
+    detected_language = detect_language(use_conditions=True)
+    language_label.configure(text=f"Erkannte Sprache: {detected_language}")
+
 # CustomTkinter root window erzeugen und Einstellungen vornehmen
 root = customtkinter.CTk()
 root.title("BILDBEARBEITUNG UND BILDANALYSE")
@@ -733,7 +750,7 @@ sättigung_button.place(x=385, y=395)#415
 
 # Label für die Bilderkennung erzeugen und positionieren
 label_erweitert = customtkinter.CTkLabel(standard_frame, text="---------- BILDERKENNUNG UND OBJEKTSUCHE ----------", fg_color="transparent")
-label_erweitert.place(x=15, y=445)
+label_erweitert.place(x=15, y=455)
 
 gesicht_path = r".\Icons\icon_gesicht.png"  # Lade das Bild
 gesicht_original = Image.open(gesicht_path)
@@ -741,7 +758,7 @@ gesicht_original = Image.open(gesicht_path)
 gesicht_image = gesicht_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(gesicht_image)
 gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n erkennung", image=tk_image, command=lambda:FaceRecognition(original_image_path))
-gesicht_button.place(x=15, y=470)#530
+gesicht_button.place(x=15, y=490)#530
 
 gesicht_path = r".\Icons\icon_gesicht.png"  # Lade das Bild
 gesicht_original = Image.open(gesicht_path)
@@ -749,16 +766,86 @@ gesicht_original = Image.open(gesicht_path)
 gesicht_image = gesicht_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(gesicht_image)
 gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n training", image=tk_image,command=lambda:FaceRecognitionTraining())
-gesicht_button.place(x=15, y=515)#530
+gesicht_button.place(x=15, y=535)#530
 
 objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
 objekte_original = Image.open(objekte_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 objekte_image = objekte_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(objekte_image)
-#objekte_button = customtkinter.CTkButton(standard_frame, text="Objekt-\n erkennung", image=tk_image, command= lambda:handle_yolo_1Bild(original_image))
 objekte_button = customtkinter.CTkButton(standard_frame, text="Objekte \n erkennen", image=tk_image, command= lambda:handle_yolo_1Bild(rgb_image))
-objekte_button.place(x=200, y=470) #530
+objekte_button.place(x=200, y=490) #530
+
+objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
+objekte_original = Image.open(objekte_path)
+# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+objekte_image = objekte_original.resize(size=[30, 30])
+tk_image = ImageTk.PhotoImage(objekte_image)
+objekte_button = customtkinter.CTkButton(standard_frame, text="Objektsuche", image=tk_image, command= lambda:Suche_Bilder_mit_Objekten(root))
+objekte_button.place(x=200, y=535) #530
+
+selfie_path = r".\Icons\icon_selfie.png"  # Lade das Bild
+selfie_original = Image.open(selfie_path)
+# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+selfie_image = selfie_original.resize(size=[30, 30])
+tk_image = ImageTk.PhotoImage(selfie_image)
+selfie_button = customtkinter.CTkButton(standard_frame, text="Selfie", image=tk_image, command=lambda: Hintergrund_Ausblendung_Fkt())
+selfie_button.place(x=385, y=490) #530
+
+# Label für die Bilderkennung erzeugen und positionieren
+label_erweitert = customtkinter.CTkLabel(standard_frame, text="---------- OCR ERKENNUNG UND AUSGABE ----------", fg_color="transparent")
+label_erweitert.place(x=15, y=590)   #610
+
+ocrstart_path = r".\Icons\icon_ocrstart.png"  # Lade das Bild
+ocrstart_original = Image.open(ocrstart_path)
+# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+ocrstart_image = ocrstart_original.resize(size=[30, 30])
+tk_image = ImageTk.PhotoImage(ocrstart_image)
+ocrstart_button = customtkinter.CTkButton(standard_frame, text="OCR Start", image=tk_image, command= lambda: handle_ocr_start(rgb_image))
+ocrstart_button.place(x=15, y=620)  #645
+
+text2speech_path = r".\Icons\icon_text2speech.png"  # Lade das Bild
+text2speech_original = Image.open(text2speech_path)
+# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+text2speech_image = text2speech_original.resize(size=[30, 30])
+tk_image = ImageTk.PhotoImage(text2speech_image)
+text2speech_button = customtkinter.CTkButton(standard_frame, text="Text 2 Speech", image=tk_image, command=on_text_to_speech_click, state="disabled")
+text2speech_button.place(x=200, y=620)  #645
+
+text_pause_path = r".\Icons\icon_pause.png"  # Lade das Bild
+text_pause_original = Image.open(text_pause_path)
+#Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+text_pause_image = text_pause_original.resize(size=[20, 20])
+tk_image = ImageTk.PhotoImage(text_pause_image)
+pause_button = customtkinter.CTkButton(standard_frame, text="", image=tk_image, command=on_pause_click, width=20, height=25, state="disabled")
+pause_button.place(x=198, y=660)
+
+text_weiter_path = r".\Icons\icon_weiter.png"  # Lade das Bild
+text_weiter_original = Image.open(text_weiter_path)
+#Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+text_weiter_image = text_weiter_original.resize(size=[20, 20])
+tk_image = ImageTk.PhotoImage(text_weiter_image)
+resume_button = customtkinter.CTkButton(standard_frame, text="", image=tk_image, command=on_resume_click, width=20, height=25, state="disabled")
+resume_button.place(x=250, y=660)
+
+text_stop_path = r".\Icons\icon_stop.png"  # Lade das Bild
+text_stop_original = Image.open(text_stop_path)
+#Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+text_stop_image = text_stop_original.resize(size=[20, 20])
+tk_image = ImageTk.PhotoImage(text_stop_image)
+stop_button = customtkinter.CTkButton(standard_frame, text="", image=tk_image, command=on_stop_click, width=20, height=25, state="disabled")
+stop_button.place(x=302, y=660)
+
+sprache_path = r".\Icons\icon_sprache.png"  # Lade das Bild
+sprache_original = Image.open(sprache_path)
+# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
+sprache_image = sprache_original.resize(size=[30, 30])
+tk_image = ImageTk.PhotoImage(sprache_image)
+sprache_button = customtkinter.CTkButton(standard_frame, text="Sprache\n anzeigen", image=tk_image, command=on_sprache_button_click, state="disabled")
+sprache_button.place(x=385, y=620)   #645
+
+language_label = customtkinter.CTkLabel(standard_frame, text=f'', font=("Arial", 10))
+language_label.place(x=385, y=670)
 
 def FaceRecognitionTraining():
     '''Funktion zur Wiedererkennung von Personen im Bild, basierend auf den gespeicherten Trainingsdaten, die ausgewählt werden können'''
@@ -898,14 +985,6 @@ def Suche_Bilder_mit_Objekten(root):
     #Ausgabe des Ergebnisses der gefundenen Bilder
     display_images(ergebnis,root)
 
-objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
-objekte_original = Image.open(objekte_path)
-# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
-objekte_image = objekte_original.resize(size=[30, 30])
-tk_image = ImageTk.PhotoImage(objekte_image)
-objekte_button = customtkinter.CTkButton(standard_frame, text="Objektsuche", image=tk_image, command= lambda:Suche_Bilder_mit_Objekten(root))
-objekte_button.place(x=200, y=515) #530
-
 # Funktion, um YOLO Objekterkennung mit Segmentierung zu starten
 def handle_yolo_1Bild(original_image):
     #Lade die Default Yolo Segmentierung
@@ -928,19 +1007,6 @@ def Hintergrund_Ausblendung_Fkt():
         image = Hintergrund_Ausblendung()
     show_image_live(image)
 
-
-selfie_path = r".\Icons\icon_selfie.png"  # Lade das Bild
-selfie_original = Image.open(selfie_path)
-# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
-selfie_image = selfie_original.resize(size=[30, 30])
-tk_image = ImageTk.PhotoImage(selfie_image)
-selfie_button = customtkinter.CTkButton(standard_frame, text="Selfie", image=tk_image, command=lambda: Hintergrund_Ausblendung_Fkt())
-selfie_button.place(x=385, y=470) #530
-
-# Label für die Bilderkennung erzeugen und positionieren
-label_erweitert = customtkinter.CTkLabel(standard_frame, text="---------- OCR ERKENNUNG UND AUSGABE ----------", fg_color="transparent")
-label_erweitert.place(x=15, y=570)   #610
-
 ocr_started = False 
 
 # Funktion, um OCR zu starten und andere Buttons zu aktivieren
@@ -956,59 +1022,5 @@ def handle_ocr_start(original_image):
         show_image_live(result)
     else:
         print('Fehler bei der Texterkennung.')
-
-
-# Funktion, um Text 2 Speech zu starten und andere Buttons zu aktivieren
-def on_text_to_speech_click():
-    text_to_speech()
-    pause_button.configure(state="normal")
-    resume_button.configure(state="normal")
-    stop_button.configure(state="normal")
-
-# Funktion, um Sprache anzeigen zu lassen
-def on_sprache_button_click():
-    detected_language = detect_language(use_conditions=True)
-    language_label.configure(text=f"Erkannte Sprache: {detected_language}")
-
-ocrstart_path = r".\Icons\icon_ocrstart.png"  # Lade das Bild
-ocrstart_original = Image.open(ocrstart_path)
-# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
-ocrstart_image = ocrstart_original.resize(size=[30, 30])
-tk_image = ImageTk.PhotoImage(ocrstart_image)
-ocrstart_button = customtkinter.CTkButton(standard_frame, text="OCR Start", image=tk_image, command= lambda: handle_ocr_start(rgb_image))
-ocrstart_button.place(x=15, y=605)  #645
-
-text2speech_path = r".\Icons\icon_text2speech.png"  # Lade das Bild
-text2speech_original = Image.open(text2speech_path)
-# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
-text2speech_image = text2speech_original.resize(size=[30, 30])
-tk_image = ImageTk.PhotoImage(text2speech_image)
-text2speech_button = customtkinter.CTkButton(standard_frame, text="Text 2 Speech", image=tk_image, command=on_text_to_speech_click, state="disabled")
-text2speech_button.place(x=200, y=605)  #645
-
-text_pause_path = r".\Icons\icon_pause.png"  # Lade das Bild
-text_pause_original = Image.open(text_pause_path)
-#Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
-text_pause_image = text_pause_original.resize(size=[30, 30])
-tk_image = ImageTk.PhotoImage(text_pause_image)
-pause_button = customtkinter.CTkButton(standard_frame, text="Pause", image=tk_image, command=on_pause_click, width=20, height=25, state="disabled")
-pause_button.place(x=198, y=645)
-
-resume_button = customtkinter.CTkButton(standard_frame, text="Weiter", command=on_resume_click, width=20, height=25, state="disabled")
-resume_button.place(x=250, y=645)
-
-stop_button = customtkinter.CTkButton(standard_frame, text="Stop", command=on_stop_click, width=20, height=25, state="disabled")
-stop_button.place(x=302, y=645)
-
-sprache_path = r".\Icons\icon_sprache.png"  # Lade das Bild
-sprache_original = Image.open(sprache_path)
-# Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
-sprache_image = sprache_original.resize(size=[30, 30])
-tk_image = ImageTk.PhotoImage(sprache_image)
-sprache_button = customtkinter.CTkButton(standard_frame, text="Sprache\n anzeigen", image=tk_image, command=on_sprache_button_click, state="disabled")
-sprache_button.place(x=385, y=605)   #645
-
-language_label = customtkinter.CTkLabel(standard_frame, text=f'', font=("Arial", 10))
-language_label.place(x=385, y=645)
 
 root.mainloop()
