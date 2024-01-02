@@ -29,6 +29,13 @@ Um das Bildbearbeitungstool lokal zu installieren und auszuführen, müssen die 
    pip install -r requirements.txt
    ```
 
+## Verwendung
+Nach der Installation des Projekts kann das Bildbearbeitungstool aus dem Verzeichnis "./PKI_group_project/" gestartet werden:
+
+    ```bash
+    python main.py
+    ```
+
 ## Funktionen
 
 - **Standardeffekte:** Enthält grundlegende Bildbearbeitungswerkzeuge wie Rotieren, Skalieren, Spiegeln usw.
@@ -39,12 +46,6 @@ Um das Bildbearbeitungstool lokal zu installieren und auszuführen, müssen die 
 
 - **OCR (Optical Character Recognition):** Ermöglicht die Erkennung und Extraktion von Text aus Bildern. Aktuell sind folgende Sprachen verfügbar: Deutsch, Englisch, Französisch, Spanisch und Italienisch.
 
-## Verwendung
-Nach der Installation des Projekts kann das Bildbearbeitungstool aus dem Verzeichnis ".\PKI_group_project\" gestartet werden:
-
-```bash
-python main.py
-```
 
 ## Daten
 [Objektklassifikation]
