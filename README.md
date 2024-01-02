@@ -31,7 +31,6 @@ Um das Bildbearbeitungstool lokal zu installieren und auszuführen, müssen die 
 
 ## Verwendung
 Nach der Installation des Projekts kann das Bildbearbeitungstool aus dem Verzeichnis "./PKI_group_project/" gestartet werden:
-
     ```bash
     python main.py
     ```
