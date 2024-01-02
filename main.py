@@ -918,9 +918,9 @@ def display_images(image_data, root):
     '''Funktion zur Ausgabe der gefundenen Bilder'''
     custom_window = customtkinter.CTkToplevel(root)
     custom_window.title("ERGEBNIS DER OBJEKT IN BILDSUCHE")
-
-    customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
-    customtkinter.set_appearance_mode("dark")
+    custom_window.attributes('-topmost', 1)  # Fenster in den Vordergrund holen
+    #customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
+    #customtkinter.set_appearance_mode("dark")
 
     # Hauptfenster in der Bildschirmmitte positionieren
     screen_width = custom_window.winfo_screenwidth()
@@ -930,13 +930,19 @@ def display_images(image_data, root):
     x_position = (screen_width - window_width) // 2
     y_position = (screen_height - window_height) // 2
 
-    # Frame für die Auswahl vom YOLO Modell
-    info_frame = customtkinter.CTkFrame(custom_window, width=400, height=35)
-    info_frame.place(x=180, y=0)
-    objekt_label = customtkinter.CTkLabel(info_frame,
+    # INFO für die Auswahl vom YOLO Modell
+    info_frame = customtkinter.CTkFrame(custom_window, width=450, height=23)
+    info_frame.place(x=200, y=0)
+    #Wenn Objekte gefunden wurden
+    if len(image_data) > 0:
+        objekt_label = customtkinter.CTkLabel(info_frame,
                                           text="Zum Vergrößern auf das Thumbnail klicken.")
-    objekt_label.place(x=100, y=0)
-
+        objekt_label.place(x=100, y=0)
+    #Wenn keine Objekte gefunden wurden:
+    else:
+        objekt_label = customtkinter.CTkLabel(info_frame,
+                                              text="Kein passendes Bild gefunden.")
+        objekt_label.place(x=100, y=0)
 
     image_cache = []
     labelbuttons= []
@@ -945,7 +951,7 @@ def display_images(image_data, root):
     for i, entrys in enumerate(sortiert.values(), start=1):
         image_path = entrys[0]
         confi = entrys[1]
-        print(f"Eintrag Nr. {i}: Bildpfad: {image_path}, Übereinstimmung: {confi}")
+        #print(f"Eintrag Nr. {i}: Bildpfad: {image_path}, Übereinstimmung: {confi}")
         image_path = image_path.replace('\\', '/')
 
         img = Image.open(image_path)
@@ -956,14 +962,14 @@ def display_images(image_data, root):
         image_cache.append(img)
 
         #Label zur Bildanzeige, dass auch als Button verwendet wird:
-        label = tk.Label(custom_window, image=img, text="")
+        label = customtkinter.CTkLabel(custom_window, image=img, text="")
         label.image = img
         #Event bei Linksklick auf Label anlegen
         label.bind("<Button-1>", lambda event,path=image_path: l_button_clicked(path))
         labelbuttons.append(label)
         label.grid(row=i, column=0, padx=10, pady=10)
 
-        confidence_label = tk.Label(custom_window, text=f"Übereinstimmung: {confi:.2f}\nPfad: {image_path}")
+        confidence_label = customtkinter.CTkLabel(custom_window, text=f"Übereinstimmung: {confi:.2f}\nPfad: {image_path}")
         confidence_label.grid(row=i, column=1, padx=10, pady=10)
 
 #Event_ Button links gedrückt
@@ -978,7 +984,6 @@ def l_button_clicked(path):
 
 def Suche_Bilder_mit_Objekten(root):
     '''Funktion zur Suche nach Objekten in Bildern eines auszuwählenden Verzeichnisses'''
-    suchordner = filedialog.askdirectory(title="Suchverzeichnis der Bilder auswählen:")
     suchobjekt, modelwahl = einstellungen.objekte_einstellungen(root)
     if suchobjekt:
         print(f"Ausgewähltes Objekt: {suchobjekt}")
@@ -987,6 +992,7 @@ def Suche_Bilder_mit_Objekten(root):
         model = objekterkennung.YOLO(".\model\yolov8m-seg.pt")  # ggf. bereits bei Programmstart initialisieren, da woanders auch verwendet
     else:
         try:
+            suchordner = filedialog.askdirectory(title="Suchverzeichnis der Bilder auswählen:")
             model = objekterkennung.YOLO(".\model\\" + modelwahl + "-seg.pt")
             ergebnis = objekterkennung.Suche_Bildinhalt(model, suchobjekt, suchordner, root)
             # Ausgabe des Ergebnisses der gefundenen Bilder
