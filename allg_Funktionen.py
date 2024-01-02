@@ -4,12 +4,12 @@ import customtkinter
 
 def reset_canvas(canvas_list, anzeigen_Bildbreite, anzeigen_Bildhoehe, anzeigen_Dateipfad):
     for canvas in canvas_list:
-        canvas.configure(bg="black")  # Hintergrundfarbe auf Schwarz setzen
+        canvas.config(bg="black")  # Hintergrundfarbe auf Schwarz setzen
         canvas.delete("all")
 
     # Labels zurücksetzen
     print(type(anzeigen_Bildbreite))
-    anzeigen_Bildbreite.configure(text="Bildbreite: ")
-    anzeigen_Bildhoehe.configure(text="Bildhöhe: ")
-    anzeigen_Dateipfad.configure(text="Dateipfad: ")
+    anzeigen_Bildbreite.configure(text="")
+    anzeigen_Bildhoehe.configure(text="")
+    anzeigen_Dateipfad.configure(text="")
 

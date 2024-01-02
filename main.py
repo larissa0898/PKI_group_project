@@ -78,6 +78,7 @@ def show_file_dialog():
         original_image_path = filedialog.askopenfilename(filetypes=file_types)
         img = cv2.imread(str(original_image_path))
         print("Datei:", str(original_image_path), "geladen.")
+        disable_buttons(new_img = True)
         show_image(img)
     except Exception as exc:
         print("Keine Datei geladen: ",exc)
@@ -124,7 +125,8 @@ def show_image_live(image, width=MAX_IMAGE_WIDTH, height=MAX_IMAGE_HEIGHT):
     canvas = tk.Canvas(root, width=tk_image.width(), height=tk_image.height())
     canvas.place(x=35, y=65)
     canvas.create_image(0, 0, anchor=tk.NW, image=tk_image)
-
+    canvas_list.append(canvas)
+    
     # Halte das Tkinter-Fenster offen
     root.mainloop()
 
@@ -167,9 +169,13 @@ def show_image(image):
 
     # Zeige Bildeigenschaften in den globalen Label-Variablen an
     # Dateieigenschaften anzeigen
+    if anzeigen_Bildbreite:
+        anzeigen_Bildbreite.destroy()
     anzeigen_Bildbreite = customtkinter.CTkLabel(root, text=f'Breite: {label_Bildbreite}', fg_color="transparent", text_color="yellow")
     anzeigen_Bildbreite.place(x=150, y=20)
-
+    
+    if anzeigen_Bildhoehe:
+        anzeigen_Bildhoehe.destroy()
     anzeigen_Bildhoehe = customtkinter.CTkLabel(root, text=f'Höhe: {label_Bildhoehe}', fg_color="transparent", text_color="yellow")
     anzeigen_Bildhoehe.place(x=250, y=20)
 
@@ -840,7 +846,7 @@ sprache_button = customtkinter.CTkButton(standard_frame, text="Sprache\n anzeige
 sprache_button.place(x=385, y=620)   #645
 
 language_label = customtkinter.CTkLabel(standard_frame, text=f'', font=("Arial", 10))
-language_label.place(x=385, y=670)
+language_label.place(x=385, y=660)
 
 def FaceRecognitionTraining():
     '''Funktion zur Wiedererkennung von Personen im Bild, basierend auf den gespeicherten Trainingsdaten, die ausgewählt werden können'''
@@ -1003,6 +1009,16 @@ def Hintergrund_Ausblendung_Fkt():
     show_image_live(image)
 
 ocr_started = False 
+
+def disable_buttons(new_img=False):
+    if new_img == True:
+        text2speech_button.configure(state="disabled")
+        sprache_button.configure(state="disabled")
+        file_menu.entryconfigure("OCR-Text als PDF speichern", state=DISABLED)
+        pause_button.configure(state="disabled")
+        resume_button.configure(state="disabled")
+        stop_button.configure(state="disabled")
+        language_label.configure(text="")
 
 # Funktion, um OCR zu starten und andere Buttons zu aktivieren
 def handle_ocr_start(original_image):
