@@ -6,6 +6,17 @@ from CTkColorPicker import *
 from objekterkennung import *
 import standardfunktionen
 
+yolo_result = ()
+
+#Funktion zur Anzeige von Benachrichtigungen und Hinweisen:
+def show_popup(root,mein_text):
+    popup = customtkinter.CTkToplevel(root)
+    popup.title("Hinweis")
+    message_label = customtkinter.CTkLabel(popup, text=mein_text)
+    message_label.pack(padx=20, pady=10)
+    ok_button = customtkinter.CTkButton(popup, text="OK", command=popup.destroy)
+    ok_button.pack(pady=10)
+
 #Funktion für die Settings der Standardeinstellungen#
 def standard_einstellungen(root):
     # CustomTkinter root window erzeugen und Einstellungen vornehmen
@@ -14,8 +25,6 @@ def standard_einstellungen(root):
     custom_window.attributes('-topmost', 1)  # Fenster in den Vordergrund holen
     customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
     customtkinter.set_appearance_mode("dark")
-    #customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
-    #customtkinter.set_appearance_mode("dark")
 
     # Hauptfenster in der Bildschirmmitte positionieren
     screen_width = custom_window.winfo_screenwidth()
@@ -208,13 +217,20 @@ def standard_einstellungen(root):
 
 #Funktion für die Settings der Bildtransformation und Objekterkennung#
 def objekte_einstellungen(root):
+    global yolo_result
     # CustomTkinter root window erzeugen und Einstellungen vornehmen
     #Erstellen eines Unterfensters
     custom_window = customtkinter.CTkToplevel(root)
     custom_window.title("BILDERKENNUNG UND OBJEKTSUCHE")
     custom_window.attributes('-topmost', 1) #Fenster in den Vordergrund holen
-    customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
-    customtkinter.set_appearance_mode("dark")
+    #customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
+    #customtkinter.set_appearance_mode("dark")
+
+    #Frame für die Auswahl vom YOLO Modell
+    info_frame = customtkinter.CTkFrame(custom_window, width=600, height=35)
+    info_frame.place(x=50, y=0)
+    objekt_label = customtkinter.CTkLabel(info_frame, text="Bitte Suchobjekt und YoloModell wählen.\nDas Yolo8-Segment Modell muss im Verzeichnis /model/ eingefügt werden.")
+    objekt_label.place(x=100, y=0)
 
     # Hauptfenster in der Bildschirmmitte positionieren
     screen_width = custom_window.winfo_screenwidth()
@@ -281,17 +297,14 @@ def objekte_einstellungen(root):
     # Funktion für Frame eigenen OK-Button
     result = None
     def ok_button_click():
-        result = objekt_combobox.get()
-        print("Gewählt: " + result)
+        global yolo_result
+        yolo_result = objekt_combobox.get(), yolo_combobox.get()
         custom_window.destroy()  # Fenster schließen
 
     objekte_button = customtkinter.CTkButton(custom_window, text="OK",command=lambda:ok_button_click())
-    result = objekt_combobox.get(), yolo_combobox.get()
     objekte_button.place(x=20, y=200)  # 530
     custom_window.wait_window()  # Warte bis das Fenster geschlossen wird
-    if result is None:
-        result = ""
-    return result
+    return yolo_result
 
 if __name__ == "__main__":
     # Die Funktion wird nur aufgerufen, wenn das Skript direkt ausgeführt wird

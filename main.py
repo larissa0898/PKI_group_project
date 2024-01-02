@@ -930,6 +930,14 @@ def display_images(image_data, root):
     x_position = (screen_width - window_width) // 2
     y_position = (screen_height - window_height) // 2
 
+    # Frame für die Auswahl vom YOLO Modell
+    info_frame = customtkinter.CTkFrame(custom_window, width=400, height=35)
+    info_frame.place(x=180, y=0)
+    objekt_label = customtkinter.CTkLabel(info_frame,
+                                          text="Zum Vergrößern auf das Thumbnail klicken.")
+    objekt_label.place(x=100, y=0)
+
+
     image_cache = []
     labelbuttons= []
     sortiert = dict(sorted(image_data.items(), key=lambda item: item[1][1], reverse=True))
@@ -979,12 +987,14 @@ def Suche_Bilder_mit_Objekten(root):
         model = objekterkennung.YOLO(".\model\yolov8m-seg.pt")  # ggf. bereits bei Programmstart initialisieren, da woanders auch verwendet
     else:
         try:
-            model = objekterkennung.YOLO(modelwahl + "-seg.pt")
+            model = objekterkennung.YOLO(".\model\\" + modelwahl + "-seg.pt")
+            ergebnis = objekterkennung.Suche_Bildinhalt(model, suchobjekt, suchordner, root)
+            # Ausgabe des Ergebnisses der gefundenen Bilder
+            display_images(ergebnis, root)
         except:
             print("Modell konnte nicht geladen werden")
-    ergebnis = objekterkennung.Suche_Bildinhalt(model, suchobjekt, suchordner, root)
-    #Ausgabe des Ergebnisses der gefundenen Bilder
-    display_images(ergebnis, root)
+            einstellungen.show_popup(root,"Modell nicht gefunden.\nBitte Modell herunterladen und im Verzeichnis\nmodel einfügen.")
+
 
 # Funktion, um YOLO Objekterkennung mit Segmentierung zu starten
 def handle_yolo_1Bild(original_image):
