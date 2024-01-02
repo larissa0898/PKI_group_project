@@ -919,8 +919,6 @@ def display_images(image_data, root):
     custom_window = customtkinter.CTkToplevel(root)
     custom_window.title("ERGEBNIS DER OBJEKT IN BILDSUCHE")
     custom_window.attributes('-topmost', 1)  # Fenster in den Vordergrund holen
-    #customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
-    #customtkinter.set_appearance_mode("dark")
 
     # Hauptfenster in der Bildschirmmitte positionieren
     screen_width = custom_window.winfo_screenwidth()

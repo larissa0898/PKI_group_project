@@ -223,8 +223,6 @@ def objekte_einstellungen(root):
     custom_window = customtkinter.CTkToplevel(root)
     custom_window.title("BILDERKENNUNG UND OBJEKTSUCHE")
     custom_window.attributes('-topmost', 1) #Fenster in den Vordergrund holen
-    #customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
-    #customtkinter.set_appearance_mode("dark")
 
     #Frame für die Auswahl vom YOLO Modell
     info_frame = customtkinter.CTkFrame(custom_window, width=600, height=35)
