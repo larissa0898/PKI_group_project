@@ -52,14 +52,11 @@ file_types = [('JPEG Files', '*.jpg'), ('PNG Files', '*.png'), ('BMP Files', '*.
 MAX_IMAGE_WIDTH = 495
 MAX_IMAGE_HEIGHT = 600
 
-def print_me():
-    print(f"Datei: {original_image.get()}")
-    print(f"Datei: ")
-
 #Funktion, um das Programm zu schließen
 def close_program():
     root.destroy()
 
+#Positioniert das Hauptfenster mittig vom Bildschirm
 def center_window(window):
     window.update_idletasks()
     screen_width = window.winfo_screenwidth()
@@ -130,7 +127,6 @@ def show_image_live(image, width=MAX_IMAGE_WIDTH, height=MAX_IMAGE_HEIGHT):
     # Halte das Tkinter-Fenster offen
     root.mainloop()
 
-# Funktion um das ausgewählte Bild zu laden und die Dateieigenschaften zuzuweisen
 def show_image(image):
     global original_image
     global original_image_copy
@@ -148,7 +144,6 @@ def show_image(image):
     rgb_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 
     # Skalierung des Bildes für die Anzeige in GUI
-    #resized_image = cv2.resize(rgb_image, (495, 600))
     resized_image = resize_image(rgb_image, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT)
 
     # Erstelle ein PhotoImage-Objekt aus dem Numpy-Array
@@ -165,7 +160,17 @@ def show_image(image):
     # Zeige Bildeigenschaften in den globalen Label-Variablen an
     label_Bildbreite = original_image.shape[1]
     label_Bildhoehe = original_image.shape[0]
-    label_Dateipfad = original_image_path  #image_path
+    label_Dateipfad = original_image_path  # image_path
+
+    # Finde den Index des letzten Slashes in der Variable Dateipfad
+    last_slash_index = label_Dateipfad.rfind("/")
+
+    # Teile den Text in zwei Teile, basierend auf dem letzten Slash
+    erster_teil = label_Dateipfad[:last_slash_index + 1]
+    zweiter_teil = label_Dateipfad[last_slash_index + 1:]
+
+    # Kombiniere die Teile mit einem Zeilenumbruch
+    neuer_text = f"{erster_teil}\n{zweiter_teil}"
 
     # Zeige Bildeigenschaften in den globalen Label-Variablen an
     # Dateieigenschaften anzeigen
@@ -173,7 +178,7 @@ def show_image(image):
         anzeigen_Bildbreite.destroy()
     anzeigen_Bildbreite = customtkinter.CTkLabel(root, text=f'Breite: {label_Bildbreite}', fg_color="transparent", text_color="yellow")
     anzeigen_Bildbreite.place(x=150, y=20)
-    
+
     if anzeigen_Bildhoehe:
         anzeigen_Bildhoehe.destroy()
     anzeigen_Bildhoehe = customtkinter.CTkLabel(root, text=f'Höhe: {label_Bildhoehe}', fg_color="transparent", text_color="yellow")
@@ -182,9 +187,8 @@ def show_image(image):
     if anzeigen_Dateipfad:
         anzeigen_Dateipfad.destroy()
 
-    anzeigen_Dateipfad = customtkinter.CTkLabel(root, text=f"Dateipfad: {label_Dateipfad}", fg_color="transparent", text_color="yellow")
+    anzeigen_Dateipfad = customtkinter.CTkLabel(root, text=f"Dateipfad: {neuer_text}", fg_color="transparent", text_color="yellow")
     anzeigen_Dateipfad.place(x=30, y=650)
-    
 
     # Halte das Tkinter-Fenster offen
     root.mainloop()
@@ -544,7 +548,6 @@ file_menu.add_command(label="Ende", command=lambda: close_program())
 settings_menu = tk.Menu(menu_bar, tearoff=0)
 settings_menu.add_command(label="Standardeinstellungen", command=lambda:einstellungen.standard_einstellungen(root))
 settings_menu.add_command(label="Objektsuche in Bildern", command=lambda:Suche_Bilder_mit_Objekten(root))
-settings_menu.add_command(label="OCR", command=print_me)
 
 info_menu = tk.Menu(menu_bar, tearoff=0)
 info_menu.add_command(label="Hilfe", command=info.show_help_dialog)
@@ -557,11 +560,11 @@ menu_bar.add_cascade(label="Info", menu=info_menu)
 
 root.config(menu=menu_bar)
 
-# Button zum Zurücksetzen des Canvas hinzufügen
+# Button zum "reseten" des Canvas hinzufügen
 reset_button = customtkinter.CTkButton(root, width=30, text="Reset", command=lambda: allg_Funktionen.reset_canvas(canvas_list, anzeigen_Bildbreite, anzeigen_Bildhoehe, anzeigen_Dateipfad))
 reset_button.place(x=30, y=20)
 
-# Button zum Zurücksetzen des Canvas hinzufügen
+# Button zum Zurücksetzen auf das Originalbild hinzufügen
 reset_button = customtkinter.CTkButton(root, width=30, text="Original", command=reset2original_callback)
 reset_button.place(x=80, y=20)
 
