@@ -220,17 +220,16 @@ def Gesichtswiedererkennung(trained_recognizer,image_path,label_map_loaded):
 
 if __name__ == "__main__":
     global label_map
-    data_folder = Path(r"/known")
-    file_path_map = r"./Gesichtswiedererkennung/known/ElonMusk"
+    data_folder = r"./Gesichtswiedererkennung/known/"
     file_path_training = r"./Gesichtswiedererkennung/training/ElonMusk/"
     file_path_known = r"./Gesichtswiedererkennung/known/ElonMusk/"
     test_image_path = r"./Gesichtswiedererkennung/search/ElonMusk_Gruppe.jpg"
     try:
-
+        #Gesichtswiedererkennung trainieren
         recognizer, label_map = Gesichtswiedererkennung_Trainieren(data_folder,file_path_training)
-        print("Training done")
+        print("Training durchgeführt")
         #Speichern der trainierten Label Daten in einer JSON Datei
-        with open(file_path_map,'w') as file:
+        with open(file_path_known,'w') as file:
             json.dump(label_map, file)
             file.close()
             print("Datei gespeichert")
@@ -239,15 +238,14 @@ if __name__ == "__main__":
             trained_recognizer, label_map_load = Lade_TrainiertesModell(file_path_training)
 
             #Test mit bekannten Bildern auf Basis der bekannten Gesichtsdatenbank
-
             img = Gesichtswiedererkennung(trained_recognizer,test_image_path, label_map_load)
             cv2.imshow('Erkannte Gesichter',img)
 
         except Exception as err2:
-            print("Error: ",err2)
+            print("Error_2: ",err2)
 
     except Exception as err1:
-        print("exception:", err1)
+        print("Error_1:", err1)
 
     print("Programm Ende")
     cv2.waitKey(0)

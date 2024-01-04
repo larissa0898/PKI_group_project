@@ -758,7 +758,7 @@ gesicht_original = Image.open(gesicht_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 gesicht_image = gesicht_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(gesicht_image)
-gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n erkennung", image=tk_image, command=lambda:FaceRecognition(original_image_path))
+gesicht_button = customtkinter.CTkButton(standard_frame, text="Wieder-\n erkennung", image=tk_image, command=lambda:FaceRecognition(original_image_path))
 gesicht_button.place(x=15, y=490)#530
 
 gesicht_path = r".\Icons\icon_gesicht.png"  # Lade das Bild
@@ -766,7 +766,7 @@ gesicht_original = Image.open(gesicht_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 gesicht_image = gesicht_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(gesicht_image)
-gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n training", image=tk_image,command=lambda:FaceRecognitionTraining())
+gesicht_button = customtkinter.CTkButton(standard_frame, text="Datenbank-\n training", image=tk_image,command=lambda:FaceRecognitionTraining())
 gesicht_button.place(x=15, y=535)#530
 
 objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
@@ -790,7 +790,7 @@ selfie_original = Image.open(selfie_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 selfie_image = selfie_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(selfie_image)
-selfie_button = customtkinter.CTkButton(standard_frame, text="Selfie", image=tk_image, command=lambda: Hintergrund_Ausblendung_Fkt())
+selfie_button = customtkinter.CTkButton(standard_frame, text="Selfie", image=tk_image, command=lambda: Hintergrund_Ausblendung_Fkt(root,rgb_image))
 selfie_button.place(x=385, y=490) #530
 
 # Label für die Bilderkennung erzeugen und positionieren
@@ -1023,14 +1023,21 @@ def handle_yolo_1Bild(original_image):
     show_image_live(image)
 
 #Funktion zum Abrufen der Webcam mit/ohne Hintergrund
-def Hintergrund_Ausblendung_Fkt():
+def Hintergrund_Ausblendung_Fkt(root, rgb_image):
     global original_image_path
     image = None
-    if original_image_path is not None:
-        image = selfie.Hintergrund_Ausblendung(0, original_image_path)
-    else:
-        image = selfie.Hintergrund_Ausblendung()
-    show_image_live(image)
+    try:
+        if original_image_path is not None:
+            image = selfie.Hintergrund_Ausblendung(0, rgb_image)
+        else:
+            image = selfie.Hintergrund_Ausblendung()
+        #Falls kein Bild zurückgegeben werden kann, z.B. weil keine Webcam vorhanden ist:
+        if image is not None:
+            show_image_live(image)
+        else:
+            einstellungen.show_popup(root, "Keine Videoquelle gefunden. Bitte Webcam prüfen.")
+    except:
+        einstellungen.show_popup(root,"Keine Videoquelle gefunden.")
 
 ocr_started = False 
 
