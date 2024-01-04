@@ -176,7 +176,7 @@ def Gesichtswiedererkennung(trained_recognizer,image_path,label_map_loaded):
             face_roi = gray[y:y + h, x:x + w]
             #Einheitlich in der Größe skalieren
             face_roi = cv2.resize(face_roi,(FACE_FACT,int((h/w)*FACE_FACT)))
-            cv2.imshow("I"+str(counter),face_roi)
+            #cv2.imshow("I"+str(counter),face_roi)
             try:
                 #Prüfung der Übereinstimmung und Genauigkeit
                 label, confidence = trained_recognizer.predict(face_roi)
