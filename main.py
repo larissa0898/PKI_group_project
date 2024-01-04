@@ -850,6 +850,8 @@ language_label.place(x=385, y=660)
 
 def FaceRecognitionTraining():
     '''Funktion zur Wiedererkennung von Personen im Bild, basierend auf den gespeicherten Trainingsdaten, die ausgewählt werden können'''
+    einstellungen.show_popup(root,
+                             "Wähle im 1. Schritt das übergeordnete Verzeichnis in dem sich\nin mit Personennamen bezeichnet die Bilder der Personen befinden.\n\n\nWähle im 2. Schritt das Verzeichnis in dem die Trainingsdatenbank gespeichert werden soll.")
     try:
         # Laden der trainierten Label Daten aus einer JSON Datei
         file_path_training = filedialog.askdirectory(title="Verzeichnis der Trainingsdaten in Ordnern")
@@ -860,16 +862,21 @@ def FaceRecognitionTraining():
         print("Speicherordner:", file_path_save)
 
         gesichtswiedererkennung.Gesichtswiedererkennung_Trainieren(file_path_training,file_path_save)
-
+        einstellungen.show_popup(root,
+                                 "Training erfolgreich durchgeführt.\n\nTeste den trainierten Datensatz und passe ggf.\ndie Bildauswahl an um ein besseres Ergebnis zu erhalten.")
         print("Training durchgeführt")
 
     except Exception as err_face_recognition_training:
         print("Error Face Recognition Training: ", err_face_recognition_training)
+        einstellungen.show_popup(root,
+                                 "Training konnte nicht durchgeführt werden!!! Bitte prüfe den gewählten Ordner und die enthaltenen Daten.")
 
 #Funktion zum Wiedererkennen von bekannten Gesichtern im geladenen Bild
 def FaceRecognition(image):
     '''Funktion zur Wiedererkennung von Personen im Bild, basierend auf den gespeicherten Trainingsdaten, die ausgewählt werden können'''
     try:
+        #Anweisung zur Bedienung einblenden
+        einstellungen.show_popup(root,"Die Erkennung wird auf dem angezeigten Bild im Hauptfenster durchgeführt.\n\nWähle im folgenden die vortrainierte Datenbank, die verwendet werden soll.")
         # Laden der trainierten Label und Modell Daten aus einer JSON und XML Datei
         file_path = filedialog.askdirectory(title="Pfad der vortrainierten Daten (Verzeichnis) wählen")
         trained_recognizer, label_map_load = gesichtswiedererkennung.Lade_TrainiertesModell(file_path)
@@ -879,12 +886,15 @@ def FaceRecognition(image):
         try:
             img, img_path, name, confidence = gesichtswiedererkennung.Gesichtswiedererkennung(trained_recognizer, image, label_map_load)
         except:
+            einstellungen.show_popup(root,
+                                     "Ggf. befindet sich kein bekanntes Gesicht im Bild.\n\nEin Unstimmigkeit ist aufgetreten. Bitte prüfe die ausgewählte Bilddatenbank.")
             print("Err oder nur unbekannte Gesichter- Gesichtswiedererkennung GUI")
         #Ausgabe des Bildes mit markierten bekannten Personen
         if img is not None:
             show_image_live(img)
 
     except Exception as err_face_recognition:
+        einstellungen.show_popup(root, "Ggf. befindet sich kein bekanntes Gesicht im Bild.\n\nEin Unstimmigkeit ist aufgetreten. Bitte prüfe die ausgewählte Bilddatenbank.")
         print("Error Face Recognition: ", err_face_recognition)
 
 #Funktion zum durchsuchen von Ordnern mit Bildern nach bekannten Gesichtern
