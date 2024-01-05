@@ -116,6 +116,21 @@ def show_image_live(image, width=MAX_IMAGE_WIDTH, height=MAX_IMAGE_HEIGHT):
     resized_image = resize_image(rgb_image, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT)
     #resized_image = cv2.resize(rgb_image, (495, 600))
 
+    # Update Größe und Breite:
+    global anzeigen_Bildhoehe
+    global anzeigen_Bildbreite
+    label_Bildbreite = rgb_image.shape[1]
+    label_Bildhoehe = rgb_image.shape[0]
+    if anzeigen_Bildbreite:
+        anzeigen_Bildbreite.destroy()
+    anzeigen_Bildbreite = customtkinter.CTkLabel(root, text=f'Breite: {label_Bildbreite}', fg_color="transparent", text_color="yellow")
+    anzeigen_Bildbreite.place(x=150, y=20)
+
+    if anzeigen_Bildhoehe:
+        anzeigen_Bildhoehe.destroy()
+    anzeigen_Bildhoehe = customtkinter.CTkLabel(root, text=f'Höhe: {label_Bildhoehe}', fg_color="transparent", text_color="yellow")
+    anzeigen_Bildhoehe.place(x=250, y=20)
+
     # Erstelle ein PhotoImage-Objekt aus dem Numpy-Array
     tk_image = ImageTk.PhotoImage(Image.fromarray(resized_image))
 
