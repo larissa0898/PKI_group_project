@@ -63,4 +63,4 @@ def crop_img(img, x, y, w, h):
 def add_frame(img, thickness, color):
     # ...thickness = thickness of frame TOP, BOTTOM, LEFT, RIGHT --> use the same value in all directions
     # ...cv2.BORDER = Framestyle (bold frame)
-    return cv2.copyMakeBorder(img, thickness, thickness, thickness, thickness, cv2.BORDER_ISOLATED, value=color)
+    return cv2.copyMakeBorder(img, int(thickness), int(thickness), int(thickness), int(thickness), cv2.BORDER_ISOLATED, value=color)

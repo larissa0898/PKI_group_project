@@ -142,7 +142,8 @@ def show_image(image):
     global anzeigen_Bildhoehe
 
     # Speichere Originalbild für Reset-Funktion
-    original_image = original_image_copy = image
+    original_image_copy = image
+    original_image = original_image_copy
 
     # Konvertiere das Bild von BGR zu RGB (für die Anzeige in Tkinter)
     rgb_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
@@ -184,7 +185,6 @@ def show_image(image):
 
     anzeigen_Dateipfad = customtkinter.CTkLabel(root, text=f"Dateipfad: {label_Dateipfad}", fg_color="transparent", text_color="yellow")
     anzeigen_Dateipfad.place(x=30, y=650)
-    
 
     # Halte das Tkinter-Fenster offen
     root.mainloop()
