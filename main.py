@@ -113,7 +113,8 @@ def show_image_live(image, width=MAX_IMAGE_WIDTH, height=MAX_IMAGE_HEIGHT):
 
     rgb_image = image
     #resized_image = resize_image(rgb_image, width, height)
-    resized_image = cv2.resize(rgb_image, (495, 600))
+    resized_image = resize_image(rgb_image, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT)
+    #resized_image = cv2.resize(rgb_image, (495, 600))
 
     # Erstelle ein PhotoImage-Objekt aus dem Numpy-Array
     tk_image = ImageTk.PhotoImage(Image.fromarray(resized_image))

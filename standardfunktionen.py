@@ -27,7 +27,7 @@ def rotate_img(img, angle):
     # ...scale = scaling factor --> always =1 for this method
     rot_Mat = cv2.getRotationMatrix2D((cols/2, rows/2), angle, 1)
     # Apply rotation matrix with target image size = original size
-    return cv2.warpAffine(img, rot_Mat, (cols, rows))
+    return cv2.warpAffine(img, rot_Mat, (rows, cols))
     #return cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
 
 # function to scale the image by a given factor
