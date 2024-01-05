@@ -52,14 +52,11 @@ file_types = [('JPEG Files', '*.jpg'), ('PNG Files', '*.png'), ('BMP Files', '*.
 MAX_IMAGE_WIDTH = 495
 MAX_IMAGE_HEIGHT = 600
 
-def print_me():
-    print(f"Datei: {original_image.get()}")
-    print(f"Datei: ")
-
 #Funktion, um das Programm zu schließen
 def close_program():
     root.destroy()
 
+#Positioniert das Hauptfenster mittig vom Bildschirm
 def center_window(window):
     window.update_idletasks()
     screen_width = window.winfo_screenwidth()
@@ -130,7 +127,6 @@ def show_image_live(image, width=MAX_IMAGE_WIDTH, height=MAX_IMAGE_HEIGHT):
     # Halte das Tkinter-Fenster offen
     root.mainloop()
 
-# Funktion um das ausgewählte Bild zu laden und die Dateieigenschaften zuzuweisen
 def show_image(image):
     global original_image
     global original_image_copy
@@ -149,7 +145,6 @@ def show_image(image):
     rgb_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 
     # Skalierung des Bildes für die Anzeige in GUI
-    #resized_image = cv2.resize(rgb_image, (495, 600))
     resized_image = resize_image(rgb_image, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT)
 
     # Erstelle ein PhotoImage-Objekt aus dem Numpy-Array
@@ -166,7 +161,17 @@ def show_image(image):
     # Zeige Bildeigenschaften in den globalen Label-Variablen an
     label_Bildbreite = original_image.shape[1]
     label_Bildhoehe = original_image.shape[0]
-    label_Dateipfad = original_image_path  #image_path
+    label_Dateipfad = original_image_path  # image_path
+
+    # Finde den Index des letzten Slashes in der Variable Dateipfad
+    last_slash_index = label_Dateipfad.rfind("/")
+
+    # Teile den Text in zwei Teile, basierend auf dem letzten Slash
+    erster_teil = label_Dateipfad[:last_slash_index + 1]
+    zweiter_teil = label_Dateipfad[last_slash_index + 1:]
+
+    # Kombiniere die Teile mit einem Zeilenumbruch
+    neuer_text = f"{erster_teil}\n{zweiter_teil}"
 
     # Zeige Bildeigenschaften in den globalen Label-Variablen an
     # Dateieigenschaften anzeigen
@@ -174,7 +179,7 @@ def show_image(image):
         anzeigen_Bildbreite.destroy()
     anzeigen_Bildbreite = customtkinter.CTkLabel(root, text=f'Breite: {label_Bildbreite}', fg_color="transparent", text_color="yellow")
     anzeigen_Bildbreite.place(x=150, y=20)
-    
+
     if anzeigen_Bildhoehe:
         anzeigen_Bildhoehe.destroy()
     anzeigen_Bildhoehe = customtkinter.CTkLabel(root, text=f'Höhe: {label_Bildhoehe}', fg_color="transparent", text_color="yellow")
@@ -183,7 +188,7 @@ def show_image(image):
     if anzeigen_Dateipfad:
         anzeigen_Dateipfad.destroy()
 
-    anzeigen_Dateipfad = customtkinter.CTkLabel(root, text=f"Dateipfad: {label_Dateipfad}", fg_color="transparent", text_color="yellow")
+    anzeigen_Dateipfad = customtkinter.CTkLabel(root, text=f"Dateipfad: {neuer_text}", fg_color="transparent", text_color="yellow")
     anzeigen_Dateipfad.place(x=30, y=650)
 
     # Halte das Tkinter-Fenster offen
@@ -544,7 +549,6 @@ file_menu.add_command(label="Ende", command=lambda: close_program())
 settings_menu = tk.Menu(menu_bar, tearoff=0)
 settings_menu.add_command(label="Standardeinstellungen", command=lambda:einstellungen.standard_einstellungen(root))
 settings_menu.add_command(label="Objektsuche in Bildern", command=lambda:Suche_Bilder_mit_Objekten(root))
-settings_menu.add_command(label="OCR", command=print_me)
 
 info_menu = tk.Menu(menu_bar, tearoff=0)
 info_menu.add_command(label="Hilfe", command=info.show_help_dialog)
@@ -557,11 +561,11 @@ menu_bar.add_cascade(label="Info", menu=info_menu)
 
 root.config(menu=menu_bar)
 
-# Button zum Zurücksetzen des Canvas hinzufügen
+# Button zum "reseten" des Canvas hinzufügen
 reset_button = customtkinter.CTkButton(root, width=30, text="Reset", command=lambda: allg_Funktionen.reset_canvas(canvas_list, anzeigen_Bildbreite, anzeigen_Bildhoehe, anzeigen_Dateipfad))
 reset_button.place(x=30, y=20)
 
-# Button zum Zurücksetzen des Canvas hinzufügen
+# Button zum Zurücksetzen auf das Originalbild hinzufügen
 reset_button = customtkinter.CTkButton(root, width=30, text="Original", command=reset2original_callback)
 reset_button.place(x=80, y=20)
 
@@ -758,7 +762,7 @@ gesicht_original = Image.open(gesicht_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 gesicht_image = gesicht_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(gesicht_image)
-gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n erkennung", image=tk_image, command=lambda:FaceRecognition(original_image_path))
+gesicht_button = customtkinter.CTkButton(standard_frame, text="Wieder-\n erkennung", image=tk_image, command=lambda:FaceRecognition(original_image_path))
 gesicht_button.place(x=15, y=490)#530
 
 gesicht_path = r".\Icons\icon_gesicht.png"  # Lade das Bild
@@ -766,7 +770,7 @@ gesicht_original = Image.open(gesicht_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 gesicht_image = gesicht_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(gesicht_image)
-gesicht_button = customtkinter.CTkButton(standard_frame, text="Gesichts-\n training", image=tk_image,command=lambda:FaceRecognitionTraining())
+gesicht_button = customtkinter.CTkButton(standard_frame, text="Datenbank-\n training", image=tk_image,command=lambda:FaceRecognitionTraining())
 gesicht_button.place(x=15, y=535)#530
 
 objekte_path = r".\Icons\icon_objekterkennung.png"  # Lade das Bild
@@ -790,7 +794,7 @@ selfie_original = Image.open(selfie_path)
 # Skaliere das Bild auf eine kleinere Größe (z.B. 50x50)
 selfie_image = selfie_original.resize(size=[30, 30])
 tk_image = ImageTk.PhotoImage(selfie_image)
-selfie_button = customtkinter.CTkButton(standard_frame, text="Selfie", image=tk_image, command=lambda: Hintergrund_Ausblendung_Fkt())
+selfie_button = customtkinter.CTkButton(standard_frame, text="Selfie", image=tk_image, command=lambda: Hintergrund_Ausblendung_Fkt(root,rgb_image))
 selfie_button.place(x=385, y=490) #530
 
 # Label für die Bilderkennung erzeugen und positionieren
@@ -850,6 +854,8 @@ language_label.place(x=385, y=660)
 
 def FaceRecognitionTraining():
     '''Funktion zur Wiedererkennung von Personen im Bild, basierend auf den gespeicherten Trainingsdaten, die ausgewählt werden können'''
+    einstellungen.show_popup(root,
+                             "Wähle im 1. Schritt das übergeordnete Verzeichnis in dem sich\nin mit Personennamen bezeichnet die Bilder der Personen befinden.\n\n\nWähle im 2. Schritt das Verzeichnis in dem die Trainingsdatenbank gespeichert werden soll.")
     try:
         # Laden der trainierten Label Daten aus einer JSON Datei
         file_path_training = filedialog.askdirectory(title="Verzeichnis der Trainingsdaten in Ordnern")
@@ -860,16 +866,21 @@ def FaceRecognitionTraining():
         print("Speicherordner:", file_path_save)
 
         gesichtswiedererkennung.Gesichtswiedererkennung_Trainieren(file_path_training,file_path_save)
-
+        einstellungen.show_popup(root,
+                                 "Training erfolgreich durchgeführt.\n\nTeste den trainierten Datensatz und passe ggf.\ndie Bildauswahl an um ein besseres Ergebnis zu erhalten.")
         print("Training durchgeführt")
 
     except Exception as err_face_recognition_training:
         print("Error Face Recognition Training: ", err_face_recognition_training)
+        einstellungen.show_popup(root,
+                                 "Training konnte nicht durchgeführt werden!!! Bitte prüfe den gewählten Ordner und die enthaltenen Daten.")
 
 #Funktion zum Wiedererkennen von bekannten Gesichtern im geladenen Bild
 def FaceRecognition(image):
     '''Funktion zur Wiedererkennung von Personen im Bild, basierend auf den gespeicherten Trainingsdaten, die ausgewählt werden können'''
     try:
+        #Anweisung zur Bedienung einblenden
+        einstellungen.show_popup(root,"Die Erkennung wird auf dem angezeigten Bild im Hauptfenster durchgeführt.\n\nWähle im folgenden die vortrainierte Datenbank, die verwendet werden soll.")
         # Laden der trainierten Label und Modell Daten aus einer JSON und XML Datei
         file_path = filedialog.askdirectory(title="Pfad der vortrainierten Daten (Verzeichnis) wählen")
         trained_recognizer, label_map_load = gesichtswiedererkennung.Lade_TrainiertesModell(file_path)
@@ -879,12 +890,15 @@ def FaceRecognition(image):
         try:
             img, img_path, name, confidence = gesichtswiedererkennung.Gesichtswiedererkennung(trained_recognizer, image, label_map_load)
         except:
+            einstellungen.show_popup(root,
+                                     "Ggf. befindet sich kein bekanntes Gesicht im Bild.\n\nEin Unstimmigkeit ist aufgetreten. Bitte prüfe die ausgewählte Bilddatenbank.")
             print("Err oder nur unbekannte Gesichter- Gesichtswiedererkennung GUI")
         #Ausgabe des Bildes mit markierten bekannten Personen
         if img is not None:
             show_image_live(img)
 
     except Exception as err_face_recognition:
+        einstellungen.show_popup(root, "Ggf. befindet sich kein bekanntes Gesicht im Bild.\n\nEin Unstimmigkeit ist aufgetreten. Bitte prüfe die ausgewählte Bilddatenbank.")
         print("Error Face Recognition: ", err_face_recognition)
 
 #Funktion zum durchsuchen von Ordnern mit Bildern nach bekannten Gesichtern
@@ -1013,14 +1027,21 @@ def handle_yolo_1Bild(original_image):
     show_image_live(image)
 
 #Funktion zum Abrufen der Webcam mit/ohne Hintergrund
-def Hintergrund_Ausblendung_Fkt():
+def Hintergrund_Ausblendung_Fkt(root, rgb_image):
     global original_image_path
     image = None
-    if original_image_path is not None:
-        image = selfie.Hintergrund_Ausblendung(0, original_image_path)
-    else:
-        image = selfie.Hintergrund_Ausblendung()
-    show_image_live(image)
+    try:
+        if original_image_path is not None:
+            image = selfie.Hintergrund_Ausblendung(0, rgb_image)
+        else:
+            image = selfie.Hintergrund_Ausblendung()
+        #Falls kein Bild zurückgegeben werden kann, z.B. weil keine Webcam vorhanden ist:
+        if image is not None:
+            show_image_live(image)
+        else:
+            einstellungen.show_popup(root, "Keine Videoquelle gefunden. Bitte Webcam prüfen.")
+    except:
+        einstellungen.show_popup(root,"Keine Videoquelle gefunden.")
 
 ocr_started = False 
 

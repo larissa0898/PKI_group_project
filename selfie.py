@@ -27,7 +27,7 @@ except ImportError:
 ### Speichern eines Bildes als "selfie.jpg" wenn Taste s gedrückt wird
 ### Beenden wenn ESC gedrückt wird
 
-def Hintergrund_Ausblendung(videoquelle=0, background_img_path=None, width=640, height=480):
+def Hintergrund_Ausblendung(videoquelle=0, background_img=None, width=640, height=480):
     """ Funktion startet eine Livebild Anzeige in einem separaten Fenster. Der Hintergrund wird dabei durch einen
     beliebig anderen ersetzt.
 
@@ -42,8 +42,8 @@ def Hintergrund_Ausblendung(videoquelle=0, background_img_path=None, width=640, 
     """
     segmentation = mp.solutions.selfie_segmentation.SelfieSegmentation(model_selection=1)
     #Wenn der Pfad eines Hintergrundbildes übergeben wird, nutze dieses Bild
-    if(background_img_path):
-        background = cv2.imread(background_img_path)
+    if(background_img is not None):
+        background = cv2.cvtColor(background_img,cv2.COLOR_BGR2RGB)
     else:
         # Nutze ein leeres schwarzes Bild
         background = np.zeros((height, width, 3), dtype=np.uint8)
@@ -98,7 +98,7 @@ def Hintergrund_Ausblendung(videoquelle=0, background_img_path=None, width=640, 
                         [0, 255, 0], int(height / 300))
             cv2.imshow("Selfie",output)
 
-    output = cv2.cvtColor(output,cv2.COLOR_BGR2RGB)
+    output = cv2.cvtColor(output.copy(),cv2.COLOR_BGR2RGB)
     return(output)
 
 if __name__ == "__main__":

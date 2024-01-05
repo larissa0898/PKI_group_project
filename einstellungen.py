@@ -227,7 +227,7 @@ def objekte_einstellungen(root):
     #Frame für die Auswahl vom YOLO Modell
     info_frame = customtkinter.CTkFrame(custom_window, width=600, height=35)
     info_frame.place(x=50, y=0)
-    objekt_label = customtkinter.CTkLabel(info_frame, text="Bitte Suchobjekt und YoloModell wählen.\nDas Yolo8-Segment Modell muss im Verzeichnis /model/ eingefügt werden.")
+    objekt_label = customtkinter.CTkLabel(info_frame, text="Bitte Suchobjekt und YoloModell wählen.\nDas Yolo8-Segment Modell muss im Verzeichnis /model/ \n vorhanden sein oder eingefügt werden.")
     objekt_label.place(x=100, y=0)
 
     # Hauptfenster in der Bildschirmmitte positionieren
