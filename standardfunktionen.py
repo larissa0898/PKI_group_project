@@ -60,6 +60,7 @@ def rotate_img(img, angle):
     rot[0, 2] += ((b_w / 2) - centerpoint[0])
     rot[1, 2] += ((b_h / 2) - centerpoint[1])
 
+    print("Bild rotiert.")
     # Rotiertes Bild erzeugen (Rotationsmatrix auf Bild anwenden)
     return cv2.warpAffine(img, rot, (b_w, b_h), flags=cv2.INTER_LINEAR)
 
@@ -71,21 +72,25 @@ def scale_img(img, sfactor):
     # Neue Größe bestimmen und Typenkonvertierung durchführen
     new_size = (int(cols * sfactor), int(rows * sfactor))
 
+    print("Bild skaliert.")
     # Skalierung durchführen und Bild zurückgeben
     return cv2.resize(img, new_size)
 
 # Funktion zum vertikalen spiegeln
 def mirror_img_v(img):
     # flipcode 1 = horizontal
+    print("Bild vertikal gespiegelt.")
     return cv2.flip(img, 1)
 
 # fFunktion zum horizontalen spiegeln
 def mirror_img_h(img):
     # flipcode 0 = vertical
+    print("Bild horizontal gespiegelt.")
     return cv2.flip(img, 0)
 
 # Bild in Graustufen umwandeln
 def grayscale_img(img):
+    print("Bild in Graustufen umgewandelt.")
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 # Funktion zum Erzeugen eines Bildausschnitts
@@ -93,6 +98,7 @@ def crop_img(img, x, y, w, h):
     # ...x,y = Start-Position des Ausschnitts
     # ...w,h = Höhe und Breite des Ausschnitts ausgehend vom Start-Punkt
     # Bildausschnitt mittels Array-Slicing erzeugen
+    print("Bildausschnitt erzeugt.")
     return img[y:y+h, x:x+w]
 
 # Einen voll-farbigen Rahmen um das Bild hinzufügen
@@ -100,4 +106,5 @@ def add_frame(img, thickness, color):
     # ...thickness = Dicke des Rahmens
     # gleiche Dicke für alle Seiten nutzen --> TOP, BOTTOM, LEFT, RIGHT
     # ...cv2.BORDER = Framestyle (bold frame)
+    print("Rahmen zum Bild hinzugefügt")
     return cv2.copyMakeBorder(img, int(thickness), int(thickness), int(thickness), int(thickness), cv2.BORDER_ISOLATED, value=color)

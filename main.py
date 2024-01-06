@@ -73,10 +73,15 @@ def show_file_dialog():
     global original_image_path
     img = None
     try:
+        # Filedialog zum Bildöffnen starten
         original_image_path = filedialog.askopenfilename(filetypes=file_types)
+
+        # Bild mittels openCV einlesen
         img = cv2.imread(str(original_image_path))
         print("Datei:", str(original_image_path), "geladen.")
         disable_buttons(new_img = True)
+
+        # Bild-Anzeige initiieren
         show_image(img)
     except Exception as exc:
         print("Keine Datei geladen: ",exc)
@@ -85,17 +90,17 @@ def show_file_dialog():
 def resize_image(image, max_width, max_height):
     '''Funktion skaliert das Bild auf eine max.Breite oder Höhe, ohne das Format zu ändern
     1:1 aus ChatGPT 3.5'''
-    # Get the original image dimensions
+    # Extrahiere Breite und Höhe
     height, width = image.shape[:2]
 
-    # Calculate the aspect ratio
+    # Seitenverhältnis berechnen
     aspect_ratio = width / height
 
-    # Calculate new dimensions while maintaining aspect ratio
+    # Neue Bilddimensionen gemäß Seitenverhältnis berechnen
     new_width = min(width, max_width)
     new_height = int(new_width / aspect_ratio)
 
-    # If the calculated height exceeds the maximum height, recalculate dimensions
+    # Wenn neue Bilddimensionen größer sind als max. Canvas-Größe --> Neu berechnen
     if new_height > max_height:
         new_height = max_height
         new_width = int(new_height * aspect_ratio)
@@ -106,16 +111,17 @@ def resize_image(image, max_width, max_height):
     return resized_image
 
 #Funktion zum Anzeigen des live verarbeiten Bildes, ohne speichern
-def show_image_live(image, width=MAX_IMAGE_WIDTH, height=MAX_IMAGE_HEIGHT):
+def show_image_live(image):
     global original_image
     global resized_image
     global rgb_image #OpenCV konvertiertes Bild - Speichern (Originalgröße)
     global tk_image #Ausgabebild
 
+    # Aktualisiere rgb_image-Objekt
     rgb_image = image
-    #resized_image = resize_image(rgb_image, width, height)
+
+    # Bild auf Canvas-Größe skalieren (nur für die Ansicht)
     resized_image = resize_image(rgb_image, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT)
-    #resized_image = cv2.resize(rgb_image, (495, 600))
 
     # Update Größe und Breite:
     global anzeigen_Bildhoehe
@@ -133,9 +139,6 @@ def show_image_live(image, width=MAX_IMAGE_WIDTH, height=MAX_IMAGE_HEIGHT):
 
     # Erstelle ein Canvas und zeige das Bild darin an
     global canvas
-    #canvas.delete("all")
-    #canvas = tk.Canvas(root, width=tk_image.width(), height=tk_image.height())
-    #canvas.place(x=35, y=65)
     canvas.config(width=tk_image.width(), height=tk_image.height())
     canvas.create_image(0, 0, anchor=tk.NW, image=tk_image)
     canvas_list.append(canvas)
@@ -168,9 +171,16 @@ def show_image(image):
 
     # Erstelle ein Canvas und zeige das Bild darin an
     global canvas
-    canvas = tk.Canvas(root, width=tk_image.width(), height=tk_image.height())
-    canvas.pack()
-    canvas.place(x=35, y=65)
+    # Canvas erzeugen, wenn noch nicht existiert.
+    if canvas is None:
+        canvas = tk.Canvas(root, width=tk_image.width(), height=tk_image.height())
+        canvas.pack()
+        canvas.place(x=35, y=65)
+    # Wenn Canvas schon existiert, nur  Größe ändern
+    else:
+        canvas.config(width=tk_image.width(), height=tk_image.height())
+
+    # Bild mit Canvas verknüpfen
     canvas.create_image(0, 0, anchor=tk.NW, image=tk_image)
 
     # Füge das Canvas-Objekt zu einer Liste hinzu
@@ -254,20 +264,20 @@ def select_object():
 #Speichern
 def save_file_callback():
     if original_image_path:
-        # convert back from BGR to RGB
+        # Farbkonvertierung von RGB in BGR
         export_img = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
-        # write image to new storage location
+        # Speichere das Bild unter dem gegebenen Dateinamen
         cv2.imwrite(original_image_path, export_img)
         print(f"Datei gespeichert: {original_image_path}")
 
 #Funktion, um speichern unter aufzurufen
 def save_file_as_callback():
-    # Get filedialog to set storage location and filename (=path)
+    # Filedialog öffnen --> Speichern des Ziel-Pfades
     file_path = filedialog.asksaveasfilename(defaultextension=".*", filetypes=file_types)
     if file_path:
-        # convert back from BGR to RGB
+        # Farbkonvertierung von RGB in BGR
         export_img = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
-        # write image to new storage location
+        # Speichere Bild in neuen Ziel-Pfad
         cv2.imwrite(file_path, export_img)
         print(f"Datei gespeichert unter: {file_path}")
 
@@ -277,9 +287,9 @@ def save_file_as_callback():
 # Callback-Funktion für Reset zum Ursprungsbild
 def reset2original_callback():
     if original_image_copy is not None:
-        # convert back from BGR to RGB
+        # Farbkonvertierung von RGB in BGR
         reset_img = cv2.cvtColor(original_image_copy, cv2.COLOR_BGR2RGB)
-        # show image
+        # Zeige Bild an
         show_image_live(reset_img)
         print("Reset durchgeführt.")
     else:
@@ -303,7 +313,7 @@ def mirror_h_callback():
     else:
         print("Error: Kein Bild geladen.")
 
-# Callback-Funktion zum Bild rotieren
+# Callback-Funktion zum Bild Rotieren
 def rotate_callback():
     global rgb_image
     if rgb_image is not None:
