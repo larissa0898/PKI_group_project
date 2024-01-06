@@ -10,6 +10,11 @@ import customtkinter
 # https://github.com/ultralytics/ultralytics/issues/561
 # https://docs.ultralytics.com/de/modes/predict/
 
+#Ultralyrics YOLO: Lizenz für Studierende: AGPL-3.0-Lizenz: OSI-geprüfte Open-Source-Lizenz für nicht-kommerzielle Nutzung
+#Lizenz: https://github.com/ultralytics/ultralytics/blob/main/LICENSE
+
+#OpenCV: Open Source
+#Lizenz: https://opencv.org/license/
 
 #Modifikationen:
 # Deutsch

@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import subprocess
 
+# Mediapipe (Google) Open Source: Apache License 2.0
+# Lizenz: https://github.com/google/mediapipe/blob/master/LICENSE
+
 #Funktion zum automatischen Installieren von Paketen die benötigt werden
 def install_package(package_name):
     try:

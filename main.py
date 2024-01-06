@@ -50,7 +50,7 @@ file_types = [('JPEG Files', '*.jpg'), ('PNG Files', '*.png'), ('BMP Files', '*.
 
 # Variables
 MAX_IMAGE_WIDTH = 495
-MAX_IMAGE_HEIGHT = 600
+MAX_IMAGE_HEIGHT = 580
 canvas = None
 
 #Funktion, um das Programm zu schließen

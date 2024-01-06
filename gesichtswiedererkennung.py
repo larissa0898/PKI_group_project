@@ -6,6 +6,8 @@ from pathlib import Path
 import os
 import einstellungen
 
+#OpenCV: Open Source
+#Lizenz: https://opencv.org/license/
 
 GesDatenbank_Datei = r"/GesichtDatenbank.xml"
 GesLabel_Datei= r"/GesichtDatenbank_label.json"
@@ -54,9 +56,9 @@ def Suche_Bildinhalt_Bekannte_Gesichter(suchobjekte ,model_label, suchordner="")
 
 
 
-'''Funktion zum Testen der Gesichtswiedererkennung - Hier Bildanzeige'''
-def display_image_center(image, window_name='Image Window'):
 
+def display_image_center(image, window_name='Image Window'):
+    '''Funktion zum Testen der Gesichtswiedererkennung - Hier Bildanzeige'''
     # Get screen dimensions
     screen_width = 1920  # Set your screen width
     screen_height = 1080  # Set your screen height
