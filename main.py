@@ -194,12 +194,25 @@ def show_image(image):
     # Finde den Index des letzten Slashes in der Variable Dateipfad
     last_slash_index = label_Dateipfad.rfind("/")
 
-    # Teile den Text in zwei Teile, basierend auf dem letzten Slash
-    erster_teil = label_Dateipfad[:last_slash_index + 1]
-    zweiter_teil = label_Dateipfad[last_slash_index + 1:]
+    # Überprüfe, ob der Text länger als 50 Zeichen ist
+    if len(label_Dateipfad) > 50:
+        # Suche nach einem Backslash ab dem 50. Zeichen
+        index_of_backslash = label_Dateipfad.find("/", 50)
 
-    # Kombiniere die Teile mit einem Zeilenumbruch
-    neuer_text = f"{erster_teil}\n{zweiter_teil}"
+        # Überprüfe, ob ein Backslash gefunden wurde
+        if index_of_backslash != -1:
+            # Teile den Text in zwei Teile, basierend auf dem gefundenen Backslash
+            erster_teil = label_Dateipfad[:index_of_backslash + 1]
+            zweiter_teil = label_Dateipfad[index_of_backslash + 1:]
+
+            # Kombiniere die Teile mit einem Zeilenumbruch
+            neuer_text = f"{erster_teil}\n{zweiter_teil}"
+        else:
+            # Wenn kein Backslash gefunden wurde, bleibe beim ursprünglichen Text
+            neuer_text = label_Dateipfad
+    else:
+        # Wenn der Text nicht länger als 50 Zeichen ist, bleibe beim ursprünglichen Text
+        neuer_text = label_Dateipfad
 
     # Zeige Bildeigenschaften in den globalen Label-Variablen an
     # Dateieigenschaften anzeigen
@@ -217,7 +230,7 @@ def show_image(image):
         anzeigen_Dateipfad.destroy()
 
     anzeigen_Dateipfad = customtkinter.CTkLabel(root, text=f"Dateipfad: {neuer_text}", fg_color="transparent", text_color="yellow")
-    anzeigen_Dateipfad.place(x=30, y=650)
+    anzeigen_Dateipfad.place(x=30, y=680)
 
     # Halte das Tkinter-Fenster offen
     root.mainloop()
