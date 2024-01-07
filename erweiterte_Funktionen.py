@@ -146,23 +146,26 @@ def markup_image_function(image):
     root.title("Markup Funktion")
 
     # Einstellung der Größe des Fensters
-    screen_width = 350
-    screen_height = 145
+    screen_width = 430
+    screen_height = 178
     root.geometry(f"{screen_width}x{screen_height}")
     root.resizable(False, False)
 
     # Button hinzufügen
-    customtkinter.CTkButton(root, text="Farbe", command=choose_color, width=290).place(x=30, y=10)
+    customtkinter.CTkButton(root, text="Farbe", command=choose_color, width=290).place(x=70, y=10)
 
     # Button hinzufügen
-    customtkinter.CTkButton(root, text="Schriftstärke", command=font_thickness, width=290).place(x=30, y=43)
+    customtkinter.CTkButton(root, text="Schriftstärke", command=font_thickness, width=290).place(x=70, y=43)
 
     # Button hinzufügen
-    customtkinter.CTkButton(root, text="Markup", command=markup, width=290).place(x=30, y=76)
+    customtkinter.CTkButton(root, text="Markup", command=markup, width=290).place(x=70, y=76)
 
     # Button hinzufügen
-    customtkinter.CTkButton(root, text="Fertig", command=finish_image, width=290).place(x=30, y=109)
-
+    customtkinter.CTkButton(root, text="Fertig", command=finish_image, width=290).place(x=70, y=109)
+    
+    # Label hinzufügen
+    customtkinter.CTkLabel(root, text="Um den Markup-Vorgang zu beenden, bitte die Esc-Taste drücken!").place(x=30, y=142)
+    
     # GUI starten
     root.mainloop()
     if adjusted is None:
