@@ -63,7 +63,23 @@ def rotate_img(img, angle):
 
     print("Bild rotiert.")
     # Rotiertes Bild erzeugen (Rotationsmatrix auf Bild anwenden)
-    return cv2.warpAffine(img, rot, (b_w, b_h), flags=cv2.INTER_LINEAR)
+    exp_image = cv2.warpAffine(img, rot, (b_w, b_h), flags=cv2.INTER_LINEAR)
+
+    # Hinzugekommene Kanten entfernen
+    # In Graustufen umwandeln
+    gray = cv2.cvtColor(exp_image, cv2.COLOR_BGR2GRAY)
+
+    # Definiere den Schwellenwert für die schwarze Farbe
+    _, thresh = cv2.threshold(gray, 1, 255, cv2.THRESH_BINARY)
+
+    # Finde die Koordinaten der nicht schwarzen Pixel
+    konturen, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    x, y, w, h = cv2.boundingRect(konturen[0])
+    print(cv2.boundingRect(konturen[0]))
+    # Schneide den schwarzen Rand aus dem Bild
+    exp_image = exp_image[y:y + h, x:x + w]
+
+    return exp_image
 
 # Funktion zum skalieren des Bildes um einen beliebigen Faktor
 def scale_img(img, sfactor):
