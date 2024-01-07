@@ -44,13 +44,13 @@ def standard_einstellungen(root):
     rotieren_label.place(x=0, y=0)
 
     # Beschriftungstext für Rotieren-Wert-Textfeld
-    rotieren_value_label = customtkinter.CTkLabel(rotieren_frame, text="90°")
+    rotieren_value_label = customtkinter.CTkLabel(rotieren_frame, text=str(standardfunktionen.rotation_angle)+"°")
     rotieren_value_label.place(x=100, y=0)
 
     # Callback-Funktion zum Ändern des Values des Schiebreglers
     def update_rotieren_label(value):
         rotieren_value_label.configure(text=f"{int(value)}°")
-        standardfunktionen.rotation_angle = value
+        standardfunktionen.rotation_angle = int(value)
         print("Rotationswinkel geändert auf: ", standardfunktionen.rotation_angle)
 
     rotieren_slider = customtkinter.CTkSlider(rotieren_frame, from_=0, to=360, command=update_rotieren_label)
@@ -66,12 +66,12 @@ def standard_einstellungen(root):
     skalieren_label.place(x=0, y=0)
 
     # Beschriftungstext für Skalieren-Wert-Textfeld
-    skalieren_value_label = customtkinter.CTkLabel(skalieren_frame, text="0.5")
+    skalieren_value_label = customtkinter.CTkLabel(skalieren_frame, text=f"{standardfunktionen.scale_factor:.2f}")
     skalieren_value_label.place(x=100, y=0)
 
     # Callback-Funktion zum Ändern des Values des Schiebreglers
     def update_skalieren_label(value):
-        skalieren_value_label.configure(text=f"{value}")
+        skalieren_value_label.configure(text=f"{value:.2f}")
         standardfunktionen.scale_factor = value
         print("Skalierungsfaktor geändert auf: ", standardfunktionen.scale_factor)
 
@@ -88,13 +88,13 @@ def standard_einstellungen(root):
     rahmen_label.place(x=0, y=0)
 
     # Beschriftungstext für Rahmendicke-Textfeld
-    rahmen_value_label = customtkinter.CTkLabel(rahmen_frame, text="20pt")
+    rahmen_value_label = customtkinter.CTkLabel(rahmen_frame, text=str(standardfunktionen.frame_thickness)+"pt")
     rahmen_value_label.place(x=100, y=0)
 
     # Callback-Funktion zum Ändern des Values des Schiebreglers
     def update_rahmen_label(value):
         rahmen_value_label.configure(text=f"{int(value)}pt")
-        standardfunktionen.frame_thickness = value
+        standardfunktionen.frame_thickness = int(value)
         print("Rahmenbreite geändert auf: ", standardfunktionen.frame_thickness)
 
     rahmen_slider = customtkinter.CTkSlider(rahmen_frame, from_=1, to=50, command=update_rahmen_label)
@@ -209,7 +209,11 @@ def standard_einstellungen(root):
 
     color_label = customtkinter.CTkLabel(custom_window, text="FARBWERTE AUSLESEN")
     color_label.place(x=630, y=40)
-    colorpicker = CTkColorPicker(custom_window, width=50, initial_color='#00c800', command=update_color_from_Picker)
+    # Berechne Farbwert in Hex aus RGB-Tuple für Initial-Farbe des ColorPickers
+    hexIntitalColor = "#{:02x}{:02x}{:02x}".format(standardfunktionen.frame_color[0], standardfunktionen.frame_color[1], standardfunktionen.frame_color[2])
+    print(hexIntitalColor)
+    #'#00c800'
+    colorpicker = CTkColorPicker(custom_window, width=50, initial_color=hexIntitalColor, command=update_color_from_Picker)
     colorpicker.place(x=600, y=80)
 
     #root.mainloop()

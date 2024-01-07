@@ -9,6 +9,7 @@
 # Hier Standardfunktionen abbilden #
 import cv2
 import math
+import numpy as np
 
 # Globale Variablen mit Default-Werten
 # werden im 0_GUI.py beim Funktionsaufruf genutzt und via Dialog vom Nutzer manipuliert
