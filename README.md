@@ -10,21 +10,22 @@ Dieses Projekt ist ein Bildbearbeitungstool, das eine Vielzahl von Funktionen f�
 ## Installation
 Um das Bildbearbeitungstool lokal zu installieren und auszuf체hren, m체ssen die folgenden Schritte ausgef체hrt werden:
 1. **Tesseract OCR installieren:**
-   Zun채chst sollte Tesseract unter ```C:\Program Files\Tesseract-OCR\tesseract.exe``` installiert sein. Wenn dies nicht der Fall ist, kann Tesseract [hier](https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.3.20231005.exe) heruntergeladen werden.
+   Zun채chst sollte Tesseract unter ```C:\Program Files\Tesseract-OCR\tesseract.exe``` installiert sein. Wenn dies nicht der Fall ist, kann Tesseract [hier](https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.3.20231005.exe) heruntergeladen werden.  
+   Bei der Installation unbedingt beachten, dass bei der Komponentenauswahl ein Haken bei *Additional language data* gesetzt wird.
 
-2. **Klonen des Repositories**
+3. **Klonen des Repositories**
    ```bash
    git clone https://github.com/larissa0898/PKI_group_project.git
    cd PKI_group_project
    ```
 
-3. **Optionale Erstellung und Aktivierung einer virtuellen Umgebung:**
+4. **Optionale Erstellung und Aktivierung einer virtuellen Umgebung:**
    ```bash
    python -m venv myenv
    source myenv/bin/activate  # Unter Windows: myenv\Scripts\activate
    ```
 
-4. **Installation der erforderlichen Pakete:**
+5. **Installation der erforderlichen Pakete:**
    ```bash
    pip install -r requirements.txt
    ```
