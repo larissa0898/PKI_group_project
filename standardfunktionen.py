@@ -75,7 +75,8 @@ def rotate_img(img, angle):
     # Finde die Koordinaten der nicht schwarzen Pixel
     konturen, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     x, y, w, h = cv2.boundingRect(konturen[0])
-    print(cv2.boundingRect(konturen[0]))
+    #print(cv2.boundingRect(konturen[0]))
+    
     # Schneide den schwarzen Rand aus dem Bild
     exp_image = exp_image[y:y + h, x:x + w]
 
