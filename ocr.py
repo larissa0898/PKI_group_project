@@ -14,9 +14,11 @@ from reportlab.pdfgen import canvas
 audio_paused = False 
 extracted_text = ''
 
+# Pfad zur Tesseract-Installation
 pytesseract.pytesseract.tesseract_cmd =r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
 
+# get_OCRboxes() 
 def get_OCRboxes(image, text, results):
     for i in range(0, len(results['text'])):
         x = results['left'][i]
@@ -40,22 +42,26 @@ def add_text_with_pillow(image, text, x, y):
     
     # Verwendung von Arial zur Darstellung deutscher Umlaute und besseren Lesbarkeit
     font_path = ".\Arial.ttf"
-    #font_path = ".\Arial.ttf"
     font = ImageFont.truetype(font_path, size=10)
 
-    # Zeichne den Text mit der ausgewählten Schriftart
+    # Text mit der ausgewählten Schriftart wird "gezeichnet"
     draw.text((x, y - 10), text, font=font, fill=(100, 0, 0))
     
     return cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
 
 
+# Startpunkt der OCR
 def start_ocr(image):
     global extracted_text
-    #cv2.imshow("Test",image)
+
+    if os.path.isfile("tmp.mp3"):
+        os.remove("tmp.mp3")
+    
     try:
         text = pytesseract.image_to_string(image)
 
-        language= detect(text)
+        # Sprachkürzel wird geändert, da tesseract andere Kürzel verwendet als langdetect
+        language = detect(text)
         language_mappings = {'de': 'deu', 'en': 'eng','fr': 'fra','es': 'spa','it': 'ita'}
 
         if language in language_mappings:
@@ -69,14 +75,15 @@ def start_ocr(image):
         return "Fehler"
     
     image_with_text = get_OCRboxes(image, text, results)
-    #show_image_with_ocr(image_with_text, text)
     extracted_text = text
+
     return "Erfolg", image_with_text
 
     
 def detect_language(use_conditions=False):
     language = detect(extracted_text)
     lang_dict = {'de': 'Deutsch', 'en': 'Englisch','fr': 'Französisch','es': 'Spanisch','it': 'Italienisch'}
+
     if use_conditions:
 
         if language in lang_dict:
@@ -85,6 +92,7 @@ def detect_language(use_conditions=False):
     return language
 
 
+# Hilfsfunktionen für die text-to-speech-Buttons in der GUI
 def on_pause_click():
     pause_audio()
 
@@ -136,25 +144,25 @@ def text_to_pdf(img_path):
     c = canvas.Canvas(pdf_path, pagesize=letter)
     textobject = c.beginText()
 
-    x_coordinate = 50  # Start x-coordinate
-    y_coordinate = 750  # Start y-coordinate
+    x_coordinate = 50  # Start x-Koordinate
+    y_coordinate = 750  # Start y-Koordinate
 
-    textobject.setTextOrigin(x_coordinate, y_coordinate)  # Text position
-    textobject.setFont("Helvetica", 12)  # Font and size
+    textobject.setTextOrigin(x_coordinate, y_coordinate)  # Textposition wird gesetzt
+    textobject.setFont("Helvetica", 12)  # Schrift und Größe wird gesetzt
 
     lines = extracted_text.split('\n')
-    line_height = 14  # Height between lines
+    line_height = 14  # Zeilengröße bestimmen
 
     for line in lines:
-        textobject.textLine(line)  # Add each line without limiting width
-        y_coordinate -= line_height  # Adjust vertical position
+        textobject.textLine(line)  # Hinzufügen jeder Zeile ohne die Breite zu limitieren
+        y_coordinate -= line_height  # vertikale Position anpassen für die nächste Zeile
 
-        if y_coordinate <= 50:  # Check if approaching page bottom
-            c.drawText(textobject)  # Draw the text on the page
-            c.showPage()  # Add a new page
-            y_coordinate = 750  # Reset y-coordinate for new page
-            textobject = c.beginText()  # Begin new text object for the new page
-            textobject.setTextOrigin(x_coordinate, y_coordinate)  # Reset text position
+        if y_coordinate <= 50:  # Seitenende überprüfen
+            c.drawText(textobject)  # Text auf Seite schreiben
+            c.showPage()  # neue Seite hinzufügen
+            y_coordinate = 750  # y-Koordinate für neue Seite zurücksetzen
+            textobject = c.beginText()  # neues Textobjekt für neue Seite
+            textobject.setTextOrigin(x_coordinate, y_coordinate)  # Textposition zurücksetzen
 
-    c.drawText(textobject)  # Draw the text on the last page
+    c.drawText(textobject)  # Text auf letzte Seite schreiben
     c.save()
