@@ -229,9 +229,9 @@ def objekte_einstellungen(root):
     custom_window.attributes('-topmost', 1) #Fenster in den Vordergrund holen
 
     #Frame für die Auswahl vom YOLO Modell
-    info_frame = customtkinter.CTkFrame(custom_window, width=600, height=35)
+    info_frame = customtkinter.CTkFrame(custom_window, width=620, height=50)
     info_frame.place(x=50, y=0)
-    objekt_label = customtkinter.CTkLabel(info_frame, text="Bitte Suchobjekt und YoloModell wählen.\nDas Yolo8-Segment Modell muss im Verzeichnis /model/ \n vorhanden sein oder eingefügt werden.")
+    objekt_label = customtkinter.CTkLabel(info_frame, text="Bitte Suchobjekt und YoloModell wählen.\nDas Yolo8-Segment Modell muss im Verzeichnis /model/ \nvorhanden sein oder eingefügt werden.")
     objekt_label.place(x=100, y=0)
 
     # Hauptfenster in der Bildschirmmitte positionieren
@@ -245,24 +245,24 @@ def objekte_einstellungen(root):
 
     # Frame für die Objektauswahl
     objekt_frame = customtkinter.CTkFrame(custom_window, width=200, height=50)
-    objekt_frame.place(x=50, y=50)
+    objekt_frame.place(x=50, y=55)
 
     objekt_label = customtkinter.CTkLabel(objekt_frame, text="Objekt:")
-    objekt_label.place(x=0, y=0)
+    objekt_label.place(x=0, y=10)
 
     # Dropdown-Liste mit den gewünschten Objekten
     # Laden der Liste aus den Einträgen der C_Objekterkennung
     listenrtrys = get_Suchoptionen_values()
 
     objekt_combobox = customtkinter.CTkComboBox(custom_window,values=listenrtrys )
-    objekt_combobox.place(x=100, y=50)
+    objekt_combobox.place(x=100, y=65)
 
     #Frame für die Auswahl vom YOLO Modell
-    objekt_frame = customtkinter.CTkFrame(custom_window, width=600, height=50)
-    objekt_frame.place(x=50, y=100)
+    objekt_frame = customtkinter.CTkFrame(custom_window, width=200, height=50)
+    objekt_frame.place(x=50, y=125)
 
     objekt_label = customtkinter.CTkLabel(objekt_frame, text="YOLO:")
-    objekt_label.place(x=0, y=0)
+    objekt_label.place(x=0, y=10)
 
     # Dropdown-Liste mit den gewünschten Modellen
     yolo_options = {
@@ -271,11 +271,11 @@ def objekte_einstellungen(root):
 
     yolo_combobox = customtkinter.CTkComboBox(custom_window, values=list(yolo_options.values()))
     yolo_combobox.set("YOLOv8m")
-    yolo_combobox.place(x=100, y=100)
+    yolo_combobox.place(x=100, y=135)
 
     # Bild einfügen
-    image_frame = customtkinter.CTkFrame(custom_window, width=600)
-    image_frame.place(x=270, y=50)  # Neue Frame-Position
+    image_frame = customtkinter.CTkFrame(custom_window, width=400)
+    image_frame.place(x=270, y=55)  # Neue Frame-Position
 
     # Anzeigebild laden - Yolo
     image_path = r".\Icons\icon_yolomodelle.png"
@@ -294,7 +294,7 @@ def objekte_einstellungen(root):
 
     # Erzeuge ein Label und füge das Bild ein
     image_label = customtkinter.CTkLabel(image_frame, image=tk_image)
-    image_label.place(x=0, y=0)
+    image_label.place(x=5, y=5)
 
     # Funktion für Frame eigenen OK-Button
     result = None
