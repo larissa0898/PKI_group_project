@@ -903,10 +903,11 @@ def FaceRecognitionTraining():
         print("Ordner Trainingsdaten:", file_path_training)
 
         # Dateipfad für die Speicherung des Modells wählen
-        file_path_save = filedialog.askdirectory(title="Speicherort für trainiertes Datenmodell")
-        print("Speicherordner:", file_path_save)
+        #file_path_save = filedialog.askdirectory(title="Speicherort für trainiertes Datenmodell")
+        #print("Speicherordner:", file_path_save)
 
-        gesichtswiedererkennung.Gesichtswiedererkennung_Trainieren(file_path_training,file_path_save)
+        #gesichtswiedererkennung.Gesichtswiedererkennung_Trainieren(file_path_training,file_path_save)
+        gesichtswiedererkennung.Gesichtswiedererkennung_Trainieren(file_path_training)
         einstellungen.show_popup(root,
                                  "Training erfolgreich durchgeführt.\n\nTeste den trainierten Datensatz und passe ggf.\ndie Bildauswahl an um ein besseres Ergebnis zu erhalten.")
         print("Training durchgeführt")
@@ -923,8 +924,14 @@ def FaceRecognition(image):
         #Anweisung zur Bedienung einblenden
         einstellungen.show_popup(root,"Die Erkennung wird auf dem angezeigten Bild im Hauptfenster durchgeführt.\n\nWähle im folgenden die vortrainierte Datenbank, die verwendet werden soll.")
         # Laden der trainierten Label und Modell Daten aus einer JSON und XML Datei
-        file_path = filedialog.askdirectory(title="Pfad der vortrainierten Daten (Verzeichnis) wählen")
-        trained_recognizer, label_map_load = gesichtswiedererkennung.Lade_TrainiertesModell(file_path)
+        options = {
+            'title': 'Pfad der vortrainierten Daten wählen.',
+            'filetypes': [('XML-Dateien', '*.xml')],
+        }
+        file_path = filedialog.askopenfilename(**options)
+        trained_recognizer, label_map_load = gesichtswiedererkennung.Lade_TrainiertesModell_alsDatei(file_path)
+        # file_path = filedialog.askdirectory(title="Pfad der vortrainierten Daten (Verzeichnis) wählen")
+        # trained_recognizer, label_map_load = gesichtswiedererkennung.Lade_TrainiertesModell(file_path)
 
         img = None
         #Gesichtswiedererkennung mit Rückgabe der wesentlichen Eigenschaften
@@ -1037,23 +1044,27 @@ def l_button_clicked(path):
 
 def Suche_Bilder_mit_Objekten(root):
     '''Funktion zur Suche nach Objekten in Bildern eines auszuwählenden Verzeichnisses'''
-    suchobjekt, modelwahl = einstellungen.objekte_einstellungen(root)
-    if suchobjekt:
-        print(f"Ausgewähltes Objekt: {suchobjekt}")
-    model = None
-    if modelwahl is None:
-        model = objekterkennung.YOLO(".\model\yolov8m-seg.pt")  # ggf. bereits bei Programmstart initialisieren, da woanders auch verwendet
-    else:
-        try:
-            suchordner = filedialog.askdirectory(title="Suchverzeichnis der Bilder auswählen:")
-            model = objekterkennung.YOLO(".\model\\" + modelwahl + "-seg.pt")
-            ergebnis = objekterkennung.Suche_Bildinhalt(model, suchobjekt, suchordner, root)
-            # Ausgabe des Ergebnisses der gefundenen Bilder
-            display_images(ergebnis, root)
-        except:
-            print("Modell konnte nicht geladen werden")
-            einstellungen.show_popup(root,"Modell nicht gefunden.\nBitte Modell herunterladen und im Verzeichnis\nmodel einfügen.")
-
+    try:
+        suchobjekt, modelwahl = einstellungen.objekte_einstellungen(root)
+        if suchobjekt:
+            print(f"Ausgewähltes Objekt: {suchobjekt}")
+        model = None
+        if modelwahl is None:
+            model = objekterkennung.YOLO(".\model\yolov8m-seg.pt")  # ggf. bereits bei Programmstart initialisieren, da woanders auch verwendet
+        else:
+            try:
+                suchordner = filedialog.askdirectory(title="Suchverzeichnis der Bilder auswählen:")
+                print("Rückgabe: "+ suchordner)
+                if((suchordner != None)and(suchordner != "")): #Wenn nicht abbrechen angeklickt wurde:
+                    model = objekterkennung.YOLO(".\model\\" + modelwahl + "-seg.pt")
+                    ergebnis = objekterkennung.Suche_Bildinhalt(model, suchobjekt, suchordner, root)
+                    # Ausgabe des Ergebnisses der gefundenen Bilder
+                    display_images(ergebnis, root)
+            except:
+                print("Modell konnte nicht geladen werden")
+                einstellungen.show_popup(root,"Modell nicht gefunden.\nBitte Modell herunterladen und im Verzeichnis\nmodel einfügen.")
+    except:
+        print("Vorgang abgebrochen.")
 
 # Funktion, um YOLO Objekterkennung mit Segmentierung zu starten
 def handle_yolo_1Bild(original_image):

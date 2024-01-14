@@ -5,9 +5,10 @@ import json
 from pathlib import Path
 import os
 import einstellungen
-
+from tkinter import filedialog
 #OpenCV: Open Source
 #Lizenz: https://opencv.org/license/
+
 
 GesDatenbank_Datei = r"/GesichtDatenbank.xml"
 GesLabel_Datei= r"/GesichtDatenbank_label.json"
@@ -78,7 +79,7 @@ def display_image_center(image, window_name='Image Window'):
     cv2.destroyAllWindows()
 
 
-def Gesichtswiedererkennung_Trainieren(data_folder_in,save_file_path_in):
+def Gesichtswiedererkennung_Trainieren(data_folder_in,save_file_path_in = None):
     '''Funktion zum Trainieren von Gesichtern
     - 1. Parameter: Pfad zu den Ordnern mit Gesichtern zum Erlernen. Der Name des Ordners wird als Label verwendet
     - 2. Parameter: Speicherpfad für die erlernte Gesichtsdatenbank
@@ -92,7 +93,7 @@ def Gesichtswiedererkennung_Trainieren(data_folder_in,save_file_path_in):
     current_label = 1
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     print("Folder Data: " + data_folder_in)
-    print("Folder Save: " + save_file_path_in)
+
     try:
         for person_folder in Path(data_folder_in).iterdir():
             if person_folder.is_dir():
@@ -131,14 +132,46 @@ def Gesichtswiedererkennung_Trainieren(data_folder_in,save_file_path_in):
     recognizer = cv2.face.LBPHFaceRecognizer_create(radius=1, neighbors=8, grid_x=8, grid_y=8, threshold=90)
     recognizer.train(images, np.array(labels))
 
-    # Speichern des trainierten Modells unter dem angegebenen Pfad
-    recognizer.save(save_file_path_in+GesDatenbank_Datei)
-    with open(save_file_path_in+GesLabel_Datei, 'w') as file:
+    if save_file_path_in == None:
+        options = {'defaultextension': '.xml', 'filetypes': [('XML-Dateien', '*.xml')],}
+        save_file_path = filedialog.asksaveasfilename(**options)
+        print("Folder Save: " + save_file_path)
+        split = save_file_path.rsplit('/', 1)
+        save_file_path_in = split[0]+"/"
+        print("Speicherpfad ohne Dateiname: " + save_file_path_in)
+
+        # Extrahiere den Dateinamen aus dem Pfad
+        file_name = os.path.basename(save_file_path)
+        # Entferne die Dateiendung
+        file_name_without_extension, file_extension = os.path.splitext(file_name)
+        print("Dateiname: " + file_name_without_extension)
+        GesLabel_Datei = file_name_without_extension+"_label.json"
+        # Speichern des trainierten Modells unter dem angegebenen Pfad
+        recognizer.save(save_file_path)
+    else:
+        # Speichern des trainierten Modells unter dem angegebenen Pfad
+        recognizer.save(save_file_path_in+GesDatenbank_Datei)
+    with open(save_file_path_in+GesLabel_Datei, 'w') as file:  #+"_label.json"
         json.dump(label_map, file)
         file.close()
         print("Datei erfolgreich gespeichert")
     return recognizer, label_map
 
+def Lade_TrainiertesModell_alsDatei(save_file_path):
+    recognizer = cv2.face.LBPHFaceRecognizer_create(radius=1, neighbors=8, grid_x=8, grid_y=8, threshold=90)
+    print("Lade_TrainiertesModell_alsDatei")
+    print("Filename_datei: " + save_file_path)
+    recognizer.read(save_file_path)
+    #Extrahieren der Endung und anpassen auf JSON Label
+    split = save_file_path.rsplit('.', 1)
+    labeldatei = split[0] + "_label.json"
+    print("Dateiname: " + labeldatei)
+
+    file_path_map = labeldatei
+    with open(file_path_map, 'r') as file:
+        label_map_load = json.load(file)
+        file.close()
+    return recognizer, label_map_load
 
 def Lade_TrainiertesModell(save_file_path):
     recognizer = cv2.face.LBPHFaceRecognizer_create(radius=1, neighbors=8, grid_x=8, grid_y=8, threshold=90)
@@ -194,7 +227,7 @@ def Gesichtswiedererkennung(trained_recognizer,image_path,label_map_loaded):
 
             try:
                 #Wenn das Gesicht dem einer angelernten Person entspricht:
-                if (confidence is not None) and (confidence < 100):
+                if (confidence is not None) and (confidence <= 100):
                     person_name = label_map_loaded[str(label)]
                     print("Person :" +person_name)
                     print("Confidence: " + str(confidence))

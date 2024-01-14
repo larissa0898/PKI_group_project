@@ -222,6 +222,7 @@ def standard_einstellungen(root):
 #Funktion für die Settings der Bildtransformation und Objekterkennung#
 def objekte_einstellungen(root):
     global yolo_result
+    yolo_result = None
     # CustomTkinter root window erzeugen und Einstellungen vornehmen
     #Erstellen eines Unterfensters
     custom_window = customtkinter.CTkToplevel(root)
@@ -298,12 +299,13 @@ def objekte_einstellungen(root):
 
     # Funktion für Frame eigenen OK-Button
     result = None
-    def ok_button_click():
+    def ok_button_click(window):
         global yolo_result
         yolo_result = objekt_combobox.get(), yolo_combobox.get()
-        custom_window.destroy()  # Fenster schließen
+        window.destroy()  # Fenster schließen
+        return yolo_result
 
-    objekte_button = customtkinter.CTkButton(custom_window, text="OK",command=lambda:ok_button_click())
+    objekte_button = customtkinter.CTkButton(custom_window, text="OK",command=lambda:ok_button_click(custom_window))
     objekte_button.place(x=20, y=200)  # 530
     custom_window.wait_window()  # Warte bis das Fenster geschlossen wird
     return yolo_result
