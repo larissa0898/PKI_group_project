@@ -189,6 +189,7 @@ def Yolo_run(img, model, background=None, segment_out_path=None):
     #Speichern der Bildgröße in Variablen für Höhe h und Breite w
     h, w, _ = img.shape
 
+
     # YOLO Objekterkennung durchführen
     results = model.predict(img, stream=False)
 
@@ -221,14 +222,14 @@ def Yolo_run(img, model, background=None, segment_out_path=None):
         for seg, box in zip(masks.data.cpu().numpy(), boxes):
 
             # Segment auf Hintergrund anpassen
+            #seg = cv2.resize(seg, (w, h))
             seg = cv2.resize(seg, (w, h))
-
             # ----
             # Einblendung der Segmentierung im Bild
             if background is None:
-                img = overlay(img, seg, colors[int(box.cls)], 0.5)
+                img = overlay(img, seg, colors[int(box.cls)], 0.5, None)
             else:
-                img = overlay(img, seg, colors[int(box.cls)], 0.7)
+                img = overlay(img, seg, colors[int(box.cls)], 0.7, None)
 
             # Erzeuge ein leeres Bild für die Maske und fülle dieses
             blank_image = np.zeros((h, w, 3), dtype=np.uint8)
