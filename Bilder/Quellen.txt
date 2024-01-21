@@ -1,0 +1,5 @@
+Tasche.jpg: https://globetrender.com/wp-content/uploads/2021/05/AdobeStock_166056625-scaled.jpeg
+Parkplatz.jpg: https://de-park.com/de/parkplatz-masse/
+Beispiel YOLO.jpg: Claus-Peter Koch, private Aufnahme
+Eingescannte_Seite.png: https://www.bundesanzeiger.de/pub/Preisliste-deutsch.pdf
+sonstige: Dietmar Ysop

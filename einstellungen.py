@@ -10,6 +10,7 @@ yolo_result = ()
 
 #Funktion zur Anzeige von Benachrichtigungen und Hinweisen:
 def show_popup(root,mein_text):
+    '''Funktion zum Erzeugen eines PopUps mit Hinweistext'''
     popup = customtkinter.CTkToplevel(root)
     popup.title("Hinweis")
     message_label = customtkinter.CTkLabel(popup, text=mein_text)
@@ -221,6 +222,12 @@ def standard_einstellungen(root):
 
 #Funktion für die Settings der Bildtransformation und Objekterkennung#
 def objekte_einstellungen(root):
+    ''' Funktion zum Aufrufen eines PopUps für die Vorkonfiguration der Bildsuche
+        Übergabeparameter: CustomTkinter root
+        Rückgabe:
+        - Ausgewähltes Suchobjekt
+        - Ausgewähltes Yolo Modell
+    '''
     global yolo_result
     yolo_result = None
     # CustomTkinter root window erzeugen und Einstellungen vornehmen

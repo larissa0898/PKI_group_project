@@ -31,6 +31,11 @@ import customtkinter
 # Deutsch
 # Suche nach Bildinhalten
 # Durchsuchen von Ordnern nach Bildern mit bestimmten Objekten
+# Auswahl von YOLO8 Segmentierungs Modellen
+# Datei/Ordnerauswahl
+# GUI Anpassungen für Fotosuche
+# Einblendung der erkannten Objekte und deren Anzahl
+# (z.T. Ausgelagert in die main)
 
 Klassen_Namen = {0: 'Person', 1: 'Fahrrad', 2: 'Auto', 3: 'Motorrad', 4: 'Flugzeug', 5: 'Bus', 6: 'Zug', 7: 'LKW',
                  8: 'Boot', 9: 'Ampel', 10: 'Feuerhydrant', 11: 'Stoppschild', 12: 'Parkuhr', 13: 'Bank', 14: 'Vogel',

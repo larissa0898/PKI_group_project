@@ -1068,6 +1068,7 @@ def Suche_Bilder_mit_Objekten(root):
 
 # Funktion, um YOLO Objekterkennung mit Segmentierung zu starten
 def handle_yolo_1Bild(original_image):
+    '''Im Einzelbild wird immer mit dem mittleren Yolo8-seg gearbeitet, eine Auswahl ist nicht notwendig'''
     #Lade die Default Yolo Segmentierung
     model = objekterkennung.YOLO(".\model\yolov8m-seg.pt")
     if original_image is None:
@@ -1080,6 +1081,7 @@ def handle_yolo_1Bild(original_image):
 
 #Funktion zum Abrufen der Webcam mit/ohne Hintergrund
 def Hintergrund_Ausblendung_Fkt(root, rgb_image):
+    ''' Selfie Funktion '''
     global original_image_path
     image = None
     try:

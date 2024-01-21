@@ -6,8 +6,17 @@ from pathlib import Path
 import os
 import einstellungen
 from tkinter import filedialog
+
+
 #OpenCV: Open Source
 #Lizenz: https://opencv.org/license/
+
+# Beinhaltet:
+# Anlernen (Trainieren) von Gesichtern die in einem gelabelten Unterverzeichnis gespeichert sind - die Anzahl der Gesichter sollte min. 3 p.P. sein.
+# Suche nach Gesichtern in Bildern und Verzeichnissen (in Main ausgelagert)
+# Wiedererkennen von Gesichtern in Bildern
+# Laden und Speichern der Datenbank und Labeldatei
+# (z.T. Ausgelagert in die main)
 
 
 GesDatenbank_Datei = r"/GesichtDatenbank.xml"
@@ -36,7 +45,6 @@ def Suche_Bildinhalt_Bekannte_Gesichter(suchobjekte ,model_label, suchordner="")
     - Verzeichnis mit Bildern das durchsucht werden soll
     - Suchobjekte
 
-
     Rückgabe:
     - Anzahl gefundener bekannter Personen
     - Liste mit Dateipfaden bekannter Personen
@@ -54,8 +62,6 @@ def Suche_Bildinhalt_Bekannte_Gesichter(suchobjekte ,model_label, suchordner="")
             print("Bekanntes Gesicht gefunden")
 
     return(counter,gefundene_bilder_Gesichter)
-
-
 
 
 def display_image_center(image, window_name='Image Window'):
@@ -174,6 +180,7 @@ def Lade_TrainiertesModell_alsDatei(save_file_path):
     return recognizer, label_map_load
 
 def Lade_TrainiertesModell(save_file_path):
+    '''Funktion lädt ein trainiertes Modell mit den hier definierten Standardattributen'''
     recognizer = cv2.face.LBPHFaceRecognizer_create(radius=1, neighbors=8, grid_x=8, grid_y=8, threshold=90)
     recognizer.read(save_file_path+GesDatenbank_Datei)
     file_path_map = save_file_path+GesLabel_Datei
