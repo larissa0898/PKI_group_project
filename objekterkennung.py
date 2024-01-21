@@ -278,17 +278,22 @@ def Yolo_run(img, model, background=None, segment_out_path=None):
     for word, count in erkannte_Objekte.items():
         text_labels += " " + word + ": " + str(count)
 
-    cv2.putText(out_img, text_labels, (10,h-50), cv2.FONT_HERSHEY_SIMPLEX,int(h/500), [0, 255, 0], int(h/250))
+    #Für kleine Bilder muss eine kleinere Schrift und ein anderer Offset vom unteren Bildrand verwendet werden
+    if(h > 500):
+        cv2.putText(out_img, text_labels, (10,h-50), cv2.FONT_HERSHEY_SIMPLEX,int(h/500), [0, 255, 0], int(h/250))
+    else:
+        cv2.putText(out_img, text_labels, (10, h - 20), cv2.FONT_HERSHEY_SIMPLEX, int(h / 200), [0, 255, 0],int(h / 100))
 
     return (out_img)
 
 
 ###
-#Funktion zum Testen des Moduls
+#Funktion zum Testen des Moduls auf meinem PC
+#Pfade müssen bei Bedarf angepasst werden
 ###
 if __name__ == "__main__":
     model = YOLO("./model/yolov8m-seg.pt")
-    ergenbnis = Suche_Bildinhalt(model,'Person',"C:\Temp\Bilder")
+    ergenbnis = Suche_Bildinhalt(model,'Person',r"C:\Users\claus\OneDrive\Bilder\Screenshots")
     for key, value in ergenbnis.items():
         bild, confidence = value
         print(f"Eintrag Nr.: {key}: Bild: = {bild}, Übereinstimmung: = {confidence}")
