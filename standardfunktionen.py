@@ -1,11 +1,3 @@
-# Disclaimer von Phil Balczukat, 10043796
-# Die hier definierten Funktionen wurden von mir vollständig selbst entwickelt.
-# Beim "Finden" der richtigen Methoden aus der CV2 Bibliothek (opencv)
-# habe ich mir von ChatGPT und Stackoverflow auf die Sprünge helfen lassen.
-
-# Einzig die Funktion rotate_img() wurde sinngemäß aus Stackoverflow übernommen, da eigene Lösungen
-# zu einem unerwünschten Abschneiden des Bildes führten.
-
 # Hier Standardfunktionen abbilden #
 import cv2
 import math
@@ -24,20 +16,6 @@ frame_color = (0, 200, 0) # RGB Tupel
 
 # Funktion zum Rotieren eines Bildes um einen beliebigen Winkel in Grad
 def rotate_img(img, angle):
-    #----------------- Vorherige Lösung -------------------
-    # Get size (# of rows and columns) of image
-    # rows, cols = img.shape[:2]
-    # Create Rotation matrix
-    # ...center = center point of rotation --> Middle point of image
-    # ...angle = user defined rotation angle
-    # ...scale = scaling factor --> always =1 for this method
-    # rot_Mat = cv2.getRotationMatrix2D((cols/2, rows/2), angle, 1)
-    # Apply rotation matrix with target image size = original size
-    # return cv2.warpAffine(img, rot_Mat, (rows, cols))
-    # return cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
-    #-------------------------------------------------------
-    # ----------------- Neue Lösung -------------------
-    # Extrahiere Bildgröße
     h, w = img.shape[:2]
 
     # Rotationspunkt=Mittelpunkt setzen
