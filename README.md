@@ -42,7 +42,7 @@ python main.py
   
 - **Erweiterte Effekte:** Bietet erweiterte Effekte wie Markup, Blur Effekt, Filter usw.
 
-- **Objekt- und Gesichtserkennung:** Ermöglicht die Erkennung von Objekten und Gesichtern in Bildern.
+- **Objekt- und Gesichtserkennung:** Ermöglicht die Erkennung von Objekten und Gesichtern in Bildern. *Hinweis: Die Gesichtswiedererkennung ist aktuell nur mit Bildern von Elon Musk möglich.*
 
 - **OCR (Optical Character Recognition):** Ermöglicht die Erkennung und Extraktion von Text aus Bildern. Aktuell sind folgende Sprachen verfügbar: Deutsch, Englisch, Französisch, Spanisch und Italienisch.
 
@@ -54,6 +54,6 @@ python main.py
 - Bilder von Claus-Peter Koch und Dietmar Ysop  
 
 ## Literatur
-Youtube zu Tesseract OCR - https://www.youtube.com/watch?v=6DjFscX4I_c von Murtaza's Workshop
+Youtube zu Tesseract OCR - https://www.youtube.com/watch?v=6DjFscX4I_c
 
 
