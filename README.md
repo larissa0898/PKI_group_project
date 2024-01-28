@@ -1,4 +1,4 @@
-# PKI Gruppenprojekt - Gruppe A1_1
+# Bildbearbeitungstool (Gruppe A1-1)
 Dieses Projekt ist ein Bildbearbeitungstool, das eine Vielzahl von Funktionen für Bildmanipulation, Effekte und Erkennung bietet.
 
 #### Inhaltsverzeichnis
