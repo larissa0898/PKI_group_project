@@ -48,7 +48,6 @@ python main.py
 
 
 ## Daten
-[Objektklassifikation]
 - YOLO - Fehlende yolov3.weights von: https://github.com/patrick013/Object-Detection---Yolov3/blob/master/model/yolov3.weights
 
 - Bilder von Claus-Peter Koch und Dietmar Ysop  
