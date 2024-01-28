@@ -3,6 +3,7 @@ Dieses Projekt ist ein Bildbearbeitungstool, das eine Vielzahl von Funktionen f√
 
 #### Inhaltsverzeichnis
 - [Installation](#installation)
+- [Verwendung](#verwendung)
 - [Funktionen](#funktionen)
 - [Daten](#daten)
 - [Literatur](#literatur)
